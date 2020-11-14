@@ -6,16 +6,27 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
-    timeout-minutes: 20
-
     steps:
-    - uses: actions/checkout@v1
-    - name: set up JDK 1.8
-      uses: actions/setup-java@v1
-      with:
-        java-version: 1.8
-    - name: Build with Gradle
-      run: ./gradlew publish --no-daemon
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'dev'
+
+      - name: Load secrets
+        working-directory: android
+        run: |
+          echo "${{ secrets.KEYSTORE }}" | base64 -d > app/keystore.jks
+          echo "${{ secrets.KEYSTORE_PROPERTIES }}" > app/keystore.properties
+          echo '${{ secrets.PLAY_STORE }}' > app/play-store.json
+      - name: Get dependencies
+        run: flutter pub get
+      - name: Publish Android
+        working-directory: android
+        run: ./gradlew publish --no-daemon

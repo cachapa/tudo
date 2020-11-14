@@ -30,7 +30,7 @@ if (flutterRoot == null) {
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('../../../AppSignature/keystore.properties')
+def keystorePropertiesFile = file('keystore.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
@@ -46,6 +46,7 @@ def getVersionName = { ->
 
 android {
     compileSdkVersion 30
+    ndkVersion "21.3.6528147"
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
@@ -53,6 +54,9 @@ android {
 
     lintOptions {
         disable 'InvalidPackage'
+
+        // TODO Remove this workaround for a bug in the build tools
+        checkReleaseBuilds false
     }
 
     defaultConfig {
@@ -65,10 +69,10 @@ android {
 
     signingConfigs {
         release {
+            storeFile file("keystore.jks")
+            storePassword keystoreProperties["storePassword"]
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
-            storeFile keystoreProperties['storeFile'] ? file('../../' + keystoreProperties['storeFile']) : null
-            storePassword keystoreProperties['storePassword']
         }
     }
 
@@ -88,7 +92,7 @@ dependencies {
 }
 
 play {
-    serviceAccountCredentials = file("../../play-store.json")
+    serviceAccountCredentials = file("play-store.json")
     userFraction = 1
     resolutionStrategy = "auto"
 }

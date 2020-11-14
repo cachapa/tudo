@@ -76,10 +76,8 @@ class MyApp extends StatelessWidget {
       }
     } catch (_) {}
 
-    return
-      Consumer<SyncManager>(
-      builder: (_, syncManager, __) =>
-      Column(
+    return Consumer<SyncManager>(
+      builder: (_, syncManager, __) => Column(
         children: [
           Expanded(
             child: MaterialApp(

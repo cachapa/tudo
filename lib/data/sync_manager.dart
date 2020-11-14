@@ -17,7 +17,6 @@ class SyncManager with ChangeNotifier {
   set listManager(ListManager lm) {
     _listManager = lm;
 
-
     print(lm.lists);
 
     lm.lists.map((e) => e.id).forEach((id) {
@@ -42,8 +41,8 @@ class SyncManager with ChangeNotifier {
   }
 
   void connect() => _clientMap.values.forEach((client) {
-    client.connect();
-  });
+        client.connect();
+      });
 
   void sync() {
     _listManager.lists.forEach((list) {

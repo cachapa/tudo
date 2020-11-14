@@ -25,7 +25,6 @@ class SyncClient {
   void connect() {
     if (isConnected) return;
 
-    // final endpoint = 'ws://192.168.0.119:8080/$id/ws';
     final endpoint = 'wss://tudo-api.cachapa.net/$id/ws';
     channel = WebSocketChannel.connect(Uri.parse(endpoint));
 
@@ -45,5 +44,9 @@ class SyncClient {
     _connectionStateController.sink.add(false);
     subscription?.cancel();
     subscription = null;
+  }
+
+  void destroy() {
+    _connectionStateController.close();
   }
 }
