@@ -77,6 +77,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            applicationIdSuffix ".beta"
+        }
+
         release {
             signingConfig signingConfigs.release
         }
