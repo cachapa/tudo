@@ -14,6 +14,10 @@ import 'data/sync_manager.dart';
 import 'ui/list_manager_page.dart';
 
 void main() async {
+  // Emulate platform
+  // debugDefaultTargetPlatformOverride = TargetPlatform.android;
+  // debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+
   WidgetsFlutterBinding.ensureInitialized();
 
   final nodeId = RandomId().generate(32);

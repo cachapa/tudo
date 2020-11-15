@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
@@ -86,46 +85,55 @@ class _ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      actionPane: const SlidableBehindActionPane(),
-      secondaryActions: [
-        SlideAction(
-          color: Colors.red,
-          child: Icon(
-            Icons.delete,
-            color: Theme.of(context).canvasColor,
-          ),
-          onTap: () => _deleteList(context, list.id),
-        ),
-      ],
-      child: Stack(
-        alignment: Alignment.centerRight,
-        children: [
-          ListTile(
-            tileColor: Theme.of(context).canvasColor,
-            leading: Progress(list: list),
-            title: Text(
-              list.name,
-              style: Theme.of(context).textTheme.headline6,
-            ),
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => ToDoListPage(id: list.id)),
-            ),
-          ),
-          Handle(
-            child: Padding(
-              padding: EdgeInsets.all(12),
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Handle(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 10,
+              clipBehavior: Clip.hardEdge,
+              decoration: BoxDecoration(),
               child: Icon(
                 Icons.reorder,
-                color: Theme.of(context).dividerColor,
+                color: Colors.grey.withOpacity(0.5),
               ),
             ),
+            SizedBox(width: 10),
+            Progress(list: list),
+          ],
+        ),
+      ),
+      title: Text(
+        list.name,
+        style: Theme.of(context).textTheme.headline6,
+      ),
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => ToDoListPage(id: list.id)),
+      ),
+      trailing: PopupMenuButton(
+        itemBuilder: (context) => [
+          PopupMenuItem<Function>(
+            child: Text('Edit'),
+            value: () => _editList(context, list),
+          ),
+          PopupMenuItem<Function>(
+            child: Text(
+              'Delete',
+              style: TextStyle(color: Colors.red),
+            ),
+            value: () => _deleteList(context, list.id),
           ),
         ],
+        onSelected: (value) => value(),
       ),
     );
   }
+
+  void _editList(BuildContext context, ToDoList list) =>
+      createToDoList(context, list);
 
   void _deleteList(BuildContext context, String listId) {
     final listManager = Provider.of<ListManager>(context, listen: false);
