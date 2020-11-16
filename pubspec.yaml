@@ -9,16 +9,20 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  hive: ^1.4.0
-  crdt: ^2.2.1
+
+  crypto: ^2.1.5
   provider: ^4.0.0
+
+  crdt: ^2.2.1
+  hive: ^1.4.0
+
   http: ^0.12.0+3
   web_socket_channel: ^1.1.0
+
+  implicitly_animated_reorderable_list: 0.4.0-dev+1 #^0.3.2
+  path_provider: ^1.6.0
   share: ^0.6.5+3
   uni_links: ^0.4.0
-  path_provider: ^1.6.0
-  implicitly_animated_reorderable_list: 0.4.0-dev+1 #^0.3.2
-  crypto: ^2.1.5
 
 dev_dependencies:
   flutter_test:

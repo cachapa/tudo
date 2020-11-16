@@ -6,8 +6,9 @@ import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 
-import 'edit_list_form.dart';
+import 'edit_list.dart';
 import 'progress.dart';
+import 'share_list.dart';
 import 'to_do_list_page.dart';
 
 class ListManagerPage extends StatelessWidget {
@@ -52,7 +53,7 @@ class ListManagerPage extends StatelessWidget {
               ),
             ],
           ),
-          onPressed: () => createToDoList(context),
+          onPressed: () => editToDoList(context),
         ),
       ),
     );
@@ -113,13 +114,17 @@ class _ListItem extends StatelessWidget {
         context,
         MaterialPageRoute(builder: (_) => ToDoListPage(id: list.id)),
       ),
-      trailing: PopupMenuButton(
+      trailing: PopupMenuButton<Function>(
         itemBuilder: (context) => [
-          PopupMenuItem<Function>(
-            child: Text('Edit'),
-            value: () => _editList(context, list),
+          PopupMenuItem(
+            child: Text('Share'),
+            value: () => shareToDoList(list),
           ),
-          PopupMenuItem<Function>(
+          PopupMenuItem(
+            child: Text('Edit'),
+            value: () => editToDoList(context, list),
+          ),
+          PopupMenuItem(
             child: Text(
               'Delete',
               style: TextStyle(color: Colors.red),
@@ -131,9 +136,6 @@ class _ListItem extends StatelessWidget {
       ),
     );
   }
-
-  void _editList(BuildContext context, ToDoList list) =>
-      createToDoList(context, list);
 
   void _deleteList(BuildContext context, String listId) {
     final listManager = Provider.of<ListManager>(context, listen: false);

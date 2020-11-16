@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:share/share.dart';
 import 'package:tudo_client/data/list_manager.dart';
 
-import 'edit_list_form.dart';
+import 'edit_list.dart';
 import 'empty_page.dart';
 
 const titleBarHeight = 60.0;
@@ -46,7 +46,7 @@ class ToDoListPage extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.edit),
-                onPressed: () => createToDoList(context, list),
+                onPressed: () => editToDoList(context, list),
               ),
             ],
           ),
