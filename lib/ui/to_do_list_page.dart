@@ -10,6 +10,7 @@ import 'package:tudo_client/ui/share_list.dart';
 
 import 'edit_list.dart';
 import 'empty_page.dart';
+import 'icon_text.dart';
 
 const titleBarHeight = 60.0;
 const inputBarHeight = 60.0;
@@ -27,6 +28,7 @@ class ToDoListPage extends StatelessWidget {
       builder: (_, list, __) => Theme(
         data: Theme.of(context).copyWith(
           primaryColor: list.color,
+          accentColor: list.color,
           primaryTextTheme: TextTheme(headline6: TextStyle(color: list.color)),
           primaryIconTheme: IconThemeData(color: list.color),
           iconTheme: IconThemeData(color: list.color),
@@ -79,7 +81,6 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
         filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: AppBar(
           centerTitle: true,
-          // iconTheme: IconThemeData(color: list.color),
           backgroundColor: primaryColor.withAlpha(20),
           elevation: 0,
           title: Text(
@@ -178,43 +179,42 @@ class ToDoListView extends StatelessWidget {
           sizeFraction: 0.7,
           curve: Curves.easeInOut,
           animation: itemAnimation,
-          child: Dismissible(
-            key: Key(item.id),
-            background: Container(color: Colors.red),
-            onDismissed: (_) {
-              // Do nothing - deletions happen in confirmDismiss
-            },
-            confirmDismiss: (_) async {
-              // Avoid conflicts between Dismissible and list animations
-              // This removes the item and waits 200 ms for the list animation
-              // to run. By returning true this widget remains in the tree so it
-              // can be removed by the list animation rather than it removing
-              // itself.
-              _removeItem(context, item);
-              await Future.delayed(Duration(milliseconds: 400));
-              return false;
-            },
-            child: Stack(
-              alignment: Alignment.centerRight,
-              children: [
-                ListTile(
-                  leading: Checkbox(
+          child: ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: Handle(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 10,
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(),
+                    child: Icon(
+                      Icons.reorder,
+                      color: Colors.grey.withOpacity(0.5),
+                    ),
+                  ),
+                  Checkbox(
                     onChanged: (_) => _toggle(item),
                     value: item.checked,
                   ),
-                  title: Text(item.name),
-                  onTap: () => _toggle(item),
+                ],
+              ),
+            ),
+            title: Text(item.name),
+            onTap: () => _toggle(item),
+            trailing: PopupMenuButton(
+              itemBuilder: (context) => [
+                PopupMenuItem<Function>(
+                  child: IconText(Icons.edit, 'Edit'),
+                  value: () => print('edit'),
                 ),
-                Handle(
-                  child: Padding(
-                    padding: EdgeInsets.all(12),
-                    child: Icon(
-                      Icons.reorder,
-                      color: Theme.of(context).dividerColor,
-                    ),
-                  ),
+                PopupMenuItem<Function>(
+                  child: IconText(Icons.delete, 'Delete', color: Colors.red),
+                  value: () => _removeItem(context, item),
                 ),
               ],
+              onSelected: (value) => value(),
             ),
           ),
         ),
