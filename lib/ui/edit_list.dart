@@ -93,7 +93,12 @@ class _EditListForm extends StatelessWidget {
 class ColorController {
   Color color;
 
-  ColorController({this.color});
+  ColorController({this.color}) {
+    if (color == null) {
+      final i = Random().nextInt(ColorSelector.colors.length);
+      color = ColorSelector.colors[i];
+    }
+  }
 }
 
 class ColorSelector extends StatefulWidget {
@@ -115,17 +120,6 @@ class ColorSelector extends StatefulWidget {
 }
 
 class _ColorSelectorState extends State<ColorSelector> {
-  @override
-  void initState() {
-    print(widget.controller.color);
-    print(ColorSelector.colors.map((e) => Color(e.value)));
-    if (widget.controller.color == null) {
-      final i = Random().nextInt(ColorSelector.colors.length);
-      widget.controller.color ??= ColorSelector.colors[i];
-    }
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Row(
