@@ -20,7 +20,7 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  final nodeId = RandomId().generate(32);
+  final nodeId = generateRandomId(32);
 
   try {
     final dir = Platform.isAndroid || Platform.isIOS

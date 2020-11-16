@@ -2,11 +2,13 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 import 'package:tudo_client/ui/share_list.dart';
+import 'package:tudo_client/ui/text_input_dialog.dart';
 
 import 'edit_list.dart';
 import 'empty_page.dart';
@@ -27,6 +29,8 @@ class ToDoListPage extends StatelessWidget {
       selector: (_, listManager) => listManager.get(id),
       builder: (_, list, __) => Theme(
         data: Theme.of(context).copyWith(
+          colorScheme:
+              Theme.of(context).colorScheme.copyWith(primary: list.color),
           primaryColor: list.color,
           accentColor: list.color,
           primaryTextTheme: TextTheme(headline6: TextStyle(color: list.color)),
@@ -207,7 +211,7 @@ class ToDoListView extends StatelessWidget {
               itemBuilder: (context) => [
                 PopupMenuItem<Function>(
                   child: IconText(Icons.edit, 'Edit'),
-                  value: () => print('edit'),
+                  value: () => _editItem(context, item),
                 ),
                 PopupMenuItem<Function>(
                   child: IconText(Icons.delete, 'Delete', color: Colors.red),
@@ -222,7 +226,17 @@ class ToDoListView extends StatelessWidget {
     );
   }
 
-  _toggle(ToDo toDo) => toDoList.set(toDo.name, !toDo.checked);
+  _toggle(ToDo toDo) => toDoList.set(toDo.id, checked: !toDo.checked);
+
+  _editItem(BuildContext context, ToDo toDo) {
+    showDialog<String>(
+      context: context,
+      child: TextInputDialog(
+        value: toDo.name,
+        onSet: (value) => toDoList.set(toDo.id, name: value),
+      ),
+    );
+  }
 
   _removeItem(BuildContext context, ToDo toDo) {
     final index = toDoList.remove(toDo.id);
@@ -231,7 +245,8 @@ class ToDoListView extends StatelessWidget {
         content: Text("${toDo.name} deleted"),
         action: SnackBarAction(
           label: 'UNDO',
-          onPressed: () => toDoList.set(toDo.name, toDo.checked, index),
+          onPressed: () => toDoList.set(toDo.id,
+              name: toDo.name, checked: toDo.checked, index: index),
         ),
       ),
     );

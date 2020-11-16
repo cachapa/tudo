@@ -65,11 +65,23 @@ class ToDoAdapter extends TypeAdapter<ToDo> {
 
   @override
   ToDo read(BinaryReader reader) {
-    return ToDo(reader.readString(), reader.readBool());
+    /* Convert from old id-less values
+     Old format: String, Bool
+     New format: String, String, Bool
+     Bools are stored as ints, so peek the first byte of the second field
+     If it's 0 or 1 then it's a boolean and therefore old-school
+    */
+    final field1 = reader.readString();
+    final field2 = reader.peekBytes(1)[0];
+
+    return (field2 == 0 || field2 == 1)
+        ? ToDo(null, field1, reader.readBool())
+        : ToDo(field1, reader.readString(), reader.readBool());
   }
 
   @override
   void write(BinaryWriter writer, ToDo obj) {
+    writer.writeString(obj.id);
     writer.writeString(obj.name);
     writer.writeBool(obj.checked);
   }

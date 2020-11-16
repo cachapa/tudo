@@ -43,7 +43,7 @@ class ListManager with ChangeNotifier {
   }
 
   Future<void> create(String name, Color color) async {
-    final id = RandomId().generate();
+    final id = generateRandomId();
     _listIds = _listIds..add(id);
     _toDoLists[id] = await ToDoList.open(this, id, name, color);
     notify();
@@ -132,19 +132,20 @@ class ToDoList {
   static Future<ToDoList> import(ListManager parent, String id) =>
       open(parent, id, null, null);
 
-  void add(String name) => set(name, false);
+  void add(String name) => set(generateRandomId(), name: name, checked: false);
 
-  void set(String name, bool checked, [int index]) {
-    if (name.trim().isEmpty) return;
+  void set(String id, {String name, bool checked, int index}) {
+    if (name != null && name.trim().isEmpty) return;
 
-    final toDo = ToDo(name, checked);
-
-    if (!_order.contains(toDo.id)) {
-      _order = index == null
-          ? (_order..add(toDo.id))
-          : (_order..insert(index, toDo.id));
+    if (!_order.contains(id)) {
+      _order = index == null ? (_order..add(id)) : (_order..insert(index, id));
     }
-    _toDoCrdt.put(toDo.id, toDo);
+
+    final toDo = (_toDoCrdt.map[id] as ToDo)
+            .copyWith(newName: name, newChecked: checked) ??
+        ToDo(id, name, checked);
+
+    _toDoCrdt.put(id, toDo);
     _parent.notify();
   }
 
@@ -201,26 +202,34 @@ class ToDoList {
 }
 
 class ToDo {
+  final String id;
   final String name;
   final bool checked;
 
-  String get id => md5.convert(utf8.encode(name.toLowerCase())).toString();
+  ToDo(String id, String name, this.checked)
+      : // TODO Remove temporary id workaround after 06.2021
+        id = id ?? md5.convert(utf8.encode(name.toLowerCase())).toString(),
+        name = name.trim();
 
-  ToDo(String name, this.checked) : name = name.trim();
+  ToDo copyWith({String newName, bool newChecked}) =>
+      (newName == null && newChecked == null)
+          ? this
+          : ToDo(id, newName ?? name, newChecked ?? checked);
 
   factory ToDo.fromJson(Map<String, dynamic> map) =>
-      ToDo(map['name'], map['checked']);
+      ToDo(map['id'], map['name'], map['checked']);
 
   Map<String, dynamic> toJson() => {
+        'id': id,
         'name': name,
         'checked': checked,
       };
 
   @override
-  bool operator ==(Object other) => other is ToDo && other.name == this.name;
+  bool operator ==(Object other) => other is ToDo && other.id == this.id;
 
   @override
-  int get hashCode => name.hashCode;
+  int get hashCode => id.hashCode;
 
   @override
   String toString() => toJson().toString();
