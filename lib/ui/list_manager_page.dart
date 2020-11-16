@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 
 import 'edit_list.dart';
+import 'icon_text.dart';
 import 'progress.dart';
 import 'share_list.dart';
 import 'to_do_list_page.dart';
@@ -117,18 +118,15 @@ class _ListItem extends StatelessWidget {
       trailing: PopupMenuButton<Function>(
         itemBuilder: (context) => [
           PopupMenuItem(
-            child: Text('Share'),
+            child: IconText(Icons.share, 'Share'),
             value: () => shareToDoList(list),
           ),
           PopupMenuItem(
-            child: Text('Edit'),
+            child: IconText(Icons.edit, 'Edit'),
             value: () => editToDoList(context, list),
           ),
           PopupMenuItem(
-            child: Text(
-              'Delete',
-              style: TextStyle(color: Colors.red),
-            ),
+            child: IconText(Icons.delete, 'Delete', color: Colors.red),
             value: () => _deleteList(context, list.id),
           ),
         ],
