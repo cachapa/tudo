@@ -142,7 +142,7 @@ class ToDoList {
     }
 
     final toDo = (_toDoCrdt.map[id] as ToDo)
-            .copyWith(newName: name, newChecked: checked) ??
+            ?.copyWith(newName: name, newChecked: checked) ??
         ToDo(id, name, checked);
 
     _toDoCrdt.put(id, toDo);
