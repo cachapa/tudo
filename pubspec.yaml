@@ -19,8 +19,10 @@ dependencies:
   http: ^0.12.0+3
   web_socket_channel: ^1.1.0
 
+  clipboard_manager: ^0.0.4
   implicitly_animated_reorderable_list: 0.4.0-dev+1 #^0.3.2
   path_provider: ^1.6.0
+  qr_flutter: ^3.1.0
   share: ^0.6.5+3
   uni_links: ^0.4.0
 

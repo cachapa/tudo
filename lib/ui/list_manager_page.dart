@@ -119,7 +119,7 @@ class _ListItem extends StatelessWidget {
         itemBuilder: (context) => [
           PopupMenuItem(
             child: IconText(Icons.share, 'Share'),
-            value: () => shareToDoList(list),
+            value: () => shareToDoList(context, list),
           ),
           PopupMenuItem(
             child: IconText(Icons.edit, 'Edit'),

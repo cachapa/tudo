@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 
-void editToDoList(BuildContext context, [ToDoList list]) async {
+void editToDoList(BuildContext context, [ToDoList list]) {
   showModalBottomSheet<String>(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
@@ -67,7 +67,7 @@ class _EditListForm extends StatelessWidget {
                 onPressed: () => _create(context),
               ),
             ],
-          )
+          ),
         ],
       ),
     );

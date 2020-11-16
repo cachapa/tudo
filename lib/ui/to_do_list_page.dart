@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
-import 'package:share/share.dart';
 import 'package:tudo_client/data/list_manager.dart';
+import 'package:tudo_client/ui/share_list.dart';
 
 import 'edit_list.dart';
 import 'empty_page.dart';
@@ -42,7 +42,7 @@ class ToDoListPage extends StatelessWidget {
             actions: [
               IconButton(
                 icon: Icon(Icons.share),
-                onPressed: () => _share(list),
+                onPressed: () => shareToDoList(context, list),
               ),
               IconButton(
                 icon: Icon(Icons.edit),
@@ -62,10 +62,6 @@ class ToDoListPage extends StatelessWidget {
       ),
     );
   }
-
-  void _share(ToDoList list) =>
-      Share.share('Tap to open "${list.name}" in your device:\n'
-          'https://tudo.cachapa.net/${list.id}');
 }
 
 class TitleBar extends StatelessWidget implements PreferredSizeWidget {
