@@ -46,13 +46,19 @@ class ToDoListPage extends StatelessWidget {
           appBar: TitleBar(
             list: list,
             actions: [
-              IconButton(
-                icon: Icon(Icons.share),
-                onPressed: () => shareToDoList(context, list),
-              ),
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () => editToDoList(context, list),
+              PopupMenuButton<Function>(
+                icon: Icon(Icons.settings),
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    child: IconText(Icons.share, 'Share'),
+                    value: () => shareToDoList(context, list),
+                  ),
+                  PopupMenuItem(
+                    child: IconText(Icons.edit, 'Edit'),
+                    value: () => editToDoList(context, list),
+                  ),
+                ],
+                onSelected: (value) => value(),
               ),
             ],
           ),
