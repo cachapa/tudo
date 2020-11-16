@@ -46,6 +46,10 @@ class ToDoListPage extends StatelessWidget {
           appBar: TitleBar(
             list: list,
             actions: [
+              IconButton(
+                icon: Icon(Icons.cleaning_services),
+                onPressed: () => _clearCompleted(context, list),
+              ),
               PopupMenuButton<Function>(
                 icon: Icon(Icons.settings),
                 itemBuilder: (context) => [
@@ -71,6 +75,29 @@ class ToDoListPage extends StatelessWidget {
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
         ),
+      ),
+    );
+  }
+
+  _clearCompleted(BuildContext context, ToDoList list) {
+    var checked = list.toDos.where((item) => item.checked).toList()..reversed;
+    var indexes = checked.map((e) => list.remove(e.id)).toList();
+
+    checked = checked.reversed.toList();
+    indexes = indexes.reversed.toList();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Cleared completed items'),
+        action: SnackBarAction(
+            label: 'UNDO',
+            onPressed: () {
+              for (var i = 0; i < checked.length; i++) {
+                final item = checked[i];
+                list.set(item.id,
+                    name: item.name, checked: item.checked, index: indexes[i]);
+              }
+            }),
       ),
     );
   }
