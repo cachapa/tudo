@@ -68,13 +68,10 @@ class ToDoAdapter extends TypeAdapter<ToDo> {
     /* Convert from old id-less values
      Old format: String, Bool
      New format: String, String, Bool
-     Bools are stored as ints, so peek the first byte of the second field
-     If it's 0 or 1 then it's a boolean and therefore old-school
+     So check the available bytes after first field
     */
     final field1 = reader.readString();
-    final field2 = reader.peekBytes(1)[0];
-
-    return (field2 == 0 || field2 == 1)
+    return (reader.availableBytes == 11)
         ? ToDo(null, field1, reader.readBool())
         : ToDo(field1, reader.readString(), reader.readBool());
   }
