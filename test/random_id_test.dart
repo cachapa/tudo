@@ -2,26 +2,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tudo_client/data/random_id.dart';
 
 void testLength(int length) {
-  final id = RandomId().generate(length);
+  final id = generateRandomId(length);
   expect(id.length, length);
 }
 
 void main() {
   test('Generate id', () {
-    final id = RandomId().generate();
+    final id = generateRandomId();
     expect(id.length, 128);
   });
 
   test('Length = -1', () {
-    expect(() => RandomId().generate(-1), throwsA(isA<Exception>()));
+    expect(() => generateRandomId(-1), throwsA(isA<Exception>()));
   });
 
   test('Length = 0', () {
-    expect(() => RandomId().generate(0), throwsA(isA<Exception>()));
+    expect(() => generateRandomId(0), throwsA(isA<Exception>()));
   });
 
   test('Length = 1', () {
-    expect(() => RandomId().generate(1), throwsA(isA<Exception>()));
+    expect(() => generateRandomId(1), throwsA(isA<Exception>()));
   });
 
   test('Length = 2', () {
@@ -45,7 +45,7 @@ void main() {
   });
 
   test('Replace illegal characters', () {
-    final id = RandomId().generate(1000);
+    final id = generateRandomId(1000);
     print(id);
     expect(id.contains('='), isFalse);
     expect(id.contains('/'), isFalse);
