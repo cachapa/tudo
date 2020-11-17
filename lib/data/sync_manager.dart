@@ -17,14 +17,12 @@ class SyncManager with ChangeNotifier {
   set listManager(ListManager lm) {
     _listManager = lm;
 
-    print(lm.lists);
-
     lm.lists.map((e) => e.id).forEach((id) {
       if (!_clientMap.containsKey(id)) {
         _clientMap[id] ??= SyncClient(id);
         _clientMap[id].connectionState.listen((connected) {
-          print(
-              '${id.substring(0, 4)}… ${connected ? 'Connected' : 'Disconnected'}');
+          // print(
+          //     '${id.substring(0, 4)}… ${connected ? 'Connected' : 'Disconnected'}');
           notifyListeners();
         });
         _clientMap[id].messages.listen((message) {

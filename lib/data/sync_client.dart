@@ -28,7 +28,6 @@ class SyncClient {
     final endpoint = 'wss://tudo-api.cachapa.net/$id/ws';
     channel = WebSocketChannel.connect(Uri.parse(endpoint));
 
-    print('connected');
     _connectionStateController.sink.add(true);
 
     subscription = channel.stream.listen(

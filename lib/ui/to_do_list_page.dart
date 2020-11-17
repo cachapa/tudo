@@ -80,15 +80,20 @@ class ToDoListPage extends StatelessWidget {
   }
 
   _clearCompleted(BuildContext context, ToDoList list) {
-    var checked = list.toDos.where((item) => item.checked).toList()..reversed;
+    var checked = list.toDos.where((item) => item.checked).toList();
+    if (checked.isEmpty) return;
+
     var indexes = checked.map((e) => list.remove(e.id)).toList();
 
+    // Insert in reverse order when undoing so the old indexes match
     checked = checked.reversed.toList();
     indexes = indexes.reversed.toList();
+    final count = checked.length;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Cleared completed items'),
+        content:
+            Text('Cleared $count completed ${count == 1 ? 'item' : 'items'}'),
         action: SnackBarAction(
             label: 'UNDO',
             onPressed: () {

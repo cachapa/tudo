@@ -91,8 +91,7 @@ class ToDoList {
 
   Color get color => _toDoCrdt.get(colorKey) ?? Colors.blue;
 
-  List<ToDo> get toDos =>
-      _order.map((id) => _toDoCrdt.get(id)).toList().cast<ToDo>();
+  List<ToDo> get toDos => _order.map(_toDoCrdt.get).toList().cast<ToDo>();
 
   List<String> get _order => _toDoCrdt.get(orderKey)?.cast<String>() ?? [];
 
