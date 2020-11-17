@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -43,7 +42,7 @@ void main() async {
   final listManager = await ListManager.open(nodeId);
 
   // TODO Remove this
-  // listManager.import('LcRj5Ls_CgJGk_rLaNj0.at1JRBlk0BiYoaietUysGKBiWSoUVNPIEy90DUj3pkJRAUVImjXYJJ0_9EEYmWZ7.3D1b7k79D4pIgKxmC4xml2PjiAqjtT7VuIEzrJq7zC');
+  // listManager.import('test');
 
   runApp(
     MultiProvider(
@@ -60,7 +59,26 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  bool isAppInForeground = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    setState(() => isAppInForeground = state == AppLifecycleState.resumed);
+  }
+
   @override
   Widget build(BuildContext context) {
     // TODO Improve this crap
@@ -81,8 +99,10 @@ class MyApp extends StatelessWidget {
       }
     } catch (_) {}
 
-    return Consumer<SyncManager>(
-      builder: (_, syncManager, __) => Column(
+    _manageConnection(context);
+
+    return Consumer<SyncManager>(builder: (_, syncManager, __) {
+      return Column(
         children: [
           Expanded(
             child: MaterialApp(
@@ -103,7 +123,16 @@ class MyApp extends StatelessWidget {
             height: 2,
           ),
         ],
-      ),
-    );
+      );
+    });
+  }
+
+  void _manageConnection(BuildContext context) {
+    final syncManager = Provider.of<SyncManager>(context, listen: false);
+    if (isAppInForeground) {
+      syncManager.connect();
+    } else {
+      syncManager.disconnect();
+    }
   }
 }

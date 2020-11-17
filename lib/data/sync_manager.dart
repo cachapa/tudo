@@ -38,8 +38,14 @@ class SyncManager with ChangeNotifier {
     sync();
   }
 
-  void connect() => _clientMap.values.forEach((client) {
-        client.connect();
+  void connect() {
+    if (connected) return;
+    _clientMap.values.forEach((client) => client.connect());
+    sync();
+  }
+
+  void disconnect() => _clientMap.values.forEach((client) {
+        client.disconnect();
       });
 
   void sync() {
