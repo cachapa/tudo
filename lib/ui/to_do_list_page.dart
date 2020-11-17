@@ -177,9 +177,9 @@ class ToDoListView extends StatelessWidget {
     final insetBottom =
         MediaQuery.of(context).viewPadding.bottom + inputBarHeight + 20;
 
-    final uncheckedItems =
-        toDoList.toDos.where((item) => !item.checked).toList();
-    final checkedItems = toDoList.toDos.where((item) => item.checked).toList();
+    final items = toDoList.toDos;
+    final uncheckedItems = items.where((item) => !item.checked).toList();
+    final checkedItems = items.where((item) => item.checked).toList();
 
     return ListView(
       padding: EdgeInsets.only(top: insetTop, bottom: insetBottom),
@@ -190,7 +190,13 @@ class ToDoListView extends StatelessWidget {
           physics: ClampingScrollPhysics(),
           reorderDuration: Duration(milliseconds: 200),
           areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-          onReorderFinished: (_, from, to, __) => toDoList.swap(from, to),
+          onReorderFinished: (_, from, to, __) {
+            if (from == to) return;
+            // Query the real position of the items in the complete list
+            from = items.indexOf(uncheckedItems[from]);
+            to = items.indexOf(uncheckedItems[to]);
+            toDoList.swap(from, to);
+          },
           itemBuilder: (_, itemAnimation, item, __) => Reorderable(
             key: ValueKey(item.id),
             builder: (context, animation, inDrag) => SizeFadeTransition(
