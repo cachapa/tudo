@@ -85,7 +85,8 @@ class MyApp extends StatelessWidget {
         children: [
           Expanded(
             child: MaterialApp(
-              debugShowCheckedModeBanner: false,
+              // debugShowCheckedModeBanner: false,
+              // themeMode: ThemeMode.dark,
               title: 'tudo',
               theme: ThemeData(
                 primarySwatch: Colors.blue,

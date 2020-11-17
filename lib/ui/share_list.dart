@@ -45,6 +45,7 @@ class _ShareListForm extends StatelessWidget {
             data: shareUrl,
             version: QrVersions.auto,
             size: 250.0,
+            backgroundColor: ThemeData.light().canvasColor,
           ),
           SizedBox(height: 20),
           ButtonBar(
