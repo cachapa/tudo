@@ -6,6 +6,7 @@ import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 
+import 'custom_handle.dart';
 import 'edit_list.dart';
 import 'icon_text.dart';
 import 'progress.dart';
@@ -89,23 +90,8 @@ class _ListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Handle(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 10,
-              clipBehavior: Clip.hardEdge,
-              decoration: BoxDecoration(),
-              child: Icon(
-                Icons.reorder,
-                color: Colors.grey.withOpacity(0.5),
-              ),
-            ),
-            SizedBox(width: 10),
-            Progress(list: list),
-          ],
-        ),
+      leading: CustomHandle(
+        child: Progress(list: list),
       ),
       title: Text(
         list.name,

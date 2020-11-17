@@ -10,6 +10,7 @@ import 'package:tudo_client/data/list_manager.dart';
 import 'package:tudo_client/ui/share_list.dart';
 import 'package:tudo_client/ui/text_input_dialog.dart';
 
+import 'custom_handle.dart';
 import 'edit_list.dart';
 import 'empty_page.dart';
 import 'icon_text.dart';
@@ -46,10 +47,6 @@ class ToDoListPage extends StatelessWidget {
           appBar: TitleBar(
             list: list,
             actions: [
-              IconButton(
-                icon: Icon(Icons.cleaning_services),
-                onPressed: () => _clearCompleted(context, list),
-              ),
               PopupMenuButton<Function>(
                 icon: Icon(Icons.settings),
                 itemBuilder: (context) => [
@@ -75,34 +72,6 @@ class ToDoListPage extends StatelessWidget {
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
         ),
-      ),
-    );
-  }
-
-  _clearCompleted(BuildContext context, ToDoList list) {
-    var checked = list.toDos.where((item) => item.checked).toList();
-    if (checked.isEmpty) return;
-
-    var indexes = checked.map((e) => list.remove(e.id)).toList();
-
-    // Insert in reverse order when undoing so the old indexes match
-    checked = checked.reversed.toList();
-    indexes = indexes.reversed.toList();
-    final count = checked.length;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:
-            Text('Cleared $count completed ${count == 1 ? 'item' : 'items'}'),
-        action: SnackBarAction(
-            label: 'UNDO',
-            onPressed: () {
-              for (var i = 0; i < checked.length; i++) {
-                final item = checked[i];
-                list.set(item.id,
-                    name: item.name, checked: item.checked, index: indexes[i]);
-              }
-            }),
       ),
     );
   }
@@ -208,59 +177,87 @@ class ToDoListView extends StatelessWidget {
     final insetBottom =
         MediaQuery.of(context).viewPadding.bottom + inputBarHeight + 20;
 
-    return ImplicitlyAnimatedReorderableList<ToDo>(
+    final uncheckedItems =
+        toDoList.toDos.where((item) => !item.checked).toList();
+    final checkedItems = toDoList.toDos.where((item) => item.checked).toList();
+
+    return ListView(
       padding: EdgeInsets.only(top: insetTop, bottom: insetBottom),
-      items: toDoList.toDos,
-      // dragDuration: Duration(milliseconds: 200),
-      reorderDuration: Duration(milliseconds: 200),
-      areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-      onReorderFinished: (_, from, to, __) => toDoList.swap(from, to),
-      itemBuilder: (_, itemAnimation, item, __) => Reorderable(
-        key: ValueKey(item.id),
-        builder: (context, animation, inDrag) => SizeFadeTransition(
-          sizeFraction: 0.7,
-          curve: Curves.easeInOut,
-          animation: itemAnimation,
-          child: ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: Handle(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 10,
-                    clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(),
-                    child: Icon(
-                      Icons.reorder,
-                      color: Colors.grey.withOpacity(0.5),
-                    ),
-                  ),
-                  Checkbox(
-                    onChanged: (_) => _toggle(item),
-                    value: item.checked,
-                  ),
-                ],
+      children: [
+        ImplicitlyAnimatedReorderableList<ToDo>(
+          items: uncheckedItems,
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          reorderDuration: Duration(milliseconds: 200),
+          areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
+          onReorderFinished: (_, from, to, __) => toDoList.swap(from, to),
+          itemBuilder: (_, itemAnimation, item, __) => Reorderable(
+            key: ValueKey(item.id),
+            builder: (context, animation, inDrag) => SizeFadeTransition(
+              sizeFraction: 0.7,
+              curve: Curves.easeInOut,
+              animation: itemAnimation,
+              child: _ListTile(
+                item: item,
+                onToggle: () => _toggle(item),
+                onEdit: () => _editItem(context, item),
+                onDelete: () => _deleteItem(context, item),
               ),
-            ),
-            title: Text(item.name),
-            onTap: () => _toggle(item),
-            trailing: PopupMenuButton(
-              itemBuilder: (context) => [
-                PopupMenuItem<Function>(
-                  child: IconText(Icons.edit, 'Edit'),
-                  value: () => _editItem(context, item),
-                ),
-                PopupMenuItem<Function>(
-                  child: IconText(Icons.delete, 'Delete', color: Colors.red),
-                  value: () => _removeItem(context, item),
-                ),
-              ],
-              onSelected: (value) => value(),
             ),
           ),
         ),
-      ),
+        AnimatedOpacity(
+          duration: Duration(milliseconds: 300),
+          opacity: checkedItems.isEmpty ? 0 : 1,
+          child: Container(
+            clipBehavior: Clip.hardEdge,
+            decoration: BoxDecoration(
+              // color: toDoList.color.withOpacity(0.05),
+              border: Border(
+                bottom: BorderSide(
+                  color: toDoList.color.withOpacity(0.4),
+                  width: 2,
+                ),
+              ),
+            ),
+            padding: EdgeInsets.only(left: 16, top: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Completed',
+                    style: Theme.of(context)
+                        .textTheme
+                        .subtitle2
+                        .copyWith(color: toDoList.color),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () => _clearCompleted(context, toDoList),
+                ),
+              ],
+            ),
+          ),
+        ),
+        ImplicitlyAnimatedList(
+          items: checkedItems,
+          shrinkWrap: true,
+          physics: ClampingScrollPhysics(),
+          areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
+          itemBuilder: (context, itemAnimation, item, i) => SizeFadeTransition(
+            sizeFraction: 0.7,
+            curve: Curves.easeInOut,
+            animation: itemAnimation,
+            child: _ListTile(
+              item: item,
+              onToggle: () => _toggle(item),
+              onEdit: () => _editItem(context, item),
+              onDelete: () => _deleteItem(context, item),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -276,7 +273,7 @@ class ToDoListView extends StatelessWidget {
     );
   }
 
-  _removeItem(BuildContext context, ToDo toDo) {
+  _deleteItem(BuildContext context, ToDo toDo) {
     final index = toDoList.remove(toDo.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -286,6 +283,81 @@ class ToDoListView extends StatelessWidget {
           onPressed: () => toDoList.set(toDo.id,
               name: toDo.name, checked: toDo.checked, index: index),
         ),
+      ),
+    );
+  }
+
+  _clearCompleted(BuildContext context, ToDoList list) {
+    var checked = list.toDos.where((item) => item.checked).toList();
+    if (checked.isEmpty) return;
+
+    var indexes = checked.map((e) => list.remove(e.id)).toList();
+
+    // Insert in reverse order when undoing so the old indexes match
+    checked = checked.reversed.toList();
+    indexes = indexes.reversed.toList();
+    final count = checked.length;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content:
+            Text('Cleared $count completed ${count == 1 ? 'item' : 'items'}'),
+        action: SnackBarAction(
+            label: 'UNDO',
+            onPressed: () {
+              for (var i = 0; i < checked.length; i++) {
+                final item = checked[i];
+                list.set(item.id,
+                    name: item.name, checked: item.checked, index: indexes[i]);
+              }
+            }),
+      ),
+    );
+  }
+}
+
+class _ListTile extends StatelessWidget {
+  final ToDo item;
+  final Function() onToggle;
+  final Function() onEdit;
+  final Function() onDelete;
+
+  const _ListTile(
+      {Key key, this.item, this.onToggle, this.onEdit, this.onDelete})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: item.checked
+          ? Padding(
+              padding: EdgeInsets.only(left: 16),
+              child: Checkbox(
+                onChanged: (_) => onToggle(),
+                value: item.checked,
+              ),
+            )
+          : CustomHandle(
+              child: Checkbox(
+                onChanged: (_) => onToggle(),
+                value: item.checked,
+              ),
+            ),
+      title: Text(item.name),
+      onTap: () => onToggle(),
+      trailing: PopupMenuButton(
+        itemBuilder: (context) => [
+          PopupMenuItem<Function>(
+            child: IconText(Icons.edit, 'Edit'),
+            value: () => onEdit(),
+          ),
+          PopupMenuItem<Function>(
+            child: IconText(Icons.delete, 'Delete', color: Colors.red),
+            value: () => onDelete(),
+          ),
+        ],
+        onSelected: (value) => value(),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -85,7 +86,7 @@ class MyApp extends StatelessWidget {
         children: [
           Expanded(
             child: MaterialApp(
-              // debugShowCheckedModeBanner: false,
+              debugShowCheckedModeBanner: false,
               // themeMode: ThemeMode.dark,
               title: 'tudo',
               theme: ThemeData(
