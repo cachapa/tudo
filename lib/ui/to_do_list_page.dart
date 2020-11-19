@@ -38,9 +38,10 @@ class ToDoListPage extends StatelessWidget {
           primaryIconTheme: IconThemeData(color: list.color),
           iconTheme: IconThemeData(color: list.color),
           toggleableActiveColor: list.color,
-          textSelectionHandleColor: list.color,
-          textSelectionColor: list.color,
-          cursorColor: list.color,
+          textSelectionTheme: TextSelectionThemeData(
+            selectionHandleColor: list.color,
+            cursorColor: list.color,
+          ),
         ),
         child: Scaffold(
           extendBodyBehindAppBar: true,
@@ -272,7 +273,7 @@ class ToDoListView extends StatelessWidget {
   _editItem(BuildContext context, ToDo toDo) {
     showDialog<String>(
       context: context,
-      child: TextInputDialog(
+      builder: (context) => TextInputDialog(
         value: toDo.name,
         onSet: (value) => toDoList.set(toDo.id, name: value),
       ),

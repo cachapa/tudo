@@ -18,6 +18,8 @@ class ListManager with ChangeNotifier {
   final Box<List<String>> _box;
   final _toDoLists = <String, ToDoList>{};
 
+  Future _initFuture;
+
   List<String> get _listIds => _box.get(listIdsKey, defaultValue: []);
 
   set _listIds(List<String> values) => _box.put(listIdsKey, values);
@@ -31,18 +33,19 @@ class ListManager with ChangeNotifier {
   }
 
   ListManager._(this.nodeId, this._box) {
-    _init();
+    _initFuture = _init();
   }
 
   Future<void> _init() async {
     // Open all the to do lists
-    for (String id in _listIds) {
-      _toDoLists[id] = await ToDoList.import(this, id);
-    }
+    await Future.wait(_listIds
+        .map((e) async => _toDoLists[e] = await ToDoList.import(this, e)));
     notify();
   }
 
   Future<void> create(String name, Color color) async {
+    await _initFuture;
+
     final id = generateRandomId();
     _listIds = _listIds..add(id);
     _toDoLists[id] = await ToDoList.open(this, id, name, color);
@@ -51,6 +54,7 @@ class ListManager with ChangeNotifier {
 
   Future<void> import(String id, [int index]) async {
     if (_listIds.contains(id)) return;
+    await _initFuture;
     _listIds =
         index == null ? (_listIds..add(id)) : (_listIds..insert(index, id));
     _toDoLists[id] = await ToDoList.import(this, id);
