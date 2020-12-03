@@ -65,7 +65,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  bool isAppInForeground = true;
+  bool isAppVisible = true;
 
   @override
   void initState() {
@@ -76,7 +76,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    setState(() => isAppInForeground = state == AppLifecycleState.resumed);
+    setState(() => isAppVisible = state != AppLifecycleState.paused);
   }
 
   @override
@@ -129,7 +129,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   void _manageConnection(BuildContext context) {
     final syncManager = Provider.of<SyncManager>(context, listen: false);
-    if (isAppInForeground) {
+    if (isAppVisible) {
       syncManager.connect();
     } else {
       syncManager.disconnect();
