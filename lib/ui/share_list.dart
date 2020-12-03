@@ -1,4 +1,4 @@
-import 'package:clipboard_manager/clipboard_manager.dart';
+import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share/share.dart';
@@ -58,7 +58,7 @@ class _ShareListForm extends StatelessWidget {
                 icon: Icon(Icons.copy),
                 label: Text('Copy Link'.toUpperCase()),
                 onPressed: () {
-                  ClipboardManager.copyToClipBoard(shareUrl);
+                  FlutterClipboard.copy(shareUrl);
                   Navigator.pop(context);
                 },
               ),
