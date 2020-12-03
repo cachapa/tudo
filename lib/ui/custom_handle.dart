@@ -9,6 +9,7 @@ class CustomHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Handle(
+      vibrate: false,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
