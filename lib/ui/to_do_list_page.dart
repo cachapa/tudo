@@ -288,7 +288,7 @@ class ToDoListView extends StatelessWidget {
     final index = toDoList.remove(toDo.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text("${toDo.name} deleted"),
+        content: Text('Deleted "${toDo.name}"'),
         action: SnackBarAction(
           label: 'UNDO',
           onPressed: () => toDoList.set(toDo.id,
