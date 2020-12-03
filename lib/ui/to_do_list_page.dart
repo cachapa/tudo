@@ -217,42 +217,11 @@ class ToDoListView extends StatelessWidget {
             ),
           ),
         ),
-        AnimatedOpacity(
-          duration: Duration(milliseconds: 300),
-          opacity: checkedItems.isEmpty ? 0 : 1,
-          child: Container(
-            clipBehavior: Clip.hardEdge,
-            decoration: BoxDecoration(
-              // color: toDoList.color.withOpacity(0.05),
-              border: Border(
-                bottom: BorderSide(
-                  color: toDoList.color.withOpacity(0.4),
-                  width: 2,
-                ),
-              ),
-            ),
-            padding: EdgeInsets.only(left: 16, top: 8),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Completed',
-                    style: Theme.of(context)
-                        .textTheme
-                        .subtitle2
-                        .copyWith(color: toDoList.color),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.delete),
-                  onPressed: () => _clearCompleted(context, toDoList),
-                ),
-              ],
-            ),
-          ),
-        ),
         ImplicitlyAnimatedList(
-          items: checkedItems,
+          items: [
+            if (checkedItems.isNotEmpty) ToDo('header', '', false),
+            ...checkedItems,
+          ],
           shrinkWrap: true,
           physics: ClampingScrollPhysics(),
           areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
@@ -260,12 +229,17 @@ class ToDoListView extends StatelessWidget {
             sizeFraction: 0.7,
             curve: Curves.easeInOut,
             animation: itemAnimation,
-            child: _ListTile(
-              item: item,
-              onToggle: () => _toggle(item),
-              onEdit: () => _editItem(context, item),
-              onDelete: () => _deleteItem(context, item),
-            ),
+            child: item.id == 'header'
+                ? _CompletedHeader(
+                    color: toDoList.color,
+                    onClear: () => _clearCompleted(context, toDoList),
+                  )
+                : _ListTile(
+                    item: item,
+                    onToggle: () => _toggle(item),
+                    onEdit: () => _editItem(context, item),
+                    onDelete: () => _deleteItem(context, item),
+                  ),
           ),
         ),
       ],
@@ -369,6 +343,43 @@ class _ListTile extends StatelessWidget {
           ),
         ],
         onSelected: (value) => value(),
+      ),
+    );
+  }
+}
+
+class _CompletedHeader extends StatelessWidget {
+  final Color color;
+  final Function() onClear;
+
+  const _CompletedHeader({Key key, this.color, this.onClear}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: color.withOpacity(0.4),
+            width: 2,
+          ),
+        ),
+      ),
+      padding: EdgeInsets.only(left: 16, top: 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              'Completed',
+              style:
+                  Theme.of(context).textTheme.subtitle2.copyWith(color: color),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: onClear,
+          ),
+        ],
       ),
     );
   }
