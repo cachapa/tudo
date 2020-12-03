@@ -137,11 +137,11 @@ class ToDoList {
 
   void add(String name) => set(generateRandomId(), name: name, checked: false);
 
-  void set(String id, {String name, bool checked, int index}) {
+  void set(String id, {String name, bool checked, int index = 0}) {
     if (name != null && name.trim().isEmpty) return;
 
     if (!_order.contains(id)) {
-      _order = index == null ? (_order..add(id)) : (_order..insert(index, id));
+      _order = _order..insert(index, id);
     }
 
     final toDo = (_toDoCrdt.map[id] as ToDo)
