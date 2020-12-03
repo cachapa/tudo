@@ -95,7 +95,14 @@ class ToDoList {
 
   Color get color => _toDoCrdt.get(colorKey) ?? Colors.blue;
 
-  List<ToDo> get toDos => _order.map(_toDoCrdt.get).toList().cast<ToDo>();
+  List<ToDo> get toDos => _toDoCrdt.values.whereType<ToDo>().toList()
+    ..sort((a, b) {
+      var ia = _order.indexOf(a.id);
+      ia = ia < 0 ? 1000000 : ia;
+      var ib = _order.indexOf(b.id);
+      ib = ib < 0 ? 1000000 : ib;
+      return ia != ib ? ia.compareTo(ib) : a.name.compareTo(b.name);
+    });
 
   List<String> get _order => _toDoCrdt.get(orderKey)?.cast<String>() ?? [];
 
@@ -163,7 +170,7 @@ class ToDoList {
 
   int remove(String id) {
     final index = _order.indexOf(id);
-    _order.remove(id);
+    _order = _order..remove(id);
     _toDoCrdt.delete(id);
     _parent.notify();
     return index;
