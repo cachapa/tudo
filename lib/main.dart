@@ -20,6 +20,10 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    statusBarColor: Colors.transparent,
+  ));
+
   final nodeId = generateRandomId(32);
 
   try {

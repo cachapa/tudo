@@ -46,6 +46,7 @@ class ToDoListPage extends StatelessWidget {
         child: Scaffold(
           extendBodyBehindAppBar: true,
           appBar: TitleBar(
+            brightness: Theme.of(context).brightness,
             list: list,
             actions: [
               PopupMenuButton<Function>(
@@ -79,10 +80,12 @@ class ToDoListPage extends StatelessWidget {
 }
 
 class TitleBar extends StatelessWidget implements PreferredSizeWidget {
+  final Brightness brightness;
   final ToDoList list;
   final List<Widget> actions;
 
-  const TitleBar({Key key, this.list, this.actions}) : super(key: key);
+  const TitleBar({Key key, this.brightness, this.list, this.actions})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +95,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: AppBar(
+          brightness: brightness,
           centerTitle: true,
           backgroundColor: primaryColor.withAlpha(20),
           elevation: 0,
@@ -347,8 +351,8 @@ class _ListTile extends StatelessWidget {
             )
           : CustomHandle(
               child: Checkbox(
-                onChanged: (_) => onToggle(),
                 value: item.checked,
+                onChanged: (_) => onToggle(),
               ),
             ),
       title: Text(item.name),

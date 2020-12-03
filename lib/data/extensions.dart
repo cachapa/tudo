@@ -7,3 +7,8 @@ extension ColorExtensions on Color {
   static Color fromHex(String hex) =>
       Color(int.parse(hex.replaceFirst('#', ''), radix: 16) + 0xFF000000);
 }
+
+extension BrightnessExtensions on Brightness {
+  Brightness get invert =>
+      this == Brightness.light ? Brightness.dark : Brightness.light;
+}
