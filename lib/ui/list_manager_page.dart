@@ -6,6 +6,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
+import 'package:tudo_client/extensions.dart';
 
 import 'custom_handle.dart';
 import 'edit_list.dart';
@@ -14,7 +15,7 @@ import 'progress.dart';
 import 'share_list.dart';
 import 'to_do_list_page.dart';
 
-import 'package:tudo_client/data/extensions.dart';
+final _controller = ScrollController();
 
 class ListManagerPage extends StatelessWidget {
   @override
@@ -26,11 +27,11 @@ class ListManagerPage extends StatelessWidget {
       child: Consumer<ListManager>(
         builder: (_, listManager, __) => Scaffold(
           body: ImplicitlyAnimatedReorderableList<ToDoList>(
+            controller: _controller,
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).padding.bottom + 80),
             items: listManager.lists,
             shrinkWrap: true,
-            // dragDuration: Duration(milliseconds: 200),
             areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
             onReorderFinished: (_, from, to, __) => listManager.swap(from, to),
             header: Logo(),
@@ -45,28 +46,42 @@ class ListManagerPage extends StatelessWidget {
             ),
           ),
           floatingActionButton: FloatingActionButton(
-            clipBehavior: Clip.antiAlias,
-            backgroundColor: Colors.transparent,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.asset('assets/images/icon_bg.png'),
-                Text(
-                  't',
-                  style: TextStyle(
-                    fontFamily: 'WaitingfortheSunrise',
-                    fontSize: 50,
-                    height: 1.3,
-                    color: Colors.white,
+              clipBehavior: Clip.antiAlias,
+              backgroundColor: Colors.transparent,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Image.asset('assets/images/icon_bg.png'),
+                  Text(
+                    't',
+                    style: TextStyle(
+                      fontFamily: 'WaitingfortheSunrise',
+                      fontSize: 50,
+                      height: 1.3,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-              ],
-            ),
-            onPressed: () => editToDoList(context),
-          ),
+                ],
+              ),
+              onPressed: () => _createList(context)),
         ),
       ),
     );
+  }
+
+  Future<void> _createList(BuildContext context) async {
+    final result = await editToDoList(context);
+    if (result ?? false) {
+      // Scroll to the bottom of the list
+      Future.delayed(
+        Duration(milliseconds: 400),
+        () => _controller.animateTo(
+          _controller.position.maxScrollExtent + 200,
+          duration: Duration(milliseconds: 400),
+          curve: Curves.fastOutSlowIn,
+        ),
+      );
+    }
   }
 }
 
@@ -130,7 +145,7 @@ class _ListItem extends StatelessWidget {
   }
 
   void _deleteList(BuildContext context, String listId) {
-    final listManager = Provider.of<ListManager>(context, listen: false);
+    final listManager = context.read<ListManager>();
     final index = listManager.remove(list.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

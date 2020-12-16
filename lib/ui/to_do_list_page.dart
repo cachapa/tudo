@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -21,6 +22,9 @@ const blurSigma = 14.0;
 
 class ToDoListPage extends StatelessWidget {
   final String id;
+  final _listKey = GlobalKey();
+  final _uncheckedListKey = GlobalKey();
+  final _controller = ScrollController();
 
   ToDoListPage({Key key, this.id}) : super(key: key);
 
@@ -65,16 +69,43 @@ class ToDoListPage extends StatelessWidget {
               ),
             ],
           ),
-          body: list.toDos.isEmpty
+          body: list.isEmpty
               ? EmptyPage(text: 'Create a new to-do item below')
-              : ToDoListView(toDoList: list),
+              : ToDoListView(
+                  key: _listKey,
+                  checkedListKey: _uncheckedListKey,
+                  controller: _controller,
+                  toDoList: list,
+                ),
           floatingActionButton: InputBar(
-            onSubmitted: (value) => list.add(value),
+            onSubmitted: (value) => _addItem(list, value),
           ),
           floatingActionButtonLocation:
               FloatingActionButtonLocation.centerFloat,
         ),
       ),
+    );
+  }
+
+  void _addItem(ToDoList list, String value) {
+    list.add(value);
+    Future.delayed(
+      Duration(milliseconds: 400),
+      () {
+        final screenHeight = MediaQuery.of(_listKey.currentContext).size.height;
+        final uncheckedListHeight =
+            ((_uncheckedListKey.currentContext.findRenderObject()) as RenderBox)
+                .size
+                .height;
+        final maxOffset = uncheckedListHeight;
+        final minOffset = max(0, uncheckedListHeight - screenHeight) + 200;
+        final offset = _controller.offset.clamp(minOffset, maxOffset);
+        _controller.animateTo(
+          offset,
+          duration: Duration(milliseconds: 400),
+          curve: Curves.fastOutSlowIn,
+        );
+      },
     );
   }
 }
@@ -173,8 +204,12 @@ class InputBar extends StatelessWidget {
 
 class ToDoListView extends StatelessWidget {
   final ToDoList toDoList;
+  final Key checkedListKey;
+  final ScrollController controller;
 
-  const ToDoListView({Key key, this.toDoList}) : super(key: key);
+  const ToDoListView(
+      {Key key, this.checkedListKey, this.controller, this.toDoList})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -187,9 +222,11 @@ class ToDoListView extends StatelessWidget {
     final checkedItems = items.where((item) => item.checked).toList();
 
     return ListView(
+      controller: controller,
       padding: EdgeInsets.only(top: insetTop, bottom: insetBottom),
       children: [
         ImplicitlyAnimatedReorderableList<ToDo>(
+          key: checkedListKey,
           items: uncheckedItems,
           shrinkWrap: true,
           physics: ClampingScrollPhysics(),
@@ -246,9 +283,9 @@ class ToDoListView extends StatelessWidget {
     );
   }
 
-  _toggle(ToDo toDo) => toDoList.set(toDo.id, checked: !toDo.checked);
+  void _toggle(ToDo toDo) => toDoList.set(toDo.id, checked: !toDo.checked);
 
-  _editItem(BuildContext context, ToDo toDo) {
+  void _editItem(BuildContext context, ToDo toDo) {
     showDialog<String>(
       context: context,
       builder: (context) => TextInputDialog(
@@ -258,7 +295,7 @@ class ToDoListView extends StatelessWidget {
     );
   }
 
-  _deleteItem(BuildContext context, ToDo toDo) {
+  void _deleteItem(BuildContext context, ToDo toDo) {
     final index = toDoList.remove(toDo.id);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -272,7 +309,7 @@ class ToDoListView extends StatelessWidget {
     );
   }
 
-  _clearCompleted(BuildContext context, ToDoList list) {
+  void _clearCompleted(BuildContext context, ToDoList list) {
     var checked = list.toDos.where((item) => item.checked).toList();
     if (checked.isEmpty) return;
 

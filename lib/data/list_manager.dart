@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-import 'extensions.dart';
+import '../extensions.dart';
 import 'hive/hive_crdt.dart';
 import 'random_id.dart';
 
@@ -95,6 +95,16 @@ class ToDoList {
 
   Color get color => _toDoCrdt.get(colorKey) ?? Colors.blue;
 
+  int get length => _toDoCrdt.values.whereType<ToDo>().length;
+
+  int get uncompletedLength =>
+      _toDoCrdt.values.whereType<ToDo>().where((e) => !e.checked).length;
+
+  int get completedLength =>
+      _toDoCrdt.values.whereType<ToDo>().where((e) => e.checked).length;
+
+  bool get isEmpty => _toDoCrdt.isEmpty;
+
   List<ToDo> get toDos => _toDoCrdt.values.whereType<ToDo>().toList()
     ..sort((a, b) {
       var ia = _order.indexOf(a.id);
@@ -142,13 +152,13 @@ class ToDoList {
   static Future<ToDoList> import(ListManager parent, String id) =>
       open(parent, id, null, null);
 
-  void add(String name) => set(generateRandomId(), name: name, checked: false);
+  ToDo add(String name) => set(generateRandomId(), name: name, checked: false);
 
-  void set(String id, {String name, bool checked, int index = 0}) {
-    if (name != null && name.trim().isEmpty) return;
+  ToDo set(String id, {String name, bool checked, int index}) {
+    if (name != null && name.trim().isEmpty) return null;
 
     if (!_order.contains(id)) {
-      _order = _order..insert(index, id);
+      _order = _order..insert(index ?? _order.length, id);
     }
 
     final toDo = (_toDoCrdt.map[id] as ToDo)
@@ -157,6 +167,8 @@ class ToDoList {
 
     _toDoCrdt.put(id, toDo);
     _parent.notify();
+
+    return toDo;
   }
 
   void swap(int oldIndex, int newIndex) {
@@ -208,7 +220,7 @@ class ToDoList {
   int get hashCode => id.hashCode & name.hashCode & _toDoCrdt.hashCode;
 
   @override
-  String toString() => '$name [${toDos.length}]';
+  String toString() => '$name [$length]';
 }
 
 class ToDo {

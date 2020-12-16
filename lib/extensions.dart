@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+export 'package:provider/provider.dart';
+
 extension ColorExtensions on Color {
   String get hexValue =>
       '#${(value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';

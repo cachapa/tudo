@@ -7,9 +7,9 @@ class Progress extends StatelessWidget {
   final double size;
   final ToDoList list;
 
-  int get progress => list.toDos.where((element) => element.checked).length;
+  int get progress => list.completedLength;
 
-  int get total => list.toDos.length;
+  int get total => list.length;
 
   const Progress({Key key, this.size = 30, this.list}) : super(key: key);
 
