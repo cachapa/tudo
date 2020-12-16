@@ -4,17 +4,17 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
-import 'package:tudo_client/ui/share_list.dart';
-import 'package:tudo_client/ui/text_input_dialog.dart';
 
-import 'custom_handle.dart';
 import 'edit_list.dart';
 import 'empty_page.dart';
 import 'icon_text.dart';
+import 'share_list.dart';
+import 'text_input_dialog.dart';
 
 const titleBarHeight = 60.0;
 const inputBarHeight = 60.0;
@@ -350,37 +350,37 @@ class _ListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: item.checked
-          ? Padding(
-              padding: EdgeInsets.only(left: 16),
-              child: Checkbox(
-                onChanged: (_) => onToggle(),
-                value: item.checked,
+    return Slidable(
+      actionExtentRatio: 0.15,
+      actionPane: SlidableDrawerActionPane(),
+      child: ListTile(
+        leading: Checkbox(
+          onChanged: (_) => onToggle(),
+          value: item.checked,
+        ),
+        title: Text(item.name),
+        onTap: () => onToggle(),
+        trailing: item.checked
+            ? null
+            : Handle(
+                vibrate: false,
+                child: Icon(Icons.reorder),
               ),
-            )
-          : CustomHandle(
-              child: Checkbox(
-                value: item.checked,
-                onChanged: (_) => onToggle(),
-              ),
-            ),
-      title: Text(item.name),
-      onTap: () => onToggle(),
-      trailing: PopupMenuButton(
-        itemBuilder: (context) => [
-          PopupMenuItem<Function>(
-            child: IconText(Icons.edit, 'Edit'),
-            value: () => onEdit(),
-          ),
-          PopupMenuItem<Function>(
-            child: IconText(Icons.delete, 'Delete', color: Colors.red),
-            value: () => onDelete(),
-          ),
-        ],
-        onSelected: (value) => value(),
       ),
+      actions: [
+        IconSlideAction(
+          color: Theme.of(context).primaryColor.withOpacity(0.8),
+          icon: Icons.edit,
+          onTap: () => onEdit(),
+        ),
+      ],
+      secondaryActions: <Widget>[
+        IconSlideAction(
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: () => onDelete(),
+        ),
+      ],
     );
   }
 }
@@ -402,7 +402,7 @@ class _CompletedHeader extends StatelessWidget {
           ),
         ),
       ),
-      padding: EdgeInsets.only(left: 16, top: 8),
+      padding: EdgeInsets.only(left: 16, top: 8, right: 8),
       child: Row(
         children: [
           Expanded(

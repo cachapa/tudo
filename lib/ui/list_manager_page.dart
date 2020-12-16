@@ -2,15 +2,14 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 import 'package:tudo_client/extensions.dart';
 
-import 'custom_handle.dart';
 import 'edit_list.dart';
-import 'icon_text.dart';
 import 'progress.dart';
 import 'share_list.dart';
 import 'to_do_list_page.dart';
@@ -111,36 +110,43 @@ class _ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: CustomHandle(
-        child: Progress(list: list),
+    return Slidable(
+      actionExtentRatio: 0.15,
+      actionPane: SlidableDrawerActionPane(),
+      child: ListTile(
+        leading: Progress(list: list),
+        title: Text(
+          list.name,
+          style: Theme.of(context).textTheme.headline6,
+        ),
+        onTap: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => ToDoListPage(id: list.id)),
+        ),
+        trailing: Handle(
+          vibrate: false,
+          child: Icon(Icons.reorder),
+        ),
       ),
-      title: Text(
-        list.name,
-        style: Theme.of(context).textTheme.headline6,
-      ),
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => ToDoListPage(id: list.id)),
-      ),
-      trailing: PopupMenuButton<Function>(
-        itemBuilder: (context) => [
-          PopupMenuItem(
-            child: IconText(Icons.share, 'Share'),
-            value: () => shareToDoList(context, list),
-          ),
-          PopupMenuItem(
-            child: IconText(Icons.edit, 'Edit'),
-            value: () => editToDoList(context, list),
-          ),
-          PopupMenuItem(
-            child: IconText(Icons.delete, 'Delete', color: Colors.red),
-            value: () => _deleteList(context, list.id),
-          ),
-        ],
-        onSelected: (value) => value(),
-      ),
+      actions: [
+        IconSlideAction(
+          color: Theme.of(context).primaryColor,
+          icon: Icons.share,
+          onTap: () => shareToDoList(context, list),
+        ),
+        IconSlideAction(
+          color: Theme.of(context).primaryColor.withOpacity(0.8),
+          icon: Icons.edit,
+          onTap: () => editToDoList(context, list),
+        ),
+      ],
+      secondaryActions: <Widget>[
+        IconSlideAction(
+          color: Colors.red,
+          icon: Icons.delete,
+          onTap: () => _deleteList(context, list.id),
+        ),
+      ],
     );
   }
 
