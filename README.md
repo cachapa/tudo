@@ -9,7 +9,7 @@ This is different. It's simply useful.
 
 ## Try it out
 
-<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80">
+[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80">](https://play.google.com/store/apps/details?id=net.cachapa.tudo)
 
 (iOS app coming later)
 
