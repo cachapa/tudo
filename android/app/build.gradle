@@ -99,4 +99,5 @@ play {
     serviceAccountCredentials = file("play-store.json")
     userFraction = 1
     resolutionStrategy = "auto"
+    track = "beta"
 }
