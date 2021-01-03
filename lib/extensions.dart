@@ -22,4 +22,7 @@ extension ContextExtensions on BuildContext {
       Navigator.of(this).push(MaterialPageRoute(builder: (_) => builder()));
 
   void pop<T>([T result]) => Navigator.of(this).pop(result);
+
+  void showSnackBar(SnackBar snackBar) =>
+      ScaffoldMessenger.of(this).showSnackBar(snackBar);
 }

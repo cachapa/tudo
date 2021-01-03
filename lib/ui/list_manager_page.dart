@@ -22,7 +22,7 @@ class ListManagerPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarIconBrightness: Theme.of(context).brightness.invert,
+        statusBarIconBrightness: context.theme.brightness.invert,
       ),
       child: Consumer<ListManager>(
         builder: (_, listManager, __) => Scaffold(
@@ -140,25 +140,22 @@ class _ListItem extends StatelessWidget {
         leading: Progress(list: list),
         title: Text(
           list.name,
-          style: Theme.of(context).textTheme.headline6,
-        ),
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => ToDoListPage(id: list.id)),
+          style: context.theme.textTheme.headline6,
         ),
         trailing: Handle(
           vibrate: false,
           child: Icon(Icons.reorder),
         ),
+        onTap: () => context.push(() => ToDoListPage(id: list.id)),
       ),
       actions: [
         IconSlideAction(
-          color: Theme.of(context).primaryColor,
+          color: context.theme.primaryColor,
           icon: Icons.share,
           onTap: () => shareToDoList(context, list),
         ),
         IconSlideAction(
-          color: Theme.of(context).primaryColor.withOpacity(0.8),
+          color: context.theme.primaryColor.withOpacity(0.8),
           icon: Icons.edit,
           onTap: () => editToDoList(context, list),
         ),
@@ -176,7 +173,7 @@ class _ListItem extends StatelessWidget {
   void _deleteList(BuildContext context, String listId) {
     final listManager = context.read<ListManager>();
     final index = listManager.remove(list.id);
-    ScaffoldMessenger.of(context).showSnackBar(
+    context.showSnackBar(
       SnackBar(
         content: Text("${list.name} deleted"),
         action: SnackBarAction(

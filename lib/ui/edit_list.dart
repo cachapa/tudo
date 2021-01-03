@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
+import 'package:tudo_client/extensions.dart';
 
 Future<bool> editToDoList(BuildContext context, [ToDoList list]) {
   return showModalBottomSheet<bool>(
@@ -59,7 +60,7 @@ class _EditListForm extends StatelessWidget {
             children: [
               TextButton(
                 child: Text('Cancel'.toUpperCase()),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () => context.pop(),
               ),
               ElevatedButton(
                 style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
@@ -73,7 +74,7 @@ class _EditListForm extends StatelessWidget {
     );
   }
 
-  _create(BuildContext context) {
+  void _create(BuildContext context) {
     final name = _textController.text;
     final color = _colorController.color;
 
@@ -83,10 +84,10 @@ class _EditListForm extends StatelessWidget {
       toDoList.name = name;
       toDoList.color = color;
     } else {
-      Provider.of<ListManager>(context, listen: false).create(name, color);
+      context.read<ListManager>().create(name, color);
     }
 
-    Navigator.pop(context, true);
+    context.pop();
   }
 }
 

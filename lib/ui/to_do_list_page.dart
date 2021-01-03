@@ -9,6 +9,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
+import 'package:tudo_client/extensions.dart';
 
 import 'edit_list.dart';
 import 'empty_page.dart';
@@ -33,9 +34,8 @@ class ToDoListPage extends StatelessWidget {
     return Selector<ListManager, ToDoList>(
       selector: (_, listManager) => listManager.get(id),
       builder: (_, list, __) => Theme(
-        data: Theme.of(context).copyWith(
-          colorScheme:
-              Theme.of(context).colorScheme.copyWith(primary: list.color),
+        data: context.theme.copyWith(
+          colorScheme: context.theme.colorScheme.copyWith(primary: list.color),
           primaryColor: list.color,
           accentColor: list.color,
           primaryTextTheme: TextTheme(headline6: TextStyle(color: list.color)),
@@ -50,7 +50,7 @@ class ToDoListPage extends StatelessWidget {
         child: Scaffold(
           extendBodyBehindAppBar: true,
           appBar: TitleBar(
-            brightness: Theme.of(context).brightness,
+            brightness: context.theme.brightness,
             list: list,
             actions: [
               PopupMenuButton<Function>(
@@ -121,7 +121,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).primaryColor;
+    final primaryColor = context.theme.primaryColor;
 
     return ClipRect(
       child: BackdropFilter(
@@ -155,7 +155,7 @@ class InputBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).primaryColor;
+    final primaryColor = context.theme.primaryColor;
     final insetBottom = MediaQuery.of(context).viewPadding.bottom;
 
     return Padding(
@@ -171,9 +171,7 @@ class InputBar extends StatelessWidget {
               focusNode: _focusNode,
               textCapitalization: TextCapitalization.sentences,
               cursorColor: primaryColor,
-              style: Theme.of(context)
-                  .textTheme
-                  .subtitle1
+              style: context.theme.textTheme.subtitle1
                   .copyWith(color: primaryColor),
               decoration: InputDecoration(
                 filled: true,
@@ -298,7 +296,7 @@ class ToDoListView extends StatelessWidget {
 
   void _deleteItem(BuildContext context, ToDo toDo) {
     final index = toDoList.remove(toDo.id);
-    ScaffoldMessenger.of(context).showSnackBar(
+    context.showSnackBar(
       SnackBar(
         content: Text('Deleted "${toDo.name}"'),
         action: SnackBarAction(
@@ -321,7 +319,7 @@ class ToDoListView extends StatelessWidget {
     indexes = indexes.reversed.toList();
     final count = checked.length;
 
-    ScaffoldMessenger.of(context).showSnackBar(
+    context.showSnackBar(
       SnackBar(
         content:
             Text('Cleared $count completed ${count == 1 ? 'item' : 'items'}'),
@@ -370,7 +368,7 @@ class _ListTile extends StatelessWidget {
       ),
       actions: [
         IconSlideAction(
-          color: Theme.of(context).primaryColor.withOpacity(0.8),
+          color: context.theme.primaryColor.withOpacity(0.8),
           icon: Icons.edit,
           onTap: () => onEdit(),
         ),
@@ -409,8 +407,7 @@ class _CompletedHeader extends StatelessWidget {
           Expanded(
             child: Text(
               'Completed',
-              style:
-                  Theme.of(context).textTheme.subtitle2.copyWith(color: color),
+              style: context.theme.textTheme.subtitle2.copyWith(color: color),
             ),
           ),
           IconButton(
