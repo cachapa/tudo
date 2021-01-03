@@ -44,6 +44,31 @@ def getVersionName = { ->
     return stdout.toString().trim()
 }
 
+def getPreviousVersion = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'describe', '--tags', '--abbrev=0', '@^'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+def getChangelog = { ->
+//    git log --oneline $(git describe --tags --abbrev=0 @^)..@
+    def previousVersion = getPreviousVersion()
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'log', '--pretty=%s', '--reverse', "$previousVersion..@"
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+task generateChangelog  {
+    new File("$projectDir/src/main/play/release-notes/en-US", "default.txt").text = getChangelog()
+}
+tasks.publish.dependsOn(generateChangelog)
+
 android {
     compileSdkVersion 30
     ndkVersion "22.0.7026061"
