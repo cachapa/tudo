@@ -117,6 +117,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                 primarySwatch: Colors.blue,
               ),
               darkTheme: ThemeData(
+                primarySwatch: Colors.blue,
+                primaryColor: Colors.blue,
                 brightness: Brightness.dark,
               ),
               home: ListManagerPage(),
