@@ -115,7 +115,7 @@ class Logo extends StatelessWidget {
 
   Future<void> _launchQrScanner(BuildContext context) async {
     final code = await FlutterBarcodeScanner.scanBarcode(
-      context.theme.primaryColor.hexValue,
+      '#00000000',
       'CLOSE',
       false,
       ScanMode.QR,
