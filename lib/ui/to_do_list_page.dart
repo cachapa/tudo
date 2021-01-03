@@ -358,8 +358,20 @@ class _ListTile extends StatelessWidget {
         onTap: () => onToggle(),
         onLongPress: onEdit,
       ),
-      background: Container(color: Colors.red),
-      // secondaryBackground: Container(color: Colors.red),
+      background: Container(
+        alignment: Alignment.centerLeft,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        color: Colors.red,
+        child: Icon(Icons.delete,
+            color: context.theme.canvasColor.withOpacity(0.9)),
+      ),
+      secondaryBackground: Container(
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        color: Colors.red,
+        child: Icon(Icons.delete,
+            color: context.theme.canvasColor.withOpacity(0.9)),
+      ),
       onDismissed: (_) {
         // Do nothing - deletions happen in confirmDismiss
       },
