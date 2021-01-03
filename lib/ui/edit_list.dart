@@ -5,8 +5,10 @@ import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 import 'package:tudo_client/extensions.dart';
 
-Future<bool> editToDoList(BuildContext context, [ToDoList list]) {
-  return showModalBottomSheet<bool>(
+import 'share_list.dart';
+
+editToDoList(BuildContext context, [ToDoList list, Function() onDelete]) {
+  return showModalBottomSheet(
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
       isScrollControlled: true,
@@ -15,7 +17,10 @@ Future<bool> editToDoList(BuildContext context, [ToDoList list]) {
         return Padding(
           padding:
               EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: _EditListForm(toDoList: list),
+          child: _EditListForm(
+            list: list,
+            onDelete: onDelete,
+          ),
         );
       });
 }
@@ -24,13 +29,14 @@ class _EditListForm extends StatelessWidget {
   final _textController;
   final _colorController;
 
-  final ToDoList toDoList;
+  final ToDoList list;
+  final Function() onDelete;
 
-  bool get editMode => toDoList != null;
+  bool get editMode => list != null;
 
-  _EditListForm({Key key, this.toDoList})
-      : _textController = TextEditingController(text: toDoList?.name),
-        _colorController = ColorController(color: toDoList?.color),
+  _EditListForm({Key key, this.list, this.onDelete})
+      : _textController = TextEditingController(text: list?.name),
+        _colorController = ColorController(color: list?.color),
         super(key: key);
 
   @override
@@ -57,15 +63,38 @@ class _EditListForm extends StatelessWidget {
           ColorSelector(controller: _colorController),
           SizedBox(height: 20),
           ButtonBar(
+            mainAxisSize: MainAxisSize.max,
+            alignment: MainAxisAlignment.spaceBetween,
             children: [
-              TextButton(
-                child: Text('Cancel'.toUpperCase()),
-                onPressed: () => context.pop(),
-              ),
-              ElevatedButton(
-                style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
-                child: Text((editMode ? 'Update' : 'Create').toUpperCase()),
-                onPressed: () => _create(context),
+              if (!editMode) Container(),
+              if (editMode)
+                IconButton(
+                  icon: Icon(
+                    Icons.delete,
+                    color: Colors.red,
+                  ),
+                  onPressed: () => _delete(context),
+                ),
+              if (editMode)
+                IconButton(
+                  icon: Icon(
+                    Icons.share,
+                    color: context.theme.primaryColor,
+                  ),
+                  onPressed: () => _share(context),
+                ),
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: context.theme.primaryColor,
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.done,
+                    color: context.theme.canvasColor,
+                  ),
+                  onPressed: () => _create(context),
+                ),
               ),
             ],
           ),
@@ -81,13 +110,23 @@ class _EditListForm extends StatelessWidget {
     if (name.isEmpty) return;
 
     if (editMode) {
-      toDoList.name = name;
-      toDoList.color = color;
+      list.name = name;
+      list.color = color;
     } else {
       context.read<ListManager>().create(name, color);
     }
 
     context.pop();
+  }
+
+  void _share(BuildContext context) {
+    context.pop();
+    shareToDoList(context, list);
+  }
+
+  void _delete(BuildContext context) {
+    context.pop();
+    onDelete();
   }
 }
 

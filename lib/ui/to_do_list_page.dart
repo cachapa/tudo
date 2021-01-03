@@ -12,13 +12,13 @@ import 'package:tudo_client/extensions.dart';
 
 import 'edit_list.dart';
 import 'empty_page.dart';
-import 'icon_text.dart';
-import 'share_list.dart';
 import 'text_input_dialog.dart';
 
 const titleBarHeight = 60.0;
 const inputBarHeight = 60.0;
 const blurSigma = 14.0;
+
+enum ListAction { delete }
 
 class ToDoListPage extends StatelessWidget {
   final String id;
@@ -52,18 +52,10 @@ class ToDoListPage extends StatelessWidget {
             brightness: context.theme.brightness,
             list: list,
             actions: [
-              PopupMenuButton<Function>(
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    child: IconText(Icons.share, 'Share'),
-                    value: () => shareToDoList(context, list),
-                  ),
-                  PopupMenuItem(
-                    child: IconText(Icons.edit, 'Edit'),
-                    value: () => editToDoList(context, list),
-                  ),
-                ],
-                onSelected: (value) => value(),
+              IconButton(
+                icon: Icon(Icons.edit),
+                onPressed: () => editToDoList(
+                    context, list, () => context.pop(ListAction.delete)),
               ),
             ],
           ),

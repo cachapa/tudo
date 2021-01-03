@@ -3,7 +3,6 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +11,6 @@ import 'package:tudo_client/extensions.dart';
 
 import 'edit_list.dart';
 import 'progress.dart';
-import 'share_list.dart';
 import 'to_do_list_page.dart';
 
 final _controller = ScrollController();
@@ -133,45 +131,36 @@ class _ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      actionExtentRatio: 0.15,
-      actionPane: SlidableDrawerActionPane(),
-      child: ListTile(
-        leading: Progress(list: list),
-        title: Text(
-          list.name,
-          style: context.theme.textTheme.headline6,
-        ),
-        trailing: Handle(
-          vibrate: false,
-          child: Icon(Icons.reorder),
-        ),
-        onTap: () => context.push(() => ToDoListPage(id: list.id)),
-        onLongPress: () => editToDoList(context, list),
+    return ListTile(
+      leading: Progress(list: list),
+      title: Text(
+        list.name,
+        style: context.theme.textTheme.headline6,
       ),
-      actions: [
-        IconSlideAction(
-          color: context.theme.primaryColor,
-          icon: Icons.share,
-          onTap: () => shareToDoList(context, list),
-        ),
-        IconSlideAction(
-          color: context.theme.primaryColor.withOpacity(0.8),
-          icon: Icons.edit,
-          onTap: () => editToDoList(context, list),
-        ),
-      ],
-      secondaryActions: <Widget>[
-        IconSlideAction(
-          color: Colors.red,
-          icon: Icons.delete,
-          onTap: () => _deleteList(context, list.id),
-        ),
-      ],
+      trailing: Handle(
+        vibrate: false,
+        child: Icon(Icons.reorder),
+      ),
+      onTap: () => _openList(context),
+      onLongPress: () => _editList(context),
     );
   }
 
-  void _deleteList(BuildContext context, String listId) {
+  void _openList(BuildContext context) async {
+    final action = await context.push(() => ToDoListPage(id: list.id));
+    if (action != null && action == ListAction.delete) {
+      Future.delayed(
+        // Wait for pop animation to complete
+        Duration(milliseconds: 310),
+        () => _deleteList(context),
+      );
+    }
+  }
+
+  void _editList(BuildContext context) =>
+      editToDoList(context, list, () => _deleteList(context));
+
+  void _deleteList(BuildContext context) {
     final listManager = context.read<ListManager>();
     final index = listManager.remove(list.id);
     context.showSnackBar(
