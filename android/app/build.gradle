@@ -41,7 +41,11 @@ def getVersionName = { ->
         commandLine 'git', 'describe', '--tags'
         standardOutput = stdout
     }
-    return stdout.toString().trim()
+    def versionName = stdout.toString().trim()
+    if (versionName.contains('-')) {
+        throw new Exception("Invalid version name: $versionName")
+    }
+    return versionName
 }
 
 def getPreviousVersion = { ->
