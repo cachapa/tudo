@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
 
-  crypto: ^2.1.5
   provider: ^4.0.0
 
   crdt: #^2.2.1
