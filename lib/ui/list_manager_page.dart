@@ -147,6 +147,7 @@ class _ListItem extends StatelessWidget {
           child: Icon(Icons.reorder),
         ),
         onTap: () => context.push(() => ToDoListPage(id: list.id)),
+        onLongPress: () => editToDoList(context, list),
       ),
       actions: [
         IconSlideAction(
