@@ -2,13 +2,19 @@ import 'package:flutter/material.dart';
 
 class TextInputDialog extends StatelessWidget {
   final String title;
+  final String positiveLabel;
   final ValueChanged<String> onSet;
   final TextInputType keyboardType;
 
   final TextEditingController _controller;
 
   TextInputDialog(
-      {Key key, this.title, String value, this.onSet, this.keyboardType})
+      {Key key,
+      this.title,
+      this.positiveLabel = 'Set',
+      String value,
+      this.onSet,
+      this.keyboardType})
       : _controller = TextEditingController(text: value),
         super(key: key);
 
@@ -36,7 +42,7 @@ class TextInputDialog extends StatelessWidget {
         ),
         ElevatedButton(
           style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
-          child: Text('Set'.toUpperCase()),
+          child: Text(positiveLabel.toUpperCase()),
           onPressed: () => _set(context, _controller.text),
         ),
       ],

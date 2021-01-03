@@ -4,7 +4,6 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +53,6 @@ class ToDoListPage extends StatelessWidget {
             list: list,
             actions: [
               PopupMenuButton<Function>(
-                icon: Icon(Icons.settings),
                 itemBuilder: (context) => [
                   PopupMenuItem(
                     child: IconText(Icons.share, 'Share'),
@@ -239,7 +237,7 @@ class ToDoListView extends StatelessWidget {
             toDoList.swap(from, to);
           },
           itemBuilder: (_, itemAnimation, item, __) => Reorderable(
-            key: ValueKey(item.id),
+            key: Key(item.id),
             builder: (context, animation, inDrag) => SizeFadeTransition(
               sizeFraction: 0.7,
               curve: Curves.easeInOut,
@@ -288,7 +286,9 @@ class ToDoListView extends StatelessWidget {
     showDialog<String>(
       context: context,
       builder: (context) => TextInputDialog(
+        title: 'Edit Item',
         value: toDo.name,
+        positiveLabel: 'Update',
         onSet: (value) => toDoList.set(toDo.id, name: value),
       ),
     );
@@ -349,37 +349,35 @@ class _ListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Slidable(
-      actionExtentRatio: 0.15,
-      actionPane: SlidableDrawerActionPane(),
+    return Dismissible(
+      key: Key(item.id),
       child: ListTile(
         leading: Checkbox(
           onChanged: (_) => onToggle(),
           value: item.checked,
         ),
         title: Text(item.name),
-        onTap: () => onToggle(),
         trailing: item.checked
             ? null
             : Handle(
                 vibrate: false,
                 child: Icon(Icons.reorder),
               ),
+        onTap: () => onToggle(),
+        onLongPress: onEdit,
       ),
-      actions: [
-        IconSlideAction(
-          color: context.theme.primaryColor.withOpacity(0.8),
-          icon: Icons.edit,
-          onTap: () => onEdit(),
-        ),
-      ],
-      secondaryActions: <Widget>[
-        IconSlideAction(
-          color: Colors.red,
-          icon: Icons.delete,
-          onTap: () => onDelete(),
-        ),
-      ],
+      background: Container(color: Colors.red),
+      // secondaryBackground: Container(color: Colors.red),
+      onDismissed: (_) {
+        // Do nothing - deletions happen in confirmDismiss
+      },
+      confirmDismiss: (_) async {
+        // Avoid conflicts between Dismissible and list animations
+        // This removes the item and returns true so this widget remains in the
+        // tree to be removed by the list animation rather than itself.
+        onDelete();
+        return false;
+      },
     );
   }
 }
