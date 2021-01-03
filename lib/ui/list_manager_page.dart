@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
@@ -88,19 +89,41 @@ class Logo extends StatelessWidget {
   @override
   Widget build(BuildContext context) => SafeArea(
         bottom: false,
-        child: Container(
-          height: 120,
-          alignment: Alignment.center,
-          child: Text(
-            'tudo',
-            style: TextStyle(
-              fontFamily: 'WaitingfortheSunrise',
-              fontSize: 100,
-              height: 1.4,
+        child: Stack(
+          alignment: Alignment.topRight,
+          children: [
+            Container(
+              height: 120,
+              alignment: Alignment.center,
+              child: Text(
+                'tudo',
+                style: TextStyle(
+                  fontFamily: 'WaitingfortheSunrise',
+                  fontSize: 100,
+                  height: 1.4,
+                ),
+              ),
             ),
-          ),
+            IconButton(
+              padding: EdgeInsets.all(20),
+              icon: Icon(Icons.qr_code_scanner),
+              onPressed: () => _launchQrScanner(context),
+            ),
+          ],
         ),
       );
+
+  Future<void> _launchQrScanner(BuildContext context) async {
+    final code = await FlutterBarcodeScanner.scanBarcode(
+      context.theme.primaryColor.hexValue,
+      'CLOSE',
+      false,
+      ScanMode.QR,
+    );
+    if (code == '-1') return;
+    print('Read QR: $code');
+    context.read<ListManager>().import(code);
+  }
 }
 
 class _ListItem extends StatelessWidget {
