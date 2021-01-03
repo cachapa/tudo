@@ -32,45 +32,13 @@ class HiveCrdt<K, V> extends Crdt<K, V> {
           MapEntry(_encode(key), ModRecord(record, canonicalTime))));
 
   @override
-  Map<K, Record<V>> recordMap() =>
-      _box.toMap().map<K, Record<V>>((key, value) => MapEntry<K, Record<V>>(
-          _decode(key), Record<V>(value.record.hlc, value.record.value)));
-
-  /// Returns a map with all records modified between [from] and [to] (exclusive).
-  /// If either [from] or [to] are null, the returned map contains all values
-  /// starting from, or up to the HLC, respectively.
-  /// See [jsonChangeset].
-  Map<K, Record<V>> changeset({Hlc from, Hlc to}) =>
-      (_box.toMap()..removeWhere((key, value) => value <= from || value >= to))
-          .map<K, Record<V>>((key, value) => MapEntry(
-              _decode(key), Record<V>(value.record.hlc, value.record.value)));
-
-  /// Helper method for returning [changeset] as json.
-  String jsonChangeset({Hlc from, Hlc to}) =>
-      CrdtJson.encode(changeset(from: from, to: to));
-
-  /// Gets all records between [startKey] and [endKey] (inclusive)
-  List<Record<V>> recordsBetween(
-          {K startKey, K endKey, bool includeDeleted = false}) =>
-      (_box.toMap()
-            ..removeWhere((key, value) =>
-                (!includeDeleted && value.record.isDeleted) ||
-                ((startKey != null
-                        ? key.compareTo(_encode(startKey)) < 0
-                        : false) ||
-                    (endKey != null
-                        ? key.compareTo(_encode(endKey)) > 0
-                        : false))))
-          .values
-          .map((modRecord) =>
-              Record<V>(modRecord.record.hlc, modRecord.record.value))
-          .toList();
-
-  /// Gets all values between [startKey] and [endKey] (inclusive)
-  List<V> between({K startKey, K endKey}) =>
-      recordsBetween(startKey: startKey, endKey: endKey)
-          .map((record) => record.value)
-          .toList();
+  Map<K, Record<V>> recordMap({Hlc modifiedSince}) => (_box.toMap()
+        ..removeWhere((key, value) =>
+            value.modified.logicalTime < (modifiedSince?.logicalTime ?? 0)))
+      .map<K, Record<V>>((key, value) => MapEntry<K, Record<V>>(
+          _decode(key),
+          Record<V>(
+              value.record.hlc, value.record.value, value.record.modified)));
 
   Stream<MapEntry<K, V>> watch({K key}) => _box
       .watch(key: key)

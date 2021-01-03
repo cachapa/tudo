@@ -132,6 +132,8 @@ class ToDoList {
 
   List<String> get _order => _toDoCrdt.get(orderKey)?.cast<String>() ?? [];
 
+  Hlc get canonicalTime => _toDoCrdt.canonicalTime;
+
   set _order(List<String> values) => _toDoCrdt.put(orderKey, values);
 
   set name(String value) {
@@ -204,7 +206,8 @@ class ToDoList {
     return index;
   }
 
-  String toJson() => _toDoCrdt.toJson(
+  String toJson(Hlc lastSync) => _toDoCrdt.toJson(
+      modifiedSince: lastSync,
       valueEncoder: (key, value) => value is Color ? value.hexValue : value);
 
   void mergeJson(String json) {

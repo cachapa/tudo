@@ -1,3 +1,4 @@
+import 'package:crdt/crdt.dart';
 import 'package:flutter/foundation.dart';
 
 import 'list_manager.dart';
@@ -6,6 +7,7 @@ import 'sync_client.dart';
 class SyncManager with ChangeNotifier {
   final _clientMap = <String, SyncClient>{};
 
+  Hlc _lastSync;
   ListManager _listManager;
 
   bool get connected => _clientMap.isEmpty
@@ -27,7 +29,10 @@ class SyncManager with ChangeNotifier {
         });
         _clientMap[id].messages.listen((message) {
           // print('<= $message');
-          _listManager.get(id).mergeJson(message);
+          final list = _listManager.get(id);
+          list.mergeJson(message);
+          _lastSync = list.canonicalTime;
+          // print('lastSync: ${_lastSync.logicalTime}');
         });
       }
     });
@@ -50,7 +55,9 @@ class SyncManager with ChangeNotifier {
 
   void sync() {
     _listManager.lists.forEach((list) {
-      _clientMap[list.id].send(list.toJson());
+      final changeset = list.toJson(_lastSync);
+      // print('=> ${list.name}: $changeset');
+      _clientMap[list.id].send(changeset);
     });
   }
 }
