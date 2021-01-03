@@ -104,7 +104,7 @@ class ColorController {
 
 class ColorSelector extends StatefulWidget {
   static const colors = [
-    Colors.pink,
+    Colors.purpleAccent,
     Colors.red,
     Colors.orange,
     Colors.green,
