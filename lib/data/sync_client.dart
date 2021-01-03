@@ -35,12 +35,14 @@ class SyncClient {
       (message) => _messageController.add(message),
       onDone: () => disconnect(),
     );
+
+    // print('connected');
   }
 
   void send(String message) => channel.sink.add(message);
 
   void disconnect() {
-    print('disconnected');
+    // print('disconnected');
     _connectionStateController.sink.add(false);
     subscription?.cancel();
     subscription = null;

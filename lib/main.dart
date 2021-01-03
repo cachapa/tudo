@@ -44,6 +44,7 @@ void main() async {
   Hive.registerAdapter(ColorAdapter(4));
 
   final listManager = await ListManager.open(nodeId);
+  _monitorDeeplinks(listManager);
 
   // TODO Remove this
   // listManager.import('test');
@@ -61,6 +62,23 @@ void main() async {
       child: MyApp(),
     ),
   );
+}
+
+void _monitorDeeplinks(ListManager listManager) {
+  try {
+    if (Platform.isAndroid || Platform.isIOS) {
+      getInitialLink().then((link) async {
+        if (link != null) {
+          print('Initial link: $link');
+          await listManager.import(link);
+        }
+      });
+      getLinksStream().listen((link) async {
+        print('Stream link: $link');
+        await listManager.import(link);
+      }).onError((e) => print(e));
+    }
+  } catch (_) {}
 }
 
 class MyApp extends StatefulWidget {
@@ -85,24 +103,6 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    // TODO Improve this crap
-    try {
-      if (Platform.isAndroid || Platform.isIOS) {
-        getInitialUri().then((uri) {
-          if (uri != null) {
-            print('URI: $uri');
-            final id = uri.pathSegments[0];
-            Provider.of<ListManager>(context, listen: false).import(id);
-          }
-        });
-        getUriLinksStream().listen((uri) {
-          print('URI: $uri');
-          final id = uri.pathSegments[0];
-          Provider.of<ListManager>(context, listen: false).import(id);
-        }).onError((e) => print(e));
-      }
-    } catch (_) {}
-
     _manageConnection(context);
 
     return Consumer<SyncManager>(builder: (_, syncManager, __) {

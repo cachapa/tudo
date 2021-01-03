@@ -37,6 +37,13 @@ class ListManager with ChangeNotifier {
   }
 
   Future<void> _init() async {
+    // Sanity check: remove duplicate list ids
+    final set = _listIds.toSet();
+    if (set.length != _listIds.length) {
+      print('WARNING: Detected duplicate list ids. Fixing…');
+      _listIds = set.toList();
+    }
+
     // Open all the to do lists
     await Future.wait(_listIds
         .map((e) async => _toDoLists[e] = await ToDoList.import(this, e)));
@@ -53,8 +60,17 @@ class ListManager with ChangeNotifier {
   }
 
   Future<void> import(String id, [int index]) async {
-    if (_listIds.contains(id)) return;
     await _initFuture;
+
+    // Remove url section if present
+    id = id.replaceFirst('https://tudo.cachapa.net/', '');
+
+    if (_listIds.contains(id)) {
+      print('Import: already have $id');
+      return;
+    }
+
+    print('Importing $id');
     _listIds =
         index == null ? (_listIds..add(id)) : (_listIds..insert(index, id));
     _toDoLists[id] = await ToDoList.import(this, id);

@@ -98,7 +98,8 @@ class ToDoListPage extends StatelessWidget {
                 .size
                 .height;
         final maxOffset = uncheckedListHeight;
-        final minOffset = max(0, uncheckedListHeight - screenHeight) + 200;
+        final minOffset =
+            max<double>(0.0, uncheckedListHeight - screenHeight) + 200.0;
         final offset = _controller.offset.clamp(minOffset, maxOffset);
         _controller.animateTo(
           offset,
