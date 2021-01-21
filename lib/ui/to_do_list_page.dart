@@ -355,7 +355,10 @@ class _ListTile extends StatelessWidget {
             ? null
             : Handle(
                 vibrate: false,
-                child: Icon(Icons.reorder),
+                child: Icon(
+                  Icons.reorder,
+                  color: context.theme.dividerColor,
+                ),
               ),
         onTap: () => onToggle(),
         onLongPress: onEdit,
