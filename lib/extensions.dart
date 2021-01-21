@@ -24,6 +24,5 @@ extension ContextExtensions on BuildContext {
   void pop<T>([T result]) => Navigator.of(this).pop(result);
 
   void showSnackBar(SnackBar snackBar) =>
-      // ScaffoldMessenger.of(this).showSnackBar(snackBar);
-      Scaffold.of(this).showSnackBar(snackBar);
+      ScaffoldMessenger.of(this).showSnackBar(snackBar);
 }

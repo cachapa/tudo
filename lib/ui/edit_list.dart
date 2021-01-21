@@ -191,7 +191,7 @@ class ColorButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FlatButton(
+    return MaterialButton(
       minWidth: 40,
       height: 40,
       color: color,
