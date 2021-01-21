@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -86,20 +85,19 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  bool isAppVisible = true;
-  StreamSubscription<ConnectivityResult> connectivity;
+  Timer reconnectTimer;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    manageConnection(AppLifecycleState.resumed);
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
-    setState(() => isAppVisible = state != AppLifecycleState.paused);
-    _manageConnection();
+    manageConnection(state);
   }
 
   @override
@@ -120,16 +118,19 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     );
   }
 
-  void _manageConnection() {
+  void manageConnection(AppLifecycleState state) {
     final syncManager = context.read<SyncManager>();
-    if (isAppVisible) {
-      syncManager.connect();
-      connectivity = Connectivity().onConnectivityChanged.listen((result) {
-        if (result != ConnectivityResult.none) syncManager.connect();
-      });
+    final appVisible = (state == AppLifecycleState.resumed ||
+        state == AppLifecycleState.inactive);
+    if (appVisible) {
+      if (!(reconnectTimer?.isActive ?? false)) {
+        reconnectTimer =
+            Timer.periodic(Duration(seconds: 10), (_) => syncManager.connect());
+        syncManager.connect();
+      }
     } else {
+      reconnectTimer?.cancel();
       syncManager.disconnect();
-      connectivity.cancel();
     }
   }
 }
