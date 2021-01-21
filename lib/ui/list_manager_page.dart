@@ -141,7 +141,10 @@ class _ListItem extends StatelessWidget {
       ),
       trailing: Handle(
         vibrate: false,
-        child: Icon(Icons.reorder),
+        child: Icon(
+          Icons.reorder,
+          color: context.theme.dividerColor,
+        ),
       ),
       onTap: () => _openList(context),
       onLongPress: () => _editList(context),
