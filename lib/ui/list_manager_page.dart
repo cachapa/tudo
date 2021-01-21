@@ -8,6 +8,7 @@ import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/data/list_manager.dart';
 import 'package:tudo_client/extensions.dart';
+import 'package:tudo_client/ui/offline_indicator.dart';
 
 import 'edit_list.dart';
 import 'progress.dart';
@@ -62,6 +63,7 @@ class ListManagerPage extends StatelessWidget {
                 ],
               ),
               onPressed: () => _createList(context)),
+          bottomNavigationBar: OfflineIndicator(),
         ),
       ),
     );

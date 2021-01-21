@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
@@ -85,6 +87,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   bool isAppVisible = true;
+  StreamSubscription<ConnectivityResult> connectivity;
 
   @override
   void initState() {
@@ -96,46 +99,37 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     setState(() => isAppVisible = state != AppLifecycleState.paused);
+    _manageConnection();
   }
 
   @override
   Widget build(BuildContext context) {
-    _manageConnection(context);
-
-    return Consumer<SyncManager>(builder: (_, syncManager, __) {
-      return Column(
-        children: [
-          Expanded(
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
-              // themeMode: ThemeMode.dark,
-              title: 'tudo',
-              theme: ThemeData(
-                primarySwatch: Colors.blue,
-              ),
-              darkTheme: ThemeData(
-                primarySwatch: Colors.blue,
-                primaryColor: Colors.blue,
-                brightness: Brightness.dark,
-              ),
-              home: ListManagerPage(),
-            ),
-          ),
-          Container(
-            color: syncManager.connected ? Colors.green : Colors.red,
-            height: 2,
-          ),
-        ],
-      );
-    });
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      // themeMode: ThemeMode.light,
+      title: 'tudo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        primaryColor: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      home: ListManagerPage(),
+    );
   }
 
-  void _manageConnection(BuildContext context) {
-    final syncManager = Provider.of<SyncManager>(context, listen: false);
+  void _manageConnection() {
+    final syncManager = context.read<SyncManager>();
     if (isAppVisible) {
       syncManager.connect();
+      connectivity = Connectivity().onConnectivityChanged.listen((result) {
+        if (result != ConnectivityResult.none) syncManager.connect();
+      });
     } else {
       syncManager.disconnect();
+      connectivity.cancel();
     }
   }
 }
