@@ -12,10 +12,7 @@ dependencies:
 
   provider: ^4.0.0
 
-  crdt: #^2.2.1
-    git:
-      url: git@github.com:cachapa/crdt.git
-      ref: modifiedSince
+  crdt: ^3.0.0-pre.3
   hive: ^1.4.0
 
   http: ^0.12.0+3

@@ -46,9 +46,6 @@ void main() async {
   final listManager = await ListManager.open(nodeId);
   _monitorDeeplinks(listManager);
 
-  // TODO Remove this
-  // listManager.import('test');
-
   runApp(
     MultiProvider(
       providers: [

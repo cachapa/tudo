@@ -15,7 +15,17 @@ class HlcAdapter extends TypeAdapter<Hlc> {
   HlcAdapter(this.typeId, this.nodeId);
 
   @override
-  Hlc read(BinaryReader reader) => Hlc.fromLogicalTime(reader.read(), nodeId);
+  Hlc read(BinaryReader reader) {
+    // Migrate from µs-based logical time
+    final logicalTime = reader.read();
+    return logicalTime < 10000000000000000
+        ? Hlc(
+            (logicalTime & 0xFFFFFFFFFFFF0000) ~/ 1000,
+            logicalTime & 0xFFFF,
+            nodeId,
+          )
+        : Hlc.fromLogicalTime(logicalTime, nodeId);
+  }
 
   @override
   void write(BinaryWriter writer, Hlc obj) => writer.write(obj.logicalTime);
