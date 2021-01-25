@@ -3,8 +3,6 @@ import 'dart:async';
 import 'package:tudo_client/config.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-enum ConnectionState { disconnected, connecting, connected }
-
 class SyncClient {
   final String id;
 
@@ -29,11 +27,13 @@ class SyncClient {
     final endpoint = '$serverAddress/$id/ws';
     channel = WebSocketChannel.connect(Uri.parse(endpoint));
 
-    _connectionStateController.sink.add(true);
-
     subscription = channel.stream.listen(
-      (message) => _messageController.add(message),
+      (message) {
+        _connectionStateController.sink.add(true);
+        _messageController.add(message);
+      },
       onDone: () => disconnect(),
+      onError: (e) => disconnect(),
     );
 
     // print('connected');

@@ -11,7 +11,7 @@ class SyncManager with ChangeNotifier {
   ListManager _listManager;
 
   bool get connected => _clientMap.isEmpty
-      ? false
+      ? true
       : _clientMap.values
           .map((e) => e.isConnected)
           .reduce((value, element) => value && element);
