@@ -21,6 +21,6 @@ jobs:
       - name: Verify code formatting
         run: dart format --output none --set-exit-if-changed .
       - name: Static code analysis
-        run: flutter analyze .
+        run: flutter analyze
       - name: Run tests
         run: flutter test
