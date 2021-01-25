@@ -17,7 +17,11 @@ class OfflineIndicator extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.wifi_off, size: 12),
+            Icon(
+              Icons.wifi_off,
+              size: 12,
+              color: context.theme.textTheme.overline.color,
+            ),
             SizedBox(width: 4),
             Text(
               'offline',
