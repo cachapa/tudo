@@ -4,6 +4,8 @@ import 'package:tudo_client/data/sync_manager.dart';
 import '../extensions.dart';
 
 class OfflineIndicator extends StatelessWidget {
+  final _color = Colors.red.shade50;
+
   @override
   Widget build(BuildContext context) {
     return Consumer<SyncManager>(
@@ -20,12 +22,12 @@ class OfflineIndicator extends StatelessWidget {
             Icon(
               Icons.wifi_off,
               size: 12,
-              color: context.theme.textTheme.overline.color,
+              color: _color,
             ),
             SizedBox(width: 4),
             Text(
               'offline',
-              style: context.theme.textTheme.overline,
+              style: context.theme.textTheme.overline.copyWith(color: _color),
             ),
           ],
         ),
