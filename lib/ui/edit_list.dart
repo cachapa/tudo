@@ -9,20 +9,15 @@ import 'share_list.dart';
 
 editToDoList(BuildContext context, [ToDoList list, Function() onDelete]) {
   return showModalBottomSheet(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: _EditListForm(
-            list: list,
-            onDelete: onDelete,
-          ),
-        );
-      });
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
+    isScrollControlled: true,
+    context: context,
+    builder: (context) => _EditListForm(
+      list: list,
+      onDelete: onDelete,
+    ),
+  );
 }
 
 class _EditListForm extends StatelessWidget {
@@ -42,7 +37,7 @@ class _EditListForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 24, right: 24, top: 24),
+      padding: EdgeInsets.all(24),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,

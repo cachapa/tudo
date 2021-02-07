@@ -6,17 +6,12 @@ import 'package:tudo_client/data/list_manager.dart';
 
 void shareToDoList(BuildContext context, ToDoList list) {
   showModalBottomSheet<String>(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
-      isScrollControlled: true,
-      context: context,
-      builder: (context) {
-        return Padding(
-          padding:
-              EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: _ShareListForm(list: list),
-        );
-      });
+    shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
+    isScrollControlled: true,
+    context: context,
+    builder: (context) => _ShareListForm(list: list),
+  );
 }
 
 class _ShareListForm extends StatelessWidget {
