@@ -1,15 +1,14 @@
 ![tudo](tudo.svg)
 
-an experiment in simple connected to-do lists.
+To-do lists are supposed to be easy, yet everyone seems to be making them complicated.
+You just want to write down a simple shopping list but then find yourself dealing with user accounts, permissions, roles, ads, autocompleters, AI helpers, location-based services, user tracking, etc.
 
-To-do lists are supposed to be easy, yet everyone seems to be making them complicated.<br/>
-You just want to write down a simple shopping list but then find yourself dealing with user accounts, permissions, roles, ads, autocompleters, AI helpers, location-based services, user tracking, etc. etc. etc.
-
-This is different. It's simply useful. 
+tudo is an experiment on simple, private, yet synchronized to-do lists.
 
 ## Try it out
 
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80">](https://play.google.com/store/apps/details?id=net.cachapa.tudo)
+[<img src="images/testflight-badge.png" height="80">](https://testflight.apple.com/join/t9C2OTf3)
 
 (iOS app coming later)
 
