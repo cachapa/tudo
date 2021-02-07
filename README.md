@@ -10,8 +10,6 @@ tudo is an experiment on simple, private, yet synchronized to-do lists.
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80">](https://play.google.com/store/apps/details?id=net.cachapa.tudo)
 [<img src="images/testflight-badge.png" height="80">](https://testflight.apple.com/join/t9C2OTf3)
 
-(iOS app coming later)
-
 The server part of this project is maintained separately: [tudo_server](https://github.com/cachapa/tudo_server).
 
 ## Features
