@@ -83,18 +83,13 @@ class _EditListForm extends StatelessWidget {
                   ),
                   onPressed: () => _share(context),
                 ),
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: context.theme.primaryColor,
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.done,
-                    color: context.theme.canvasColor,
-                  ),
-                  onPressed: () => _create(context),
-                ),
+              MaterialButton(
+                minWidth: 48,
+                height: 48,
+                color: context.theme.primaryColor,
+                shape: CircleBorder(),
+                onPressed: () => _create(context),
+                child: Text('OK'),
               ),
             ],
           ),
@@ -192,6 +187,7 @@ class ColorButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
+      elevation: selected ? null : 0,
       minWidth: 40,
       height: 40,
       color: color,
