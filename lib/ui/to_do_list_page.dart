@@ -148,7 +148,6 @@ class InputBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = context.theme.primaryColor;
-    final insetBottom = MediaQuery.of(context).viewPadding.bottom;
 
     return Padding(
       padding: EdgeInsets.all(10),
@@ -156,30 +155,27 @@ class InputBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(100),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-          child: Container(
-            padding: EdgeInsets.only(bottom: insetBottom),
-            child: TextField(
-              controller: _controller,
-              focusNode: _focusNode,
-              textCapitalization: TextCapitalization.sentences,
-              cursorColor: primaryColor,
-              style: context.theme.textTheme.subtitle1
-                  .copyWith(color: primaryColor),
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: primaryColor.withAlpha(30),
-                contentPadding: EdgeInsets.all(20),
-                hintText: 'Add Item',
-                border: InputBorder.none,
-                suffixIcon: IconButton(
-                  padding: EdgeInsets.only(right: 10),
-                  icon: Icon(Icons.add),
-                  onPressed: () => _onSubmitted(_controller.text),
-                ),
+          child: TextField(
+            controller: _controller,
+            focusNode: _focusNode,
+            textCapitalization: TextCapitalization.sentences,
+            cursorColor: primaryColor,
+            style:
+                context.theme.textTheme.subtitle1.copyWith(color: primaryColor),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: primaryColor.withAlpha(30),
+              contentPadding: EdgeInsets.all(20),
+              hintText: 'Add Item',
+              border: InputBorder.none,
+              suffixIcon: IconButton(
+                padding: EdgeInsets.only(right: 10),
+                icon: Icon(Icons.add),
+                onPressed: () => _onSubmitted(_controller.text),
               ),
-              maxLines: 1,
-              onSubmitted: (text) => _onSubmitted(text),
             ),
+            maxLines: 1,
+            onSubmitted: (text) => _onSubmitted(text),
           ),
         ),
       ),
