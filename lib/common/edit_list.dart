@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tudo_client/data/list_manager.dart';
+import 'package:tudo_client/list_manager/list_provider.dart';
 import 'package:tudo_client/extensions.dart';
 
 import 'share_list.dart';
@@ -103,7 +103,7 @@ class _EditListForm extends StatelessWidget {
       list.name = name;
       list.color = color;
     } else {
-      context.read<ListManager>().create(name, color);
+      context.read<ListProvider>().create(name, color);
     }
 
     context.pop();

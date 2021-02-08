@@ -8,11 +8,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
 
-import 'data/hive/hive_adapters.dart';
-import 'data/list_manager.dart';
-import 'data/random_id.dart';
-import 'data/sync_manager.dart';
-import 'ui/list_manager_page.dart';
+import 'list_manager/list_provider.dart';
+import 'util/hive/hive_adapters.dart';
+import 'util/random_id.dart';
+import 'util/sync_manager.dart';
+import 'list_manager/list_manager_page.dart';
 
 void main() async {
   // Emulate platform
@@ -45,14 +45,14 @@ void main() async {
   Hive.registerAdapter(ToDoAdapter(3));
   Hive.registerAdapter(ColorAdapter(4));
 
-  final listManager = await ListManager.open(nodeId);
+  final listManager = await ListProvider.open(nodeId);
   _monitorDeeplinks(listManager);
 
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: listManager),
-        ChangeNotifierProxyProvider<ListManager, SyncManager>(
+        ChangeNotifierProxyProvider<ListProvider, SyncManager>(
           create: (_) => SyncManager(),
           update: (_, listManager, syncManager) =>
               syncManager..listManager = listManager,
@@ -63,7 +63,7 @@ void main() async {
   );
 }
 
-void _monitorDeeplinks(ListManager listManager) {
+void _monitorDeeplinks(ListProvider listManager) {
   try {
     if (Platform.isAndroid || Platform.isIOS) {
       getInitialLink().then((link) async {

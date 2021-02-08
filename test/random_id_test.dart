@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tudo_client/data/random_id.dart';
+import 'package:tudo_client/util/random_id.dart';
 
 void testLength(int length) {
   final id = generateRandomId(length);

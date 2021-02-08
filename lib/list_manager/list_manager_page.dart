@@ -7,13 +7,12 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
-import 'package:tudo_client/data/list_manager.dart';
+import 'package:tudo_client/common/edit_list.dart';
+import 'package:tudo_client/common/progress.dart';
+import 'package:tudo_client/list_manager/list_provider.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/ui/offline_indicator.dart';
-
-import 'edit_list.dart';
-import 'progress.dart';
-import 'to_do_list_page.dart';
+import 'package:tudo_client/common/offline_indicator.dart';
+import 'package:tudo_client/to_to_list/to_do_list_page.dart';
 
 final _controller = ScrollController();
 
@@ -24,7 +23,7 @@ class ListManagerPage extends StatelessWidget {
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.theme.brightness.invert,
       ),
-      child: Consumer<ListManager>(
+      child: Consumer<ListProvider>(
         builder: (_, listManager, __) => Scaffold(
           body: ImplicitlyAnimatedReorderableList<ToDoList>(
             controller: _controller,
@@ -123,7 +122,7 @@ class Logo extends StatelessWidget {
     );
     if (code == '-1') return;
     print('Read QR: $code');
-    context.read<ListManager>().import(code);
+    context.read<ListProvider>().import(code);
   }
 }
 
@@ -161,7 +160,7 @@ class _ListItem extends StatelessWidget {
       editToDoList(context, list, () => _deleteList(context));
 
   void _deleteList(BuildContext context) {
-    final listManager = context.read<ListManager>();
+    final listManager = context.read<ListProvider>();
     final index = listManager.remove(list.id);
     context.showSnackBar(
       SnackBar(

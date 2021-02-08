@@ -6,14 +6,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-
-import '../extensions.dart';
-import 'hive/hive_crdt.dart';
-import 'random_id.dart';
+import 'package:tudo_client/extensions.dart';
+import 'package:tudo_client/util/hive/hive_crdt.dart';
+import 'package:tudo_client/util/random_id.dart';
 
 const listIdsKey = 'list_id_keys';
 
-class ListManager with ChangeNotifier {
+class ListProvider with ChangeNotifier {
   final String nodeId;
   final Box<List<String>> _box;
   final _toDoLists = <String, ToDoList>{};
@@ -27,12 +26,12 @@ class ListManager with ChangeNotifier {
   List<ToDoList> get lists =>
       _listIds.map((e) => _toDoLists[e]).where((e) => e != null).toList();
 
-  static Future<ListManager> open(String nodeId) async {
+  static Future<ListProvider> open(String nodeId) async {
     final box = await Hive.openBox<List<String>>('store');
-    return ListManager._(nodeId, box);
+    return ListProvider._(nodeId, box);
   }
 
-  ListManager._(this.nodeId, this._box) {
+  ListProvider._(this.nodeId, this._box) {
     _initFuture = _init();
   }
 
@@ -103,7 +102,7 @@ class ToDoList {
   static final colorKey = '__color__';
   static final orderKey = '__order__';
 
-  final ListManager _parent;
+  final ListProvider _parent;
   final String id;
   final Crdt<String, dynamic> _toDoCrdt;
 
@@ -160,14 +159,14 @@ class ToDoList {
   }
 
   static Future<ToDoList> open(
-      ListManager parent, String id, String name, Color color) async {
+      ListProvider parent, String id, String name, Color color) async {
     final crdt = await HiveCrdt.open<String, dynamic>(id, parent.nodeId);
     if (name != null) crdt.put(nameKey, name);
     if (color != null) crdt.put(colorKey, color);
     return ToDoList._internal(parent, id, crdt);
   }
 
-  static Future<ToDoList> import(ListManager parent, String id) =>
+  static Future<ToDoList> import(ListProvider parent, String id) =>
       open(parent, id, null, null);
 
   ToDo add(String name) => set(generateRandomId(), name: name, checked: false);

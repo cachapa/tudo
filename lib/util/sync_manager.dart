@@ -1,14 +1,14 @@
 import 'package:crdt/crdt.dart';
 import 'package:flutter/foundation.dart';
 
-import 'list_manager.dart';
+import '../list_manager/list_provider.dart';
 import 'sync_client.dart';
 
 class SyncManager with ChangeNotifier {
   final _clientMap = <String, SyncClient>{};
 
   Hlc _lastSync;
-  ListManager _listManager;
+  ListProvider _listManager;
 
   bool get connected => _clientMap.isEmpty
       ? true
@@ -16,7 +16,7 @@ class SyncManager with ChangeNotifier {
           .map((e) => e.isConnected)
           .reduce((value, element) => value && element);
 
-  set listManager(ListManager lm) {
+  set listManager(ListProvider lm) {
     _listManager = lm;
 
     lm.lists.map((e) => e.id).forEach((id) {

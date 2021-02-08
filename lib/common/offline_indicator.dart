@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tudo_client/data/sync_manager.dart';
+import 'package:tudo_client/util/sync_manager.dart';
 
 import '../extensions.dart';
 

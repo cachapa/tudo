@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:crdt/crdt.dart';
 import 'package:hive/hive.dart';
 
-import '../list_manager.dart';
+import '../../list_manager/list_provider.dart';
 import 'hive_crdt.dart';
 
 class HlcAdapter extends TypeAdapter<Hlc> {

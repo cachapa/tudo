@@ -8,13 +8,12 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
-import 'package:tudo_client/data/list_manager.dart';
+import 'package:tudo_client/common/edit_list.dart';
+import 'package:tudo_client/common/empty_page.dart';
+import 'package:tudo_client/common/text_input_dialog.dart';
+import 'package:tudo_client/list_manager/list_provider.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/ui/offline_indicator.dart';
-
-import 'edit_list.dart';
-import 'empty_page.dart';
-import 'text_input_dialog.dart';
+import 'package:tudo_client/common/offline_indicator.dart';
 
 const titleBarHeight = 60.0;
 const inputBarHeight = 60.0;
@@ -32,7 +31,7 @@ class ToDoListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<ListManager, ToDoList>(
+    return Selector<ListProvider, ToDoList>(
       selector: (_, listManager) => listManager.get(id),
       builder: (_, list, __) => Theme(
         data: context.theme.copyWith(
