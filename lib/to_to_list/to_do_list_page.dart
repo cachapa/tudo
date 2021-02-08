@@ -10,10 +10,10 @@ import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
 import 'package:tudo_client/common/empty_page.dart';
-import 'package:tudo_client/common/text_input_dialog.dart';
-import 'package:tudo_client/list_manager/list_provider.dart';
-import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/common/offline_indicator.dart';
+import 'package:tudo_client/common/text_input_dialog.dart';
+import 'package:tudo_client/extensions.dart';
+import 'package:tudo_client/list_manager/list_provider.dart';
 
 const titleBarHeight = 60.0;
 const inputBarHeight = 60.0;
@@ -200,17 +200,15 @@ class ToDoListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final insetTop = MediaQuery.of(context).padding.top;
-    final insetBottom =
-        MediaQuery.of(context).viewPadding.bottom + inputBarHeight + 20;
-
     final items = toDoList.toDos;
     final uncheckedItems = items.where((item) => !item.checked).toList();
     final checkedItems = items.where((item) => item.checked).toList();
 
     return ListView(
       controller: controller,
-      padding: EdgeInsets.only(top: insetTop, bottom: insetBottom),
+      padding: EdgeInsets.only(
+          top: context.padding.top,
+          bottom: context.padding.bottom + inputBarHeight + 40),
       children: [
         ImplicitlyAnimatedReorderableList<ToDo>(
           key: checkedListKey,
