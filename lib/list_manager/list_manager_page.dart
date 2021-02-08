@@ -164,6 +164,7 @@ class _ListItem extends StatelessWidget {
     final index = listManager.remove(list.id);
     context.showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text("${list.name} deleted"),
         action: SnackBarAction(
           label: 'UNDO',

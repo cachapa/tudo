@@ -286,6 +286,7 @@ class ToDoListView extends StatelessWidget {
     final index = toDoList.remove(toDo.id);
     context.showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content: Text('Deleted "${toDo.name}"'),
         action: SnackBarAction(
           label: 'UNDO',
@@ -309,6 +310,7 @@ class ToDoListView extends StatelessWidget {
 
     context.showSnackBar(
       SnackBar(
+        behavior: SnackBarBehavior.floating,
         content:
             Text('Cleared $count completed ${count == 1 ? 'item' : 'items'}'),
         action: SnackBarAction(
