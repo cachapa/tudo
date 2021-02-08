@@ -50,7 +50,7 @@ class _EditListForm extends StatelessWidget {
           TextField(
             controller: _textController,
             textCapitalization: TextCapitalization.sentences,
-            autofocus: true,
+            autofocus: !editMode,
             decoration: InputDecoration(labelText: 'Name'),
             onSubmitted: (_) => _create(context),
           ),
