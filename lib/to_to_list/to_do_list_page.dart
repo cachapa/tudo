@@ -31,49 +31,56 @@ class ToDoListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Selector<ListProvider, ToDoList>(
-      selector: (_, listManager) => listManager.get(id),
-      builder: (_, list, __) => Theme(
-        data: context.theme.copyWith(
-          colorScheme: context.theme.colorScheme.copyWith(primary: list.color),
-          primaryColor: list.color,
-          accentColor: list.color,
-          primaryTextTheme: TextTheme(headline6: TextStyle(color: list.color)),
-          primaryIconTheme: IconThemeData(color: list.color),
-          iconTheme: IconThemeData(color: list.color),
-          toggleableActiveColor: list.color,
-          textSelectionTheme: TextSelectionThemeData(
-            selectionHandleColor: list.color,
-            cursorColor: list.color,
+    return GestureDetector(
+      // Close keyboard when tapping a non-focusable area
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Selector<ListProvider, ToDoList>(
+        selector: (_, listManager) => listManager.get(id),
+        builder: (_, list, __) => Theme(
+          data: context.theme.copyWith(
+            colorScheme:
+                context.theme.colorScheme.copyWith(primary: list.color),
+            primaryColor: list.color,
+            accentColor: list.color,
+            primaryTextTheme:
+                TextTheme(headline6: TextStyle(color: list.color)),
+            primaryIconTheme: IconThemeData(color: list.color),
+            iconTheme: IconThemeData(color: list.color),
+            toggleableActiveColor: list.color,
+            textSelectionTheme: TextSelectionThemeData(
+              selectionHandleColor: list.color,
+              cursorColor: list.color,
+            ),
           ),
-        ),
-        child: Scaffold(
-          extendBodyBehindAppBar: true,
-          appBar: TitleBar(
-            brightness: context.theme.brightness,
-            list: list,
-            actions: [
-              IconButton(
-                icon: Icon(Icons.edit),
-                onPressed: () => editToDoList(
-                    context, list, () => context.pop(ListAction.delete)),
-              ),
-            ],
-          ),
-          body: list.isEmpty
-              ? EmptyPage(text: 'Create a new to-do item below')
-              : ToDoListView(
-                  key: _listKey,
-                  checkedListKey: _uncheckedListKey,
-                  controller: _controller,
-                  toDoList: list,
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: TitleBar(
+              brightness: context.theme.brightness,
+              list: list,
+              actions: [
+                IconButton(
+                  icon: Icon(Icons.edit),
+                  onPressed: () => editToDoList(
+                      context, list, () => context.pop(ListAction.delete)),
                 ),
-          floatingActionButton: InputBar(
-            onSubmitted: (value) => _addItem(list, value),
+              ],
+            ),
+            body: list.isEmpty
+                ? EmptyPage(text: 'Create a new to-do item below')
+                : ToDoListView(
+                    key: _listKey,
+                    checkedListKey: _uncheckedListKey,
+                    controller: _controller,
+                    toDoList: list,
+                  ),
+            floatingActionButton: InputBar(
+              // key: inputKey,
+              onSubmitted: (value) => _addItem(list, value),
+            ),
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            bottomNavigationBar: OfflineIndicator(),
           ),
-          floatingActionButtonLocation:
-              FloatingActionButtonLocation.centerFloat,
-          bottomNavigationBar: OfflineIndicator(),
         ),
       ),
     );
@@ -137,13 +144,22 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => Size.fromHeight(kToolbarHeight);
 }
 
-class InputBar extends StatelessWidget {
+class InputBar extends StatefulWidget {
   final Function(String value) onSubmitted;
 
+  InputBar({Key key, this.onSubmitted}) : super(key: key);
+
+  @override
+  _InputBarState createState() => _InputBarState();
+}
+
+class _InputBarState extends State<InputBar> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
 
-  InputBar({Key key, this.onSubmitted}) : super(key: key);
+  _InputBarState() {
+    print('created');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -183,7 +199,7 @@ class InputBar extends StatelessWidget {
   }
 
   void _onSubmitted(String text) {
-    onSubmitted(text);
+    widget.onSubmitted(text);
     _controller.clear();
     _focusNode.requestFocus();
   }
