@@ -25,4 +25,6 @@ extension ContextExtensions on BuildContext {
 
   void showSnackBar(SnackBar snackBar) =>
       ScaffoldMessenger.of(this).showSnackBar(snackBar);
+
+  EdgeInsets get padding => MediaQuery.of(this).viewPadding;
 }

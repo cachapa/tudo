@@ -2,8 +2,8 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tudo_client/list_manager/list_provider.dart';
 import 'package:tudo_client/extensions.dart';
+import 'package:tudo_client/list_manager/list_provider.dart';
 
 import 'share_list.dart';
 
@@ -37,7 +37,8 @@ class _EditListForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(24),
+      padding: EdgeInsets.only(
+          left: 24, right: 24, top: 24, bottom: context.padding.bottom),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
