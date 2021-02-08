@@ -6,6 +6,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
+import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/data/list_manager.dart';
 import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/ui/offline_indicator.dart';
@@ -139,13 +140,7 @@ class _ListItem extends StatelessWidget {
         list.name,
         style: context.theme.textTheme.headline6,
       ),
-      trailing: Handle(
-        vibrate: false,
-        child: Icon(
-          Icons.reorder,
-          color: context.theme.dividerColor,
-        ),
-      ),
+      trailing: DragHandle(),
       onTap: () => _openList(context),
       onLongPress: () => _editList(context),
     );

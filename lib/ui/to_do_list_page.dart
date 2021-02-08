@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
+import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/data/list_manager.dart';
 import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/ui/offline_indicator.dart';
@@ -347,15 +348,7 @@ class _ListTile extends StatelessWidget {
           value: item.checked,
         ),
         title: Text(item.name),
-        trailing: item.checked
-            ? null
-            : Handle(
-                vibrate: false,
-                child: Icon(
-                  Icons.reorder,
-                  color: context.theme.dividerColor,
-                ),
-              ),
+        trailing: item.checked ? null : DragHandle(),
         onTap: () => onToggle(),
         onLongPress: onEdit,
       ),
