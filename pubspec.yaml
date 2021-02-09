@@ -19,12 +19,12 @@ dependencies:
   web_socket_channel: ^1.1.0
 
   clipboard: ^0.1.2+8
+  flutter_barcode_scanner: ^1.0.1
   implicitly_animated_reorderable_list: ^0.4.0-dev+1 #^0.3.2
   path_provider: ^1.6.27
   qr_flutter: ^3.1.0
   share: ^0.6.5+3
   uni_links: ^0.4.0
-  flutter_barcode_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:

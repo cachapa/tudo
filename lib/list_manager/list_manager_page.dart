@@ -8,10 +8,10 @@ import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
-import 'package:tudo_client/common/progress.dart';
-import 'package:tudo_client/list_manager/list_provider.dart';
-import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/common/offline_indicator.dart';
+import 'package:tudo_client/common/progress.dart';
+import 'package:tudo_client/extensions.dart';
+import 'package:tudo_client/list_manager/list_provider.dart';
 import 'package:tudo_client/to_to_list/to_do_list_page.dart';
 
 final _controller = ScrollController();
@@ -27,8 +27,7 @@ class ListManagerPage extends StatelessWidget {
         builder: (_, listManager, __) => Scaffold(
           body: ImplicitlyAnimatedReorderableList<ToDoList>(
             controller: _controller,
-            padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).padding.bottom + 80),
+            padding: EdgeInsets.only(bottom: context.padding.bottom + 80),
             items: listManager.lists,
             shrinkWrap: true,
             areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,

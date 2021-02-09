@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -36,9 +37,14 @@ class _EditListForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final keyboardInset =
+        Platform.isAndroid ? 0 : MediaQuery.of(context).viewInsets.bottom;
     return Padding(
       padding: EdgeInsets.only(
-          left: 24, right: 24, top: 24, bottom: context.padding.bottom),
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: context.padding.bottom + keyboardInset),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
