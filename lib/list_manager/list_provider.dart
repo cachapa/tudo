@@ -19,12 +19,12 @@ class ListProvider with ChangeNotifier {
 
   Future _initFuture;
 
-  List<String> get _listIds => _box.get(listIdsKey, defaultValue: []);
+  List<String> get listIds => _box.get(listIdsKey, defaultValue: []);
 
   set _listIds(List<String> values) => _box.put(listIdsKey, values);
 
   List<ToDoList> get lists =>
-      _listIds.map((e) => _toDoLists[e]).where((e) => e != null).toList();
+      listIds.map((e) => _toDoLists[e]).where((e) => e != null).toList();
 
   static Future<ListProvider> open(String nodeId) async {
     final box = await Hive.openBox<List<String>>('store');
@@ -37,14 +37,14 @@ class ListProvider with ChangeNotifier {
 
   Future<void> _init() async {
     // Sanity check: remove duplicate list ids
-    final set = _listIds.toSet();
-    if (set.length != _listIds.length) {
+    final set = listIds.toSet();
+    if (set.length != listIds.length) {
       print('WARNING: Detected duplicate list ids. Fixing…');
       _listIds = set.toList();
     }
 
     // Open all the to do lists
-    await Future.wait(_listIds
+    await Future.wait(listIds
         .map((e) async => _toDoLists[e] = await ToDoList.import(this, e)));
     notify();
   }
@@ -53,7 +53,7 @@ class ListProvider with ChangeNotifier {
     await _initFuture;
 
     final id = generateRandomId();
-    _listIds = _listIds..add(id);
+    _listIds = listIds..add(id);
     _toDoLists[id] = await ToDoList.open(this, id, name, color);
     notify();
   }
@@ -64,14 +64,14 @@ class ListProvider with ChangeNotifier {
     // Remove url section if present
     id = id.replaceFirst('https://tudo.cachapa.net/', '');
 
-    if (_listIds.contains(id)) {
+    if (listIds.contains(id)) {
       print('Import: already have $id');
       return;
     }
 
     print('Importing $id');
     _listIds =
-        index == null ? (_listIds..add(id)) : (_listIds..insert(index, id));
+        index == null ? (listIds..add(id)) : (listIds..insert(index, id));
     _toDoLists[id] = await ToDoList.import(this, id);
     notify();
   }
@@ -80,15 +80,15 @@ class ListProvider with ChangeNotifier {
 
   void swap(int oldIndex, int newIndex) {
     if (oldIndex == newIndex) return;
-    final id = _listIds[oldIndex];
-    _listIds = _listIds
+    final id = listIds[oldIndex];
+    _listIds = listIds
       ..removeAt(oldIndex)
       ..insert(newIndex, id);
   }
 
   int remove(String id) {
-    final index = _listIds.indexOf(id);
-    _listIds = _listIds..remove(id);
+    final index = listIds.indexOf(id);
+    _listIds = listIds..remove(id);
     _toDoLists.remove(id);
     notify();
     return index;

@@ -27,15 +27,10 @@ void main() async {
 
   final nodeId = generateRandomId(32);
 
-  try {
-    final dir = Platform.isAndroid || Platform.isIOS
-        ? (await getApplicationDocumentsDirectory()).path
-        : 'store';
-    Hive.init(dir);
-  } catch (_) {
-    // Is web
-    Hive.init('');
-  }
+  final dir = Platform.isAndroid || Platform.isIOS
+      ? (await getApplicationDocumentsDirectory()).path
+      : 'store';
+  Hive.init(dir);
 
   // Adapters
   Hive.registerAdapter(RecordAdapter(0));
@@ -46,6 +41,8 @@ void main() async {
 
   final listManager = await ListProvider.open(nodeId);
   _monitorDeeplinks(listManager);
+
+  _deleteStaleLists(dir, listManager);
 
   runApp(
     MultiProvider(
@@ -60,6 +57,19 @@ void main() async {
       child: MyApp(),
     ),
   );
+}
+
+void _deleteStaleLists(String dir, ListProvider listManager) {
+  final existingLists = listManager.listIds.map((e) => e.toLowerCase()).toSet();
+  final allLists = Directory(dir)
+      .listSync()
+      .map((e) => e.path)
+      .where((e) => e.endsWith('.hive'))
+      .map((e) => e.substring(e.lastIndexOf('/') + 1, e.lastIndexOf('.')))
+      .where((e) => e != 'store')
+      .toSet();
+  (allLists..removeAll(existingLists))
+      .forEach((e) => Hive.deleteBoxFromDisk(e));
 }
 
 void _monitorDeeplinks(ListProvider listManager) {
