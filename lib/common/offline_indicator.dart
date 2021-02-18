@@ -15,21 +15,24 @@ class OfflineIndicator extends StatelessWidget {
         duration: Duration(milliseconds: 400),
         curve: Curves.fastOutSlowIn,
         color: Colors.red,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              Icons.wifi_off,
-              size: 12,
-              color: _color,
-            ),
-            SizedBox(width: 4),
-            Text(
-              'offline',
-              style: context.theme.textTheme.overline.copyWith(color: _color),
-            ),
-          ],
+        child: SafeArea(
+          top: false,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.wifi_off,
+                size: 12,
+                color: _color,
+              ),
+              SizedBox(width: 4),
+              Text(
+                'offline',
+                style: context.theme.textTheme.overline.copyWith(color: _color),
+              ),
+            ],
+          ),
         ),
       ),
     );
