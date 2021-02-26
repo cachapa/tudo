@@ -157,10 +157,6 @@ class _InputBarState extends State<InputBar> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
 
-  _InputBarState() {
-    print('created');
-  }
-
   @override
   Widget build(BuildContext context) {
     final primaryColor = context.theme.primaryColor;
@@ -222,6 +218,7 @@ class ToDoListView extends StatelessWidget {
 
     return ListView(
       controller: controller,
+      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: EdgeInsets.only(
           top: context.padding.top,
           bottom: context.padding.bottom + inputBarHeight + 40),
