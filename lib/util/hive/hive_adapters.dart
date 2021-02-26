@@ -41,7 +41,7 @@ class RecordAdapter extends TypeAdapter<Record> {
   Record read(BinaryReader reader) {
     final hlc = reader.read();
     final value = reader.read();
-    final modified = reader.availableBytes > 10 ? reader.read() : hlc;
+    final modified = reader.read();
     return Record(hlc, value, modified);
   }
 
@@ -84,10 +84,11 @@ class ToDoAdapter extends TypeAdapter<ToDo> {
      New format: String, String, Bool
      So check the available bytes after first field
     */
-    final field1 = reader.readString();
-    return (reader.availableBytes == 11)
-        ? ToDo(null, field1, reader.readBool())
-        : ToDo(field1, reader.readString(), reader.readBool());
+    final id = reader.readString();
+    final name = reader.readString();
+    final checked = reader.readBool();
+    final isDeleted = reader.availableBytes == 21 ? reader.readBool() : false;
+    return ToDo(id, name, checked, false);
   }
 
   @override
@@ -95,6 +96,7 @@ class ToDoAdapter extends TypeAdapter<ToDo> {
     writer.writeString(obj.id);
     writer.writeString(obj.name);
     writer.writeBool(obj.checked);
+    writer.writeBool(obj.isDeleted);
   }
 }
 

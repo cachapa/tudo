@@ -1,7 +1,6 @@
-import 'dart:convert';
+import 'dart:io';
 
 import 'package:crdt/crdt.dart';
-import 'package:crypto/crypto.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -171,15 +170,15 @@ class ToDoList {
 
   ToDo add(String name) => set(generateRandomId(), name: name, checked: false);
 
-  ToDo set(String id, {String name, bool checked, int index}) {
+  ToDo set(String id, {String name, bool checked, int index, bool isDeleted}) {
     if (name != null && name.trim().isEmpty) return null;
 
     if (!_order.contains(id)) {
       _order = _order..insert(index ?? _order.length, id);
     }
 
-    final toDo = (_toDoCrdt.map[id] as ToDo)
-            ?.copyWith(newName: name, newChecked: checked) ??
+    final toDo = (_toDoCrdt.map[id] as ToDo)?.copyWith(
+            newName: name, newChecked: checked, newDeleted: isDeleted) ??
         ToDo(id, name, checked);
 
     _toDoCrdt.put(id, toDo);
@@ -245,19 +244,17 @@ class ToDo {
   final String id;
   final String name;
   final bool checked;
+  // Transient marker while item is deleted
+  final bool isDeleted;
 
-  ToDo(String id, String name, this.checked)
-      : // TODO Remove temporary id workaround after 06.2021
-        id = id ?? md5.convert(utf8.encode(name.toLowerCase())).toString(),
-        name = name.trim();
+  ToDo(this.id, String name, this.checked, [this.isDeleted = false])
+      : name = name.trim();
 
-  ToDo copyWith({String newName, bool newChecked}) =>
-      (newName == null && newChecked == null)
-          ? this
-          : ToDo(id, newName ?? name, newChecked ?? checked);
+  ToDo copyWith({String newName, bool newChecked, bool newDeleted}) =>
+      ToDo(id, newName ?? name, newChecked ?? checked, newDeleted ?? isDeleted);
 
   factory ToDo.fromJson(Map<String, dynamic> map) =>
-      ToDo(map['id'], map['name'], map['checked']);
+      ToDo(map['id'], map['name'], map['checked'], false);
 
   Map<String, dynamic> toJson() => {
         'id': id,

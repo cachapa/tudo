@@ -295,8 +295,12 @@ class ToDoListView extends StatelessWidget {
     );
   }
 
-  void _deleteItem(BuildContext context, ToDo toDo) {
+  Future<void> _deleteItem(BuildContext context, ToDo toDo) async {
+    // Mark item as deleted to account for implicit removal animations
+    toDoList.set(toDo.id, isDeleted: true);
+    await Future.delayed(Duration.zero);
     final index = toDoList.remove(toDo.id);
+
     context.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
@@ -352,42 +356,49 @@ class _ListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(item.id),
-      child: ListTile(
-        leading: Checkbox(
-          onChanged: (_) => onToggle(),
-          value: item.checked,
+    return Container(
+      color: item.isDeleted ? Colors.red : null,
+      child: Opacity(
+        opacity: item.isDeleted ? 0 : 1,
+        child: Dismissible(
+          key: Key(item.id),
+          child: ListTile(
+            tileColor: item.isDeleted ? Colors.red : null,
+            leading: Checkbox(
+              onChanged: (_) => onToggle(),
+              value: item.checked,
+            ),
+            title: Text(item.name),
+            trailing: item.checked ? null : DragHandle(),
+            onTap: () => onToggle(),
+            onLongPress: onEdit,
+          ),
+          background: Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            color: Colors.red,
+            child: Icon(Icons.delete,
+                color: context.theme.canvasColor.withOpacity(0.9)),
+          ),
+          secondaryBackground: Container(
+            alignment: Alignment.centerRight,
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            color: Colors.red,
+            child: Icon(Icons.delete,
+                color: context.theme.canvasColor.withOpacity(0.9)),
+          ),
+          onDismissed: (_) {
+            // Do nothing - deletions happen in confirmDismiss
+          },
+          confirmDismiss: (_) async {
+            // Avoid conflicts between Dismissible and list animations
+            // This removes the item and returns true so this widget remains in the
+            // tree to be removed by the list animation rather than itself.
+            onDelete();
+            return false;
+          },
         ),
-        title: Text(item.name),
-        trailing: item.checked ? null : DragHandle(),
-        onTap: () => onToggle(),
-        onLongPress: onEdit,
       ),
-      background: Container(
-        alignment: Alignment.centerLeft,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        color: Colors.red,
-        child: Icon(Icons.delete,
-            color: context.theme.canvasColor.withOpacity(0.9)),
-      ),
-      secondaryBackground: Container(
-        alignment: Alignment.centerRight,
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        color: Colors.red,
-        child: Icon(Icons.delete,
-            color: context.theme.canvasColor.withOpacity(0.9)),
-      ),
-      onDismissed: (_) {
-        // Do nothing - deletions happen in confirmDismiss
-      },
-      confirmDismiss: (_) async {
-        // Avoid conflicts between Dismissible and list animations
-        // This removes the item and returns true so this widget remains in the
-        // tree to be removed by the list animation rather than itself.
-        onDelete();
-        return false;
-      },
     );
   }
 }
