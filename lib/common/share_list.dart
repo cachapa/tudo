@@ -19,7 +19,7 @@ class _ShareListForm extends StatelessWidget {
 
   String get shareUrl => 'https://tudo.cachapa.net/${list.id}';
 
-  const _ShareListForm({Key key, this.list}) : super(key: key);
+  const _ShareListForm({Key? key, required this.list}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,7 @@ class _ShareListForm extends StatelessWidget {
             list.name,
             style: Theme.of(context)
                 .textTheme
-                .headline6
+                .headline6!
                 .copyWith(color: list.color),
           ),
           SizedBox(height: 20),

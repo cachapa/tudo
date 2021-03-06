@@ -6,8 +6,8 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class SyncClient {
   final String id;
 
-  WebSocketChannel channel;
-  StreamSubscription subscription;
+  WebSocketChannel? channel;
+  StreamSubscription? subscription;
 
   final _connectionStateController = StreamController<bool>();
 
@@ -27,7 +27,7 @@ class SyncClient {
     final endpoint = '$serverAddress/$id/ws';
     channel = WebSocketChannel.connect(Uri.parse(endpoint));
 
-    subscription = channel.stream.listen(
+    subscription = channel!.stream.listen(
       (message) {
         _connectionStateController.sink.add(true);
         _messageController.add(message);
@@ -39,7 +39,7 @@ class SyncClient {
     // print('connected');
   }
 
-  void send(String message) => channel.sink.add(message);
+  void send(String message) => channel!.sink.add(message);
 
   void disconnect() {
     // print('disconnected');

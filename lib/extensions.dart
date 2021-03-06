@@ -18,10 +18,10 @@ extension BrightnessExtensions on Brightness {
 extension ContextExtensions on BuildContext {
   ThemeData get theme => Theme.of(this);
 
-  Future<T> push<T>(Widget Function() builder) =>
-      Navigator.of(this).push(MaterialPageRoute(builder: (_) => builder()));
+  Future<T?> push<T>(Widget Function() builder) =>
+      Navigator.of(this).push<T>(MaterialPageRoute(builder: (_) => builder()));
 
-  void pop<T>([T result]) => Navigator.of(this).pop(result);
+  void pop<T>([T? result]) => Navigator.of(this).pop<T>(result);
 
   void showSnackBar(SnackBar snackBar) =>
       ScaffoldMessenger.of(this).showSnackBar(snackBar);

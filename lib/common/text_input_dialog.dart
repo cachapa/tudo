@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 class TextInputDialog extends StatelessWidget {
-  final String title;
+  final String? title;
   final String positiveLabel;
   final ValueChanged<String> onSet;
-  final TextInputType keyboardType;
+  final TextInputType? keyboardType;
 
   final TextEditingController _controller;
 
   TextInputDialog(
-      {Key key,
+      {Key? key,
       this.title,
       this.positiveLabel = 'Set',
-      String value,
-      this.onSet,
+      required String value,
+      required this.onSet,
       this.keyboardType})
       : _controller = TextEditingController(text: value),
         super(key: key);
@@ -21,7 +21,7 @@ class TextInputDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: title == null ? null : Text(title),
+      title: title == null ? null : Text(title!),
       content: Row(
         children: [
           Expanded(

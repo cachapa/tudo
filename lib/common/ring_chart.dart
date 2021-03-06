@@ -10,8 +10,13 @@ class AnimatedRingChart extends ImplicitlyAnimatedWidget {
   final double progress;
   final double total;
 
-  AnimatedRingChart({Key key, this.size, this.color, this.progress, this.total})
-      : super(
+  AnimatedRingChart({
+    Key? key,
+    required this.size,
+    required this.color,
+    required this.progress,
+    required this.total,
+  }) : super(
             duration: Duration(milliseconds: 300),
             curve: Curves.fastOutSlowIn,
             key: key);
@@ -23,27 +28,28 @@ class AnimatedRingChart extends ImplicitlyAnimatedWidget {
 
 class _AnimatedRingChartState
     extends AnimatedWidgetBaseState<AnimatedRingChart> {
-  ColorTween _color;
-  Tween<double> _progress;
-  Tween<double> _total;
+  ColorTween? _color;
+  Tween<double>? _progress;
+  Tween<double>? _total;
 
   @override
-  void forEachTween(TweenVisitor visitor) {
+  void forEachTween(TweenVisitor<dynamic> visitor) {
     _color = visitor(
-        _color, widget.color, (dynamic value) => ColorTween(begin: value));
+            _color, widget.color, (dynamic value) => ColorTween(begin: value))
+        as ColorTween;
     _progress = visitor(_progress, widget.progress,
-        (dynamic value) => Tween<double>(begin: value));
-    _total = visitor(
-        _total, widget.total, (dynamic value) => Tween<double>(begin: value));
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
+    _total = visitor(_total, widget.total,
+        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
   }
 
   @override
   Widget build(BuildContext context) {
     return RingChart(
       size: widget.size,
-      color: _color.evaluate(animation),
-      progress: _progress.evaluate(animation),
-      total: _total.evaluate(animation),
+      color: _color!.evaluate(animation)!,
+      progress: _progress!.evaluate(animation),
+      total: _total!.evaluate(animation),
     );
   }
 }
@@ -55,11 +61,11 @@ class RingChart extends StatelessWidget {
   final double total;
 
   const RingChart({
-    Key key,
+    Key? key,
     this.size = 100,
     this.color = Colors.blue,
-    this.progress,
-    this.total,
+    required this.progress,
+    required this.total,
   }) : super(key: key);
 
   @override
@@ -88,7 +94,8 @@ class _ChartPainter extends CustomPainter {
 
   double get ratio => total == 0 ? 0 : progress / total;
 
-  _ChartPainter({this.color, this.progress, this.total})
+  _ChartPainter(
+      {required this.color, required this.progress, required this.total})
       : _backgroundColor = color.withAlpha(100),
         _fillPaint = Paint()..color = color;
 

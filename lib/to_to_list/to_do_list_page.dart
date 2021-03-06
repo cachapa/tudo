@@ -27,7 +27,7 @@ class ToDoListPage extends StatelessWidget {
   final _uncheckedListKey = GlobalKey();
   final _controller = ScrollController();
 
-  ToDoListPage({Key key, this.id}) : super(key: key);
+  ToDoListPage({Key? key, required this.id}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +35,7 @@ class ToDoListPage extends StatelessWidget {
       // Close keyboard when tapping a non-focusable area
       onTap: () => FocusScope.of(context).unfocus(),
       child: Selector<ListProvider, ToDoList>(
-        selector: (_, listManager) => listManager.get(id),
+        selector: (_, listManager) => listManager.get(id)!,
         builder: (_, list, __) => Theme(
           data: context.theme.copyWith(
             colorScheme:
@@ -91,11 +91,12 @@ class ToDoListPage extends StatelessWidget {
     Future.delayed(
       Duration(milliseconds: 400),
       () {
-        final screenHeight = MediaQuery.of(_listKey.currentContext).size.height;
-        final uncheckedListHeight =
-            ((_uncheckedListKey.currentContext.findRenderObject()) as RenderBox)
-                .size
-                .height;
+        final screenHeight =
+            MediaQuery.of(_listKey.currentContext!).size.height;
+        final uncheckedListHeight = ((_uncheckedListKey.currentContext!
+                .findRenderObject()) as RenderBox)
+            .size
+            .height;
         final maxOffset = uncheckedListHeight;
         final minOffset =
             max<double>(0.0, uncheckedListHeight - screenHeight) + 200.0;
@@ -115,7 +116,11 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
   final ToDoList list;
   final List<Widget> actions;
 
-  const TitleBar({Key key, this.brightness, this.list, this.actions})
+  const TitleBar(
+      {Key? key,
+      required this.brightness,
+      required this.list,
+      required this.actions})
       : super(key: key);
 
   @override
@@ -147,7 +152,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
 class InputBar extends StatefulWidget {
   final Function(String value) onSubmitted;
 
-  InputBar({Key key, this.onSubmitted}) : super(key: key);
+  InputBar({Key? key, required this.onSubmitted}) : super(key: key);
 
   @override
   _InputBarState createState() => _InputBarState();
@@ -172,8 +177,8 @@ class _InputBarState extends State<InputBar> {
             focusNode: _focusNode,
             textCapitalization: TextCapitalization.sentences,
             cursorColor: primaryColor,
-            style:
-                context.theme.textTheme.subtitle1.copyWith(color: primaryColor),
+            style: context.theme.textTheme.subtitle1!
+                .copyWith(color: primaryColor),
             decoration: InputDecoration(
               filled: true,
               fillColor: primaryColor.withAlpha(30),
@@ -207,7 +212,10 @@ class ToDoListView extends StatelessWidget {
   final ScrollController controller;
 
   const ToDoListView(
-      {Key key, this.checkedListKey, this.controller, this.toDoList})
+      {Key? key,
+      required this.checkedListKey,
+      required this.controller,
+      required this.toDoList})
       : super(key: key);
 
   @override
@@ -252,7 +260,7 @@ class ToDoListView extends StatelessWidget {
             ),
           ),
         ),
-        ImplicitlyAnimatedList(
+        ImplicitlyAnimatedList<ToDo>(
           items: [
             if (checkedItems.isNotEmpty) ToDo('header', '', false),
             ...checkedItems,
@@ -351,7 +359,11 @@ class _ListTile extends StatelessWidget {
   final Function() onDelete;
 
   const _ListTile(
-      {Key key, this.item, this.onToggle, this.onEdit, this.onDelete})
+      {Key? key,
+      required this.item,
+      required this.onToggle,
+      required this.onEdit,
+      required this.onDelete})
       : super(key: key);
 
   @override
@@ -407,7 +419,8 @@ class _CompletedHeader extends StatelessWidget {
   final Color color;
   final Function() onClear;
 
-  const _CompletedHeader({Key key, this.color, this.onClear}) : super(key: key);
+  const _CompletedHeader({Key? key, required this.color, required this.onClear})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -426,7 +439,7 @@ class _CompletedHeader extends StatelessWidget {
           Expanded(
             child: Text(
               'Completed',
-              style: context.theme.textTheme.subtitle2.copyWith(color: color),
+              style: context.theme.textTheme.subtitle2!.copyWith(color: color),
             ),
           ),
           IconButton(

@@ -128,7 +128,7 @@ class Logo extends StatelessWidget {
 class _ListItem extends StatelessWidget {
   final ToDoList list;
 
-  _ListItem({Key key, this.list}) : super(key: key);
+  _ListItem({Key? key, required this.list}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

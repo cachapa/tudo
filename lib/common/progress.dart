@@ -11,7 +11,8 @@ class Progress extends StatelessWidget {
 
   int get total => list.length;
 
-  const Progress({Key key, this.size = 30, this.list}) : super(key: key);
+  const Progress({Key? key, this.size = 30, required this.list})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

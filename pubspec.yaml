@@ -4,26 +4,24 @@ version: 1.0.0
 homepage: https://github.com/cachapa/tudo_client
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  provider: ^4.0.0
+  provider: ^5.0.0
 
-  crdt: ^3.0.0-pre.3
-  hive: ^1.4.0
-
-  http: ^0.12.0+3
-  web_socket_channel: ^1.1.0
+  hive_crdt: ^1.0.2
+  http: ^0.13.0
+  web_socket_channel: ^2.0.0
 
   clipboard: ^0.1.2+8
   flutter_barcode_scanner: ^1.0.1
-  implicitly_animated_reorderable_list: ^0.4.0-dev+1 #^0.3.2
-  path_provider: ^1.6.27
+  implicitly_animated_reorderable_list: ^0.4.0-dev+1
+  path_provider: ^2.0.1
   qr_flutter: ^3.1.0
-  share: ^0.6.5+3
+  share: ^2.0.0
   uni_links: ^0.4.0
 
 dev_dependencies:

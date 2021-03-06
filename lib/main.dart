@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_crdt/hive_adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links/uni_links.dart';
@@ -34,7 +35,6 @@ void main() async {
 
   // Adapters
   Hive.registerAdapter(RecordAdapter(0));
-  Hive.registerAdapter(ModRecordAdapter(1));
   Hive.registerAdapter(HlcAdapter(2, nodeId));
   Hive.registerAdapter(ToDoAdapter(3));
   Hive.registerAdapter(ColorAdapter(4));
@@ -51,7 +51,7 @@ void main() async {
         ChangeNotifierProxyProvider<ListProvider, SyncManager>(
           create: (_) => SyncManager(),
           update: (_, listManager, syncManager) =>
-              syncManager..listManager = listManager,
+              syncManager!..listManager = listManager,
         )
       ],
       child: MyApp(),
@@ -95,12 +95,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  Timer reconnectTimer;
+  Timer? reconnectTimer;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance!.addObserver(this);
     manageConnection(AppLifecycleState.resumed);
   }
 

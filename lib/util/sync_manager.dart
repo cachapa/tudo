@@ -7,8 +7,8 @@ import 'sync_client.dart';
 class SyncManager with ChangeNotifier {
   final _clientMap = <String, SyncClient>{};
 
-  Hlc _lastSync;
-  ListProvider _listManager;
+  late ListProvider _listManager;
+  Hlc? _lastSync;
 
   bool get connected => _clientMap.isEmpty
       ? true
@@ -21,19 +21,19 @@ class SyncManager with ChangeNotifier {
 
     lm.lists.map((e) => e.id).forEach((id) {
       if (!_clientMap.containsKey(id)) {
-        _clientMap[id] ??= SyncClient(id);
-        _clientMap[id].connectionState.listen((connected) {
-          // print(
-          //     '${id.substring(0, 4)}… ${connected ? 'Connected' : 'Disconnected'}');
-          notifyListeners();
-        });
-        _clientMap[id].messages.listen((message) {
-          // print('<= $message');
-          final list = _listManager.get(id);
-          list.mergeJson(message);
-          _lastSync = list.canonicalTime;
-          // print('lastSync: ${_lastSync.logicalTime}');
-        });
+        _clientMap[id] ??= SyncClient(id)
+          ..connectionState.listen((connected) {
+            // print(
+            //     '${id.substring(0, 4)}… ${connected ? 'Connected' : 'Disconnected'}');
+            notifyListeners();
+          })
+          ..messages.listen((message) {
+            // print('<= $message');
+            final list = _listManager.get(id);
+            list!.mergeJson(message);
+            _lastSync = list.canonicalTime;
+            // print('lastSync: ${_lastSync.logicalTime}');
+          });
       }
     });
 
@@ -57,7 +57,7 @@ class SyncManager with ChangeNotifier {
     _listManager.lists.forEach((list) {
       final changeset = list.toJson(_lastSync);
       // print('=> ${list.name}: $changeset');
-      _clientMap[list.id].send(changeset);
+      _clientMap[list.id]!.send(changeset);
     });
   }
 }

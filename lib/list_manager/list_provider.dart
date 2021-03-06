@@ -1,12 +1,10 @@
-import 'dart:io';
-
 import 'package:crdt/crdt.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:hive_crdt/hive_crdt.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/util/hive/hive_crdt.dart';
 import 'package:tudo_client/util/random_id.dart';
 
 const listIdsKey = 'list_id_keys';
@@ -16,14 +14,17 @@ class ListProvider with ChangeNotifier {
   final Box<List<String>> _box;
   final _toDoLists = <String, ToDoList>{};
 
-  Future _initFuture;
+  late final Future _initFuture;
 
-  List<String> get listIds => _box.get(listIdsKey, defaultValue: []);
+  List<String> get listIds => _box.get(listIdsKey, defaultValue: [])!;
 
   set _listIds(List<String> values) => _box.put(listIdsKey, values);
 
-  List<ToDoList> get lists =>
-      listIds.map((e) => _toDoLists[e]).where((e) => e != null).toList();
+  List<ToDoList> get lists => listIds
+      .map((e) => _toDoLists[e])
+      .where((e) => e != null)
+      .map((e) => e!)
+      .toList();
 
   static Future<ListProvider> open(String nodeId) async {
     final box = await Hive.openBox<List<String>>('store');
@@ -57,7 +58,7 @@ class ListProvider with ChangeNotifier {
     notify();
   }
 
-  Future<void> import(String id, [int index]) async {
+  Future<void> import(String id, [int? index]) async {
     await _initFuture;
 
     // Remove url section if present
@@ -75,7 +76,7 @@ class ListProvider with ChangeNotifier {
     notify();
   }
 
-  ToDoList get(String id) => _toDoLists[id];
+  ToDoList? get(String id) => _toDoLists[id];
 
   void swap(int oldIndex, int newIndex) {
     if (oldIndex == newIndex) return;
@@ -158,8 +159,15 @@ class ToDoList {
   }
 
   static Future<ToDoList> open(
-      ListProvider parent, String id, String name, Color color) async {
-    final crdt = await HiveCrdt.open<String, dynamic>(id, parent.nodeId);
+      ListProvider parent, String id, String? name, Color? color) async {
+    late final crdt;
+    try {
+      crdt = await HiveCrdt.open<String, dynamic>(id, parent.nodeId);
+    } catch (e) {
+      print('$e\nResetting store');
+      await Hive.deleteBoxFromDisk(id);
+      crdt = await HiveCrdt.open<String, dynamic>(id, parent.nodeId);
+    }
     if (name != null) crdt.put(nameKey, name);
     if (color != null) crdt.put(colorKey, color);
     return ToDoList._internal(parent, id, crdt);
@@ -168,18 +176,19 @@ class ToDoList {
   static Future<ToDoList> import(ListProvider parent, String id) =>
       open(parent, id, null, null);
 
-  ToDo add(String name) => set(generateRandomId(), name: name, checked: false);
+  ToDo add(String name) => set(generateRandomId(), name: name, checked: false)!;
 
-  ToDo set(String id, {String name, bool checked, int index, bool isDeleted}) {
+  ToDo? set(String id,
+      {String? name, bool? checked, int? index, bool? isDeleted}) {
     if (name != null && name.trim().isEmpty) return null;
 
     if (!_order.contains(id)) {
       _order = _order..insert(index ?? _order.length, id);
     }
 
-    final toDo = (_toDoCrdt.map[id] as ToDo)?.copyWith(
+    final toDo = (_toDoCrdt.map[id] as ToDo?)?.copyWith(
             newName: name, newChecked: checked, newDeleted: isDeleted) ??
-        ToDo(id, name, checked);
+        ToDo(id, name!, checked!);
 
     _toDoCrdt.put(id, toDo);
     _parent.notify();
@@ -204,7 +213,7 @@ class ToDoList {
     return index;
   }
 
-  String toJson(Hlc lastSync) => _toDoCrdt.toJson(
+  String toJson(Hlc? lastSync) => _toDoCrdt.toJson(
       modifiedSince: lastSync,
       valueEncoder: (key, value) => value is Color ? value.hexValue : value);
 
@@ -214,7 +223,7 @@ class ToDoList {
     _toDoCrdt.mergeJson(
       json,
       valueDecoder: (key, value) {
-        return value is Map
+        return value is Map<String, dynamic>
             ? ToDo.fromJson(value)
             : key == colorKey
                 ? ColorExtensions.fromHex(value)
@@ -244,13 +253,14 @@ class ToDo {
   final String id;
   final String name;
   final bool checked;
+
   // Transient marker while item is deleted
   final bool isDeleted;
 
   ToDo(this.id, String name, this.checked, [this.isDeleted = false])
       : name = name.trim();
 
-  ToDo copyWith({String newName, bool newChecked, bool newDeleted}) =>
+  ToDo copyWith({String? newName, bool? newChecked, bool? newDeleted}) =>
       ToDo(id, newName ?? name, newChecked ?? checked, newDeleted ?? isDeleted);
 
   factory ToDo.fromJson(Map<String, dynamic> map) =>

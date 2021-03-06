@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -8,7 +7,7 @@ import 'package:tudo_client/list_manager/list_provider.dart';
 
 import 'share_list.dart';
 
-editToDoList(BuildContext context, [ToDoList list, Function() onDelete]) {
+editToDoList(BuildContext context, [ToDoList? list, Function()? onDelete]) {
   return showModalBottomSheet(
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
@@ -25,12 +24,12 @@ class _EditListForm extends StatelessWidget {
   final _textController;
   final _colorController;
 
-  final ToDoList list;
-  final Function() onDelete;
+  final ToDoList? list;
+  final Function()? onDelete;
 
   bool get editMode => list != null;
 
-  _EditListForm({Key key, this.list, this.onDelete})
+  _EditListForm({Key? key, this.list, this.onDelete})
       : _textController = TextEditingController(text: list?.name),
         _colorController = ColorController(color: list?.color),
         super(key: key);
@@ -106,8 +105,8 @@ class _EditListForm extends StatelessWidget {
     if (name.isEmpty) return;
 
     if (editMode) {
-      list.name = name;
-      list.color = color;
+      list!.name = name;
+      list!.color = color;
     } else {
       context.read<ListProvider>().create(name, color);
     }
@@ -117,23 +116,24 @@ class _EditListForm extends StatelessWidget {
 
   void _share(BuildContext context) {
     context.pop();
-    shareToDoList(context, list);
+    shareToDoList(context, list!);
   }
 
   void _delete(BuildContext context) {
     context.pop();
-    onDelete();
+    onDelete!();
   }
 }
 
 class ColorController {
-  Color color;
+  late Color color;
 
-  ColorController({this.color}) {
+  ColorController({Color? color}) {
     if (color == null) {
       final i = Random().nextInt(ColorSelector.colors.length);
       color = ColorSelector.colors[i];
     }
+    this.color = color;
   }
 }
 
@@ -149,7 +149,7 @@ class ColorSelector extends StatefulWidget {
 
   final ColorController controller;
 
-  const ColorSelector({Key key, @required this.controller}) : super(key: key);
+  const ColorSelector({Key? key, required this.controller}) : super(key: key);
 
   @override
   _ColorSelectorState createState() => _ColorSelectorState();
@@ -179,10 +179,10 @@ class ColorButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const ColorButton({
-    Key key,
-    @required this.color,
-    @required this.selected,
-    @required this.onPressed,
+    Key? key,
+    required this.color,
+    required this.selected,
+    required this.onPressed,
   }) : super(key: key);
 
   @override

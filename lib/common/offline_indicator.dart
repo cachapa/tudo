@@ -29,7 +29,8 @@ class OfflineIndicator extends StatelessWidget {
               SizedBox(width: 4),
               Text(
                 'offline',
-                style: context.theme.textTheme.overline.copyWith(color: _color),
+                style:
+                    context.theme.textTheme.overline!.copyWith(color: _color),
               ),
             ],
           ),
