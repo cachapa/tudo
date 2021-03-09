@@ -37,8 +37,7 @@ class _EditListForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final keyboardInset =
-        Platform.isAndroid ? 0 : MediaQuery.of(context).viewInsets.bottom;
+    final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
     return Padding(
       padding: EdgeInsets.only(
           left: 24,
