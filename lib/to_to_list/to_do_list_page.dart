@@ -369,35 +369,26 @@ class _ListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: item.isDeleted ? Colors.red : null,
+      // color: item.isDeleted ? Colors.red : null,
       child: Opacity(
         opacity: item.isDeleted ? 0 : 1,
         child: Dismissible(
           key: Key(item.id),
-          child: ListTile(
-            tileColor: item.isDeleted ? Colors.red : null,
-            leading: Checkbox(
-              onChanged: (_) => onToggle(),
-              value: item.checked,
-            ),
-            title: Text(item.name),
-            trailing: item.checked ? null : DragHandle(),
-            onTap: () => onToggle(),
-            onLongPress: onEdit,
-          ),
           background: Container(
             alignment: Alignment.centerLeft,
             padding: EdgeInsets.symmetric(horizontal: 20),
-            color: Colors.red,
-            child: Icon(Icons.delete,
-                color: context.theme.canvasColor.withOpacity(0.9)),
+            child: Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
           ),
           secondaryBackground: Container(
             alignment: Alignment.centerRight,
             padding: EdgeInsets.symmetric(horizontal: 20),
-            color: Colors.red,
-            child: Icon(Icons.delete,
-                color: context.theme.canvasColor.withOpacity(0.9)),
+            child: Icon(
+              Icons.delete,
+              color: Colors.red,
+            ),
           ),
           onDismissed: (_) {
             // Do nothing - deletions happen in confirmDismiss
@@ -409,6 +400,16 @@ class _ListTile extends StatelessWidget {
             onDelete();
             return false;
           },
+          child: ListTile(
+            leading: Checkbox(
+              onChanged: (_) => onToggle(),
+              value: item.checked,
+            ),
+            title: Text(item.name),
+            trailing: item.checked ? null : DragHandle(),
+            onTap: () => onToggle(),
+            onLongPress: onEdit,
+          ),
         ),
       ),
     );
