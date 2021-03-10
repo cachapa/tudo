@@ -44,24 +44,25 @@ class ListManagerPage extends StatelessWidget {
             ),
           ),
           floatingActionButton: FloatingActionButton(
-              clipBehavior: Clip.antiAlias,
-              backgroundColor: Colors.transparent,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Image.asset('assets/images/icon_bg.png'),
-                  Text(
-                    't',
-                    style: TextStyle(
-                      fontFamily: 'WaitingfortheSunrise',
-                      fontSize: 50,
-                      height: 1.3,
-                      color: Colors.white,
-                    ),
+            clipBehavior: Clip.antiAlias,
+            backgroundColor: Colors.transparent,
+            onPressed: () => _createList(context),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Image.asset('assets/images/icon_bg.png'),
+                Text(
+                  't',
+                  style: TextStyle(
+                    fontFamily: 'WaitingfortheSunrise',
+                    fontSize: 50,
+                    height: 1.3,
+                    color: Colors.white,
                   ),
-                ],
-              ),
-              onPressed: () => _createList(context)),
+                ),
+              ],
+            ),
+          ),
           bottomNavigationBar: OfflineIndicator(),
         ),
       ),
@@ -121,7 +122,7 @@ class Logo extends StatelessWidget {
     );
     if (code == '-1') return;
     print('Read QR: $code');
-    context.read<ListProvider>().import(code);
+    await context.read<ListProvider>().import(code);
   }
 }
 
@@ -164,7 +165,7 @@ class _ListItem extends StatelessWidget {
     context.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        content: Text("${list.name} deleted"),
+        content: Text('${list.name} deleted'),
         action: SnackBarAction(
           label: 'UNDO',
           onPressed: () => listManager.import(list.id, index),

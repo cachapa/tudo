@@ -273,7 +273,7 @@ class ToDo {
       };
 
   @override
-  bool operator ==(Object other) => other is ToDo && other.id == this.id;
+  bool operator ==(Object other) => other is ToDo && other.id == id;
 
   @override
   int get hashCode => id.hashCode;

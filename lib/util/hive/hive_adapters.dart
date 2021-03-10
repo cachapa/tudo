@@ -20,7 +20,7 @@ class ToDoAdapter extends TypeAdapter<ToDo> {
     final name = reader.readString();
     final checked = reader.readBool();
     final isDeleted = reader.availableBytes == 21 ? reader.readBool() : false;
-    return ToDo(id, name, checked, false);
+    return ToDo(id, name, checked, isDeleted);
   }
 
   @override

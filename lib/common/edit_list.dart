@@ -7,8 +7,9 @@ import 'package:tudo_client/list_manager/list_provider.dart';
 
 import 'share_list.dart';
 
-editToDoList(BuildContext context, [ToDoList? list, Function()? onDelete]) {
-  return showModalBottomSheet(
+Future<dynamic> editToDoList(BuildContext context,
+    [ToDoList? list, Function()? onDelete]) {
+  return showModalBottomSheet<bool>(
     shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
     isScrollControlled: true,

@@ -37,13 +37,13 @@ class TextInputDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Cancel'.toUpperCase()),
           onPressed: () => Navigator.pop(context),
+          child: Text('Cancel'.toUpperCase()),
         ),
         ElevatedButton(
           style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
-          child: Text(positiveLabel.toUpperCase()),
           onPressed: () => _set(context, _controller.text),
+          child: Text(positiveLabel.toUpperCase()),
         ),
       ],
     );

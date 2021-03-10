@@ -76,6 +76,7 @@ void _monitorDeeplinks(ListProvider listManager) {
   try {
     if (Platform.isAndroid || Platform.isIOS) {
       getInitialLink().then((link) async {
+        // ignore: unnecessary_null_comparison
         if (link != null) {
           print('Initial link: $link');
           await listManager.import(link);
