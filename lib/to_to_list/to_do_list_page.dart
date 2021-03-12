@@ -241,7 +241,7 @@ class ToDoListView extends StatelessWidget {
           onReorderFinished: (_, from, to, __) {
             if (from == to) return;
             // Query the real position of the items in the complete list
-            from = items.indexOf(uncheckedItems[from]);
+            from = items.indexOf(uncheckedItems[from!]);
             to = items.indexOf(uncheckedItems[to]);
             toDoList.swap(from, to);
           },

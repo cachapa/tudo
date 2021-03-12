@@ -30,8 +30,8 @@ class ListManagerPage extends StatelessWidget {
             padding: EdgeInsets.only(bottom: context.padding.bottom + 80),
             items: listManager.lists,
             shrinkWrap: true,
-            areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
-            onReorderFinished: (_, from, to, __) => listManager.swap(from, to),
+            areItemsTheSame: (oldItem, newItem) => oldItem?.id == newItem?.id,
+            onReorderFinished: (_, from, to, __) => listManager.swap(from!, to),
             header: Logo(),
             itemBuilder: (_, itemAnimation, item, __) => Reorderable(
               key: ValueKey(item.id),

@@ -16,7 +16,7 @@ class ListProvider with ChangeNotifier {
 
   late final Future _initFuture;
 
-  List<String> get listIds => _box.get(listIdsKey, defaultValue: [])!;
+  List<String> get listIds => _box.get(listIdsKey, defaultValue: [])!.toList();
 
   set _listIds(List<String> values) => _box.put(listIdsKey, values);
 
@@ -129,11 +129,12 @@ class ToDoList {
       return ia != ib ? ia.compareTo(ib) : a.name.compareTo(b.name);
     });
 
-  List<String> get _order => _toDoCrdt.get(orderKey)?.cast<String>() ?? [];
-
-  Hlc get canonicalTime => _toDoCrdt.canonicalTime;
+  List<String> get _order =>
+      _toDoCrdt.get(orderKey)?.cast<String>().toList() ?? [];
 
   set _order(List<String> values) => _toDoCrdt.put(orderKey, values);
+
+  Hlc get canonicalTime => _toDoCrdt.canonicalTime;
 
   set name(String value) {
     value = value.trim();
