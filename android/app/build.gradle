@@ -1,7 +1,9 @@
+import com.github.triplet.gradle.androidpublisher.ResolutionStrategy
+
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
-    id 'com.github.triplet.play' version '2.8.1'
+    id 'com.github.triplet.play' version '3.3.0'
 }
 
 def localProperties = new Properties()
@@ -61,7 +63,7 @@ def getChangelog = { ->
 task generateChangelog {
     new File("$projectDir/src/main/play/release-notes/en-US", "default.txt").text = getChangelog()
 }
-tasks.publish.dependsOn(generateChangelog)
+tasks.publishBundle.dependsOn(generateChangelog)
 
 android {
     compileSdkVersion 30
@@ -72,9 +74,6 @@ android {
 
     lintOptions {
         disable 'InvalidPackage'
-
-        // TODO Remove this workaround for a bug in the build tools
-        checkReleaseBuilds false
     }
 
     defaultConfig {
@@ -88,7 +87,7 @@ android {
     signingConfigs {
         release {
             storeFile file("keystore.jks")
-            storePassword keystoreProperties["storePassword"]
+            storePassword keystoreProperties['storePassword']
             keyAlias keystoreProperties['keyAlias']
             keyPassword keystoreProperties['keyPassword']
         }
@@ -101,6 +100,12 @@ android {
 
         release {
             signingConfig signingConfigs.release
+
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
         }
     }
 }
@@ -114,9 +119,9 @@ dependencies {
 }
 
 play {
-    defaultToAppBundles = true
-    serviceAccountCredentials = file("play-store.json")
-    userFraction = 1
-    resolutionStrategy = "auto"
-    track = "beta"
+    defaultToAppBundles.set(true)
+    serviceAccountCredentials.set(file("play-store.json"))
+    userFraction.set(1.0d)
+    resolutionStrategy.set(ResolutionStrategy.AUTO)
+    track.set("beta")
 }
