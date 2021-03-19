@@ -107,6 +107,7 @@ class Logo extends StatelessWidget {
             IconButton(
               padding: EdgeInsets.all(20),
               icon: Icon(Icons.qr_code_scanner),
+              tooltip: 'Import using QR code',
               onPressed: () => _launchQrScanner(context),
             ),
           ],
