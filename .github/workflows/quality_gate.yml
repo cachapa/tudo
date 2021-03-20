@@ -2,8 +2,8 @@ name: Quality Gate
 
 on:
   push:
-    tags-ignore:
-      - '**'
+    branches:
+      - master
 
 jobs:
   build:
