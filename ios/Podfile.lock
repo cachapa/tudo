@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_barcode_scanner (1.0.2):
+  - flutter_barcode_scanner (1.0.1):
     - Flutter
   - path_provider (0.0.1):
     - Flutter
@@ -30,7 +30,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  flutter_barcode_scanner: fc42adac0732eca7bd9d3d676b215bce5903f269
+  flutter_barcode_scanner: 49cd22fac3304077a6c1672f63bee4a2572ffd85
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   share: 0b2c3e82132f5888bccca3351c504d0003b3b410
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
