@@ -13,16 +13,18 @@ dependencies:
   provider: ^5.0.0
 
   hive_crdt: ^1.0.2
-  http: ^0.13.0
+  http: ^0.13.1
   web_socket_channel: ^2.0.0
 
   clipboard: ^0.1.2+8
-  flutter_barcode_scanner: ^1.0.1
+  flutter_barcode_scanner: ^2.0.0-nullsafety.0
   implicitly_animated_reorderable_list: ^0.4.0-dev+1
   path_provider: ^2.0.1
   qr_flutter: ^4.0.0
   share: ^2.0.0
-  uni_links: ^0.4.0
+  uni_links: #^0.4.0
+    git:
+      url: git@github.com:objectivecosta/uni_links_simplified.git
 
 dev_dependencies:
   flutter_test:

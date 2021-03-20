@@ -32,8 +32,8 @@ jobs:
           echo '${{ secrets.PLAY_STORE }}' > app/play-store.json
       - name: Precache Flutter
         run: flutter precache
-      - name: Build bundle
-        run: flutter build appbundle --no-sound-null-safety
+      - name: Fetch dependencies
+        run: flutter pub get
       - name: Publish Android
         working-directory: android
         run: ./gradlew publishBundle --no-daemon

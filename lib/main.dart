@@ -82,9 +82,9 @@ void _monitorDeeplinks(ListProvider listManager) {
           await listManager.import(link);
         }
       });
-      getLinksStream().listen((link) async {
+      linkStream.where((e) => e != null).listen((link) async {
         print('Stream link: $link');
-        await listManager.import(link);
+        await listManager.import(link!);
       }).onError((e) => print(e));
     }
   } catch (_) {}
