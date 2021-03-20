@@ -17,7 +17,7 @@ class AnimatedRingChart extends ImplicitlyAnimatedWidget {
     required this.progress,
     required this.total,
   }) : super(
-            duration: Duration(milliseconds: 300),
+            duration: Duration(milliseconds: 1000),
             curve: Curves.fastOutSlowIn,
             key: key);
 
