@@ -30,8 +30,8 @@ class SyncManager with ChangeNotifier {
           ..messages.listen((message) {
             // print('<= $message');
             final list = _listManager.get(id);
-            list!.mergeJson(message);
-            _lastSync = list.canonicalTime;
+            _lastSync = list!.canonicalTime;
+            list.mergeJson(message);
             // print('lastSync: ${_lastSync.logicalTime}');
           });
       }
