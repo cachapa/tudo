@@ -7,8 +7,8 @@ tudo is an experiment on simple, private, yet synchronized to-do lists.
 
 ## Try it out
 
-[<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80">](https://play.google.com/store/apps/details?id=net.cachapa.tudo)
-[<img src="images/testflight-badge.png" height="80">](https://testflight.apple.com/join/t9C2OTf3)
+[<img src="images/google_play.png" height="80">](https://play.google.com/store/apps/details?id=net.cachapa.tudo)
+[<img src="images/app_store.png" height="80">](https://apps.apple.com/us/app/tudo-lists/id1550819275)
 
 The server part of this project is maintained separately: [tudo_server](https://github.com/cachapa/tudo_server).
 
