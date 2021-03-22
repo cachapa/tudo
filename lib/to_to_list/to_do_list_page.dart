@@ -11,6 +11,7 @@ import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
 import 'package:tudo_client/common/empty_page.dart';
 import 'package:tudo_client/common/offline_indicator.dart';
+import 'package:tudo_client/common/progress.dart';
 import 'package:tudo_client/common/text_input_dialog.dart';
 import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/list_manager/list_provider.dart';
@@ -135,6 +136,25 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
           centerTitle: true,
           backgroundColor: primaryColor.withAlpha(20),
           elevation: 0,
+          leading: InkResponse(
+            onTap: () => context.pop(),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Positioned(
+                  left: 8,
+                  child: Icon(
+                    Icons.arrow_back_ios,
+                    size: 16,
+                  ),
+                ),
+                Positioned(
+                  right: 4,
+                  child: Progress(list: list),
+                ),
+              ],
+            ),
+          ),
           title: Text(
             list.name,
             overflow: TextOverflow.fade,
