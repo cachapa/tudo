@@ -19,15 +19,18 @@ final _controller = ScrollController();
 class ListManagerPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    print('bot: ${context.padding.bottom}');
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.theme.brightness.invert,
       ),
-      child: Consumer<ListProvider>(
-        builder: (_, listManager, __) => Scaffold(
-          body: ImplicitlyAnimatedReorderableList<ToDoList>(
+      child: Scaffold(
+        body: Consumer<ListProvider>(
+          builder: (_, listManager, __) =>
+              ImplicitlyAnimatedReorderableList<ToDoList>(
             controller: _controller,
-            padding: EdgeInsets.only(bottom: context.padding.bottom + 80),
+            padding: EdgeInsets.only(bottom: context.padding.bottom),
             items: listManager.lists,
             shrinkWrap: true,
             areItemsTheSame: (oldItem, newItem) => oldItem?.id == newItem?.id,
@@ -43,28 +46,28 @@ class ListManagerPage extends StatelessWidget {
               ),
             ),
           ),
-          floatingActionButton: FloatingActionButton(
-            clipBehavior: Clip.antiAlias,
-            backgroundColor: Colors.transparent,
-            onPressed: () => _createList(context),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.asset('assets/images/icon_bg.png'),
-                Text(
-                  't',
-                  style: TextStyle(
-                    fontFamily: 'WaitingfortheSunrise',
-                    fontSize: 50,
-                    height: 1.3,
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          bottomNavigationBar: OfflineIndicator(),
         ),
+        floatingActionButton: FloatingActionButton(
+          clipBehavior: Clip.antiAlias,
+          backgroundColor: Colors.transparent,
+          onPressed: () => _createList(context),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset('assets/images/icon_bg.png'),
+              Text(
+                't',
+                style: TextStyle(
+                  fontFamily: 'WaitingfortheSunrise',
+                  fontSize: 50,
+                  height: 1.3,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+        bottomNavigationBar: OfflineIndicator(),
       ),
     );
   }

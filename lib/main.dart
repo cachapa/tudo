@@ -7,7 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:hive_crdt/hive_adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:uni_links/uni_links.dart';
+import 'package:uni_links2/uni_links.dart';
 
 import 'list_manager/list_manager_page.dart';
 import 'list_manager/list_provider.dart';

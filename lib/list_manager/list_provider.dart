@@ -169,7 +169,7 @@ class ToDoList {
       await Hive.deleteBoxFromDisk(id);
       crdt = await HiveCrdt.open<String, dynamic>(id, parent.nodeId);
     }
-    if (name != null) crdt.put(nameKey, name);
+    if (name != null) crdt.put(nameKey, name.trim());
     if (color != null) crdt.put(colorKey, color);
     return ToDoList._internal(parent, id, crdt);
   }
