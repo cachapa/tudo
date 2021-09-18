@@ -36,8 +36,3 @@ flutter:
 
   assets:
     - assets/images/
-
-  fonts:
-    - family: WaitingfortheSunrise
-      fonts:
-        - asset: assets/fonts/WaitingfortheSunrise-Regular.ttf

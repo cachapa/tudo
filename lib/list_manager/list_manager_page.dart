@@ -56,14 +56,10 @@ class ListManagerPage extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Image.asset('assets/images/icon_bg.png'),
-              const Text(
-                't',
-                style: TextStyle(
-                  fontFamily: 'WaitingfortheSunrise',
-                  fontSize: 50,
-                  height: 1.3,
-                  color: Colors.white,
-                ),
+              Image.asset(
+                'assets/images/t.png',
+                height: 32,
+                color: Colors.white,
               ),
             ],
           ),
@@ -92,47 +88,59 @@ class Logo extends StatelessWidget {
   const Logo({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => SafeArea(
-        bottom: false,
-        child: Stack(
-          children: [
-            Container(
-              height: 120,
-              alignment: Alignment.center,
-              child: const Text(
-                'tudo',
-                style: TextStyle(
-                  fontFamily: 'WaitingfortheSunrise',
-                  fontSize: 100,
-                  height: 1.4,
-                ),
-              ),
-            ),
-            IconButton(
-              padding: const EdgeInsets.all(20),
-              icon: Selector<SettingsProvider, ThemeMode>(
-                selector: (_, settingsProvider) => settingsProvider.theme,
-                builder: (_, theme, __) => Icon(theme == ThemeMode.system
+  Widget build(BuildContext context) {
+    final color = context.theme.textTheme.bodyText1!.color;
+
+    return SafeArea(
+      bottom: false,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            padding: const EdgeInsets.all(20),
+            icon: Selector<SettingsProvider, ThemeMode>(
+              selector: (_, settingsProvider) => settingsProvider.theme,
+              builder: (_, theme, __) => Icon(
+                theme == ThemeMode.system
                     ? Icons.brightness_auto
                     : theme == ThemeMode.light
                         ? Icons.light_mode_outlined
-                        : Icons.mode_night_outlined),
-              ),
-              tooltip: 'Toggle theme',
-              onPressed: () => _toggleTheme(context),
-            ),
-            Positioned(
-              right: 0,
-              child: IconButton(
-                padding: const EdgeInsets.all(20),
-                icon: const Icon(Icons.qr_code_scanner),
-                tooltip: 'Import using QR code',
-                onPressed: () => _launchQrScanner(context),
+                        : Icons.mode_night_outlined,
+                color: color,
               ),
             ),
-          ],
-        ),
-      );
+            tooltip: 'Toggle theme',
+            onPressed: () => _toggleTheme(context),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Stack(
+              children: [
+                Image.asset(
+                  'assets/images/tudo_rainbow_blur.png',
+                  height: 72,
+                ),
+                Image.asset(
+                  'assets/images/tudo.png',
+                  height: 72,
+                  color: color,
+                ),
+              ],
+            ),
+          ),
+          IconButton(
+            padding: const EdgeInsets.all(20),
+            icon: Icon(
+              Icons.qr_code_scanner,
+              color: color,
+            ),
+            tooltip: 'Import using QR code',
+            onPressed: () => _launchQrScanner(context),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _toggleTheme(BuildContext context) {
     final settingsProvider = context.read<SettingsProvider>();
