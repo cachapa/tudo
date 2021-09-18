@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
 import 'package:tudo_client/common/empty_page.dart';
-import 'package:tudo_client/common/offline_indicator.dart';
 import 'package:tudo_client/common/progress.dart';
 import 'package:tudo_client/common/text_input_dialog.dart';
 import 'package:tudo_client/extensions.dart';
@@ -80,7 +79,6 @@ class ToDoListPage extends StatelessWidget {
             ),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
-            bottomNavigationBar: OfflineIndicator(),
           ),
         ),
       ),

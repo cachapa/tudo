@@ -4,22 +4,14 @@ import 'package:flutter/foundation.dart';
 import '../list_manager/list_provider.dart';
 import 'sync_client.dart';
 
-class SyncManager with ChangeNotifier {
+class SyncProvider with ChangeNotifier {
+  final ListProvider _listProvider;
   final _clientMap = <String, SyncClient>{};
 
-  late ListProvider _listManager;
   Hlc? _lastSync;
 
-  bool get connected => _clientMap.isEmpty
-      ? true
-      : _clientMap.values
-          .map((e) => e.isConnected)
-          .reduce((value, element) => value && element);
-
-  set listManager(ListProvider lm) {
-    _listManager = lm;
-
-    lm.lists.map((e) => e.id).forEach((id) {
+  SyncProvider(this._listProvider) {
+    _listProvider.lists.map((e) => e.id).forEach((id) {
       if (!_clientMap.containsKey(id)) {
         _clientMap[id] ??= SyncClient(id)
           ..connectionState.listen((connected) {
@@ -29,7 +21,7 @@ class SyncManager with ChangeNotifier {
           })
           ..messages.listen((message) {
             // print('<= $message');
-            final list = _listManager.get(id);
+            final list = _listProvider.get(id);
             _lastSync = list!.canonicalTime;
             list.mergeJson(message);
             // print('lastSync: ${_lastSync.logicalTime}');
@@ -43,21 +35,31 @@ class SyncManager with ChangeNotifier {
     sync();
   }
 
+  bool get connected => _clientMap.isEmpty
+      ? true
+      : _clientMap.values
+          .map((e) => e.isConnected)
+          .reduce((value, element) => value && element);
+
   void connect() {
     if (connected) return;
-    _clientMap.values.forEach((client) => client.connect());
+    for (var client in _clientMap.values) {
+      client.connect();
+    }
     sync();
   }
 
-  void disconnect() => _clientMap.values.forEach((client) {
-        client.disconnect();
-      });
+  void disconnect() {
+    for (var client in _clientMap.values) {
+      client.disconnect();
+    }
+  }
 
   void sync() {
-    _listManager.lists.forEach((list) {
+    for (var list in _listProvider.lists) {
       final changeset = list.toJson(_lastSync);
       // print('=> ${list.name}: $changeset');
       _clientMap[list.id]!.send(changeset);
-    });
+    }
   }
 }

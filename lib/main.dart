@@ -8,12 +8,13 @@ import 'package:hive_crdt/hive_adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links2/uni_links.dart';
+import 'package:tudo_client/common/offline_indicator.dart';
 
 import 'list_manager/list_manager_page.dart';
 import 'list_manager/list_provider.dart';
 import 'util/hive/hive_adapters.dart';
 import 'util/random_id.dart';
-import 'util/sync_manager.dart';
+import 'util/sync_provider.dart';
 
 void main() async {
   // Emulate platform
@@ -113,35 +114,41 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // themeMode: ThemeMode.light,
-      title: 'tudo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blue,
-        primaryColor: Colors.blue,
-        brightness: Brightness.dark,
-      ),
-      home: ListManagerPage(),
+    return Column(
+      children: [
+        Expanded(
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'tudo',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+            ),
+            darkTheme: ThemeData(
+              primarySwatch: Colors.blue,
+              primaryColor: Colors.blue,
+              brightness: Brightness.dark,
+            ),
+            home: const ListManagerPage(),
+          ),
+        ),
+        const OfflineIndicator(),
+      ],
     );
   }
 
   void manageConnection(AppLifecycleState state) {
-    final syncManager = context.read<SyncManager>();
+    final syncProvider = context.read<SyncProvider>();
     final appVisible = (state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive);
     if (appVisible) {
       if (!(reconnectTimer?.isActive ?? false)) {
-        reconnectTimer =
-            Timer.periodic(Duration(seconds: 10), (_) => syncManager.connect());
-        syncManager.connect();
+        reconnectTimer = Timer.periodic(
+            const Duration(seconds: 10), (_) => syncProvider.connect());
+        syncProvider.connect();
       }
     } else {
       reconnectTimer?.cancel();
-      syncManager.disconnect();
+      syncProvider.disconnect();
     }
   }
 }
