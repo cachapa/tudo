@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
@@ -112,8 +113,9 @@ class Logo extends StatelessWidget {
             tooltip: 'Toggle theme',
             onPressed: () => _toggleTheme(context),
           ),
-          Padding(
+          MaterialButton(
             padding: const EdgeInsets.symmetric(vertical: 20),
+            onPressed: () => _showAbout(context),
             child: Stack(
               children: [
                 Image.asset(
@@ -138,6 +140,19 @@ class Logo extends StatelessWidget {
             onPressed: () => _launchQrScanner(context),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _showAbout(BuildContext context) async {
+    final version = (await PackageInfo.fromPlatform()).version;
+    showAboutDialog(
+      context: context,
+      applicationVersion: version,
+      applicationIcon: Image.asset(
+        'assets/images/icon_rounded.png',
+        height: 48,
+        filterQuality: FilterQuality.high,
       ),
     );
   }
