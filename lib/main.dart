@@ -8,10 +8,10 @@ import 'package:hive/hive.dart';
 import 'package:hive_crdt/hive_adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:uni_links2/uni_links.dart';
 import 'package:tudo_client/common/offline_indicator.dart';
 import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/util/settings_provider.dart';
+import 'package:uni_links/uni_links.dart';
 
 import 'list_manager/list_manager_page.dart';
 import 'list_manager/list_provider.dart';
@@ -34,7 +34,7 @@ void main() async {
 
   // Adapters
   Hive.registerAdapter(RecordAdapter(0));
-  Hive.registerAdapter(HlcAdapter(2, nodeId));
+  Hive.registerAdapter(HlcAdapter(2));
   Hive.registerAdapter(ToDoAdapter(3));
   Hive.registerAdapter(ColorAdapter(4));
 
@@ -53,7 +53,7 @@ void main() async {
         ChangeNotifierProvider.value(value: listProvider),
         ChangeNotifierProvider(create: (_) => SyncProvider(listProvider)),
       ],
-      child: MyApp(),
+      child: const MyApp(),
     ),
   );
 }
@@ -67,8 +67,9 @@ void _deleteStaleLists(String dir, ListProvider listManager) {
       .map((e) => e.substring(e.lastIndexOf('/') + 1, e.lastIndexOf('.')))
       .where((e) => e != 'store' && e != 'settings')
       .toSet();
-  (allLists..removeAll(existingLists))
-      .forEach((e) => Hive.deleteBoxFromDisk(e));
+  for (var e in (allLists..removeAll(existingLists))) {
+    Hive.deleteBoxFromDisk(e);
+  }
 }
 
 void _monitorDeeplinks(ListProvider listManager) {
@@ -77,19 +78,21 @@ void _monitorDeeplinks(ListProvider listManager) {
       getInitialLink().then((link) async {
         // ignore: unnecessary_null_comparison
         if (link != null) {
-          print('Initial link: $link');
+          'Initial link: $link'.log;
           await listManager.import(link);
         }
       });
       linkStream.where((e) => e != null).listen((link) async {
-        print('Stream link: $link');
+        'Stream link: $link'.log;
         await listManager.import(link!);
-      }).onError((e) => print(e));
+      }).onError((e) => e.log);
     }
   } catch (_) {}
 }
 
 class MyApp extends StatefulWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   _MyAppState createState() => _MyAppState();
 }

@@ -5,7 +5,7 @@ import 'package:tudo_client/list_manager/list_provider.dart';
 
 class ToDoAdapter extends TypeAdapter<ToDo> {
   @override
-  final typeId;
+  final int typeId;
 
   ToDoAdapter(this.typeId);
 

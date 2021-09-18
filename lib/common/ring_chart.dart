@@ -10,14 +10,14 @@ class AnimatedRingChart extends ImplicitlyAnimatedWidget {
   final double progress;
   final double total;
 
-  AnimatedRingChart({
+  const AnimatedRingChart({
     Key? key,
     required this.size,
     required this.color,
     required this.progress,
     required this.total,
   }) : super(
-            duration: Duration(milliseconds: 1000),
+            duration: const Duration(milliseconds: 1000),
             curve: Curves.fastOutSlowIn,
             key: key);
 

@@ -41,7 +41,6 @@ class ToDoListPage extends StatelessWidget {
             colorScheme:
                 context.theme.colorScheme.copyWith(primary: list.color),
             primaryColor: list.color,
-            accentColor: list.color,
             primaryTextTheme:
                 TextTheme(headline6: TextStyle(color: list.color)),
             primaryIconTheme: IconThemeData(color: list.color),
@@ -59,14 +58,14 @@ class ToDoListPage extends StatelessWidget {
               list: list,
               actions: [
                 IconButton(
-                  icon: Icon(Icons.edit),
+                  icon: const Icon(Icons.edit),
                   onPressed: () => editToDoList(
                       context, list, () => context.pop(ListAction.delete)),
                 ),
               ],
             ),
             body: list.isEmpty
-                ? EmptyPage(text: 'Create a new to-do item below')
+                ? const EmptyPage(text: 'Create a new to-do item below')
                 : ToDoListView(
                     key: _listKey,
                     checkedListKey: _uncheckedListKey,
@@ -88,7 +87,7 @@ class ToDoListPage extends StatelessWidget {
   void _addItem(ToDoList list, String value) {
     list.add(value);
     Future.delayed(
-      Duration(milliseconds: 400),
+      const Duration(milliseconds: 400),
       () {
         final screenHeight =
             MediaQuery.of(_listKey.currentContext!).size.height;
@@ -102,7 +101,7 @@ class ToDoListPage extends StatelessWidget {
         final offset = _controller.offset.clamp(minOffset, maxOffset);
         _controller.animateTo(
           offset,
-          duration: Duration(milliseconds: 400),
+          duration: const Duration(milliseconds: 400),
           curve: Curves.fastOutSlowIn,
         );
       },
@@ -130,7 +129,8 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: AppBar(
-          brightness: brightness,
+          systemOverlayStyle: SystemUiOverlayStyle.dark,
+          foregroundColor: primaryColor,
           centerTitle: true,
           backgroundColor: primaryColor.withAlpha(20),
           elevation: 0,
@@ -139,7 +139,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Positioned(
+                const Positioned(
                   left: 8,
                   child: Icon(
                     Icons.arrow_back_ios,
@@ -164,13 +164,13 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class InputBar extends StatefulWidget {
   final Function(String value) onSubmitted;
 
-  InputBar({Key? key, required this.onSubmitted}) : super(key: key);
+  const InputBar({Key? key, required this.onSubmitted}) : super(key: key);
 
   @override
   _InputBarState createState() => _InputBarState();
@@ -185,7 +185,7 @@ class _InputBarState extends State<InputBar> {
     final primaryColor = context.theme.primaryColor;
 
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(100),
         child: BackdropFilter(
@@ -200,12 +200,12 @@ class _InputBarState extends State<InputBar> {
             decoration: InputDecoration(
               filled: true,
               fillColor: primaryColor.withAlpha(30),
-              contentPadding: EdgeInsets.all(20),
+              contentPadding: const EdgeInsets.all(20),
               hintText: 'Add Item',
               border: InputBorder.none,
               suffixIcon: IconButton(
-                padding: EdgeInsets.only(right: 10),
-                icon: Icon(Icons.add),
+                padding: const EdgeInsets.only(right: 10),
+                icon: const Icon(Icons.add),
                 onPressed: () => _onSubmitted(_controller.text),
               ),
             ),
@@ -253,13 +253,13 @@ class ToDoListView extends StatelessWidget {
           key: checkedListKey,
           items: uncheckedItems,
           shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
-          reorderDuration: Duration(milliseconds: 200),
+          physics: const ClampingScrollPhysics(),
+          reorderDuration: const Duration(milliseconds: 200),
           areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
           onReorderFinished: (_, from, to, __) {
             if (from == to) return;
             // Query the real position of the items in the complete list
-            from = items.indexOf(uncheckedItems[from!]);
+            from = items.indexOf(uncheckedItems[from]);
             to = items.indexOf(uncheckedItems[to]);
             toDoList.swap(from, to);
           },
@@ -284,7 +284,7 @@ class ToDoListView extends StatelessWidget {
             ...checkedItems,
           ],
           shrinkWrap: true,
-          physics: ClampingScrollPhysics(),
+          physics: const ClampingScrollPhysics(),
           areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
           itemBuilder: (context, itemAnimation, item, i) => SizeFadeTransition(
             sizeFraction: 0.7,
@@ -386,48 +386,45 @@ class _ListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // color: item.isDeleted ? Colors.red : null,
-      child: Opacity(
-        opacity: item.isDeleted ? 0 : 1,
-        child: Dismissible(
-          key: Key(item.id),
-          background: Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Icon(
-              Icons.delete,
-              color: Colors.red,
-            ),
+    return Opacity(
+      opacity: item.isDeleted ? 0 : 1,
+      child: Dismissible(
+        key: Key(item.id),
+        background: Container(
+          alignment: Alignment.centerLeft,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: const Icon(
+            Icons.delete,
+            color: Colors.red,
           ),
-          secondaryBackground: Container(
-            alignment: Alignment.centerRight,
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Icon(
-              Icons.delete,
-              color: Colors.red,
-            ),
+        ),
+        secondaryBackground: Container(
+          alignment: Alignment.centerRight,
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: const Icon(
+            Icons.delete,
+            color: Colors.red,
           ),
-          onDismissed: (_) {
-            // Do nothing - deletions happen in confirmDismiss
-          },
-          confirmDismiss: (_) async {
-            // Avoid conflicts between Dismissible and list animations
-            // This removes the item and returns true so this widget remains in the
-            // tree to be removed by the list animation rather than itself.
-            onDelete();
-            return false;
-          },
-          child: ListTile(
-            leading: Checkbox(
-              onChanged: (_) => onToggle(),
-              value: item.checked,
-            ),
-            title: Text(item.name),
-            trailing: item.checked ? null : DragHandle(),
-            onTap: () => onToggle(),
-            onLongPress: onEdit,
+        ),
+        onDismissed: (_) {
+          // Do nothing - deletions happen in confirmDismiss
+        },
+        confirmDismiss: (_) async {
+          // Avoid conflicts between Dismissible and list animations
+          // This removes the item and returns true so this widget remains in the
+          // tree to be removed by the list animation rather than itself.
+          onDelete();
+          return false;
+        },
+        child: ListTile(
+          leading: Checkbox(
+            onChanged: (_) => onToggle(),
+            value: item.checked,
           ),
+          title: Text(item.name),
+          trailing: item.checked ? null : const DragHandle(),
+          onTap: () => onToggle(),
+          onLongPress: onEdit,
         ),
       ),
     );
@@ -452,7 +449,7 @@ class _CompletedHeader extends StatelessWidget {
           ),
         ),
       ),
-      padding: EdgeInsets.only(left: 16, top: 8, right: 8),
+      padding: const EdgeInsets.only(left: 16, top: 8, right: 8),
       child: Row(
         children: [
           Expanded(
@@ -462,7 +459,7 @@ class _CompletedHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: Icon(Icons.delete),
+            icon: const Icon(Icons.delete),
             onPressed: onClear,
           ),
         ],

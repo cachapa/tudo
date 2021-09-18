@@ -1,11 +1,5 @@
-include: package:pedantic/analysis_options.yaml
-
-# For lint rules and documentation, see http://dart-lang.github.io/linter/lints.
-# Uncomment to specify additional rules.
-#linter:
-#  rules:
-#    import_of_legacy_library_into_null_safe: ignore
+include: package:flutter_lints/flutter.yaml
 
 analyzer:
-  errors:
-    import_of_legacy_library_into_null_safe: ignore
+#  errors:
+#    import_of_legacy_library_into_null_safe: ignore

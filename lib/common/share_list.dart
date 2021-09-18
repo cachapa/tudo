@@ -1,12 +1,12 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:tudo_client/list_manager/list_provider.dart';
 
 void shareToDoList(BuildContext context, ToDoList list) {
   showModalBottomSheet<String>(
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
     isScrollControlled: true,
     context: context,
@@ -24,7 +24,7 @@ class _ShareListForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 12),
+      padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -35,14 +35,14 @@ class _ShareListForm extends StatelessWidget {
                 .headline6!
                 .copyWith(color: list.color),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           QrImage(
             data: shareUrl,
             version: QrVersions.auto,
             size: 250.0,
             backgroundColor: ThemeData.light().canvasColor,
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ButtonBar(
             mainAxisSize: MainAxisSize.max,
             alignment: MainAxisAlignment.spaceEvenly,
@@ -50,18 +50,18 @@ class _ShareListForm extends StatelessWidget {
               TextButton.icon(
                 style: ButtonStyle(
                     foregroundColor: MaterialStateProperty.all(list.color)),
-                icon: Icon(Icons.copy),
+                icon: const Icon(Icons.copy),
                 label: Text('Copy Link'.toUpperCase()),
                 onPressed: () {
                   FlutterClipboard.copy(shareUrl);
                   Navigator.pop(context);
                 },
               ),
-              SizedBox(width: 16),
+              const SizedBox(width: 16),
               TextButton.icon(
                 style: ButtonStyle(
                     foregroundColor: MaterialStateProperty.all(list.color)),
-                icon: Icon(Icons.share),
+                icon: const Icon(Icons.share),
                 label: Text('Share'.toUpperCase()),
                 onPressed: () {
                   Share.share('Tap to open "${list.name}" in your device:\n'

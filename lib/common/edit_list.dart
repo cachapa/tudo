@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/extensions.dart';
@@ -10,7 +8,7 @@ import 'share_list.dart';
 Future<dynamic> editToDoList(BuildContext context,
     [ToDoList? list, Function()? onDelete]) {
   return showModalBottomSheet<bool>(
-    shape: RoundedRectangleBorder(
+    shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
     isScrollControlled: true,
     context: context,
@@ -22,8 +20,8 @@ Future<dynamic> editToDoList(BuildContext context,
 }
 
 class _EditListForm extends StatelessWidget {
-  final _textController;
-  final _colorController;
+  final TextEditingController _textController;
+  final ColorController _colorController;
 
   final ToDoList? list;
   final Function()? onDelete;
@@ -57,12 +55,12 @@ class _EditListForm extends StatelessWidget {
             controller: _textController,
             textCapitalization: TextCapitalization.sentences,
             autofocus: !editMode,
-            decoration: InputDecoration(labelText: 'Name'),
+            decoration: const InputDecoration(labelText: 'Name'),
             onSubmitted: (_) => _create(context),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ColorSelector(controller: _colorController),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ButtonBar(
             mainAxisSize: MainAxisSize.max,
             alignment: MainAxisAlignment.spaceBetween,
@@ -70,7 +68,7 @@ class _EditListForm extends StatelessWidget {
               if (!editMode) Container(),
               if (editMode)
                 IconButton(
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.delete,
                     color: Colors.red,
                   ),
@@ -88,9 +86,9 @@ class _EditListForm extends StatelessWidget {
                 minWidth: 48,
                 height: 48,
                 color: context.theme.primaryColor,
-                shape: CircleBorder(),
+                shape: const CircleBorder(),
                 onPressed: () => _create(context),
-                child: Text('OK'),
+                child: const Text('OK'),
               ),
             ],
           ),
@@ -126,28 +124,22 @@ class _EditListForm extends StatelessWidget {
   }
 }
 
-class ColorController {
-  late Color color;
+const _colors = <Color>[
+  Colors.purpleAccent,
+  Colors.red,
+  Colors.orange,
+  Colors.green,
+  Colors.blue,
+  Colors.purple,
+];
 
-  ColorController({Color? color}) {
-    if (color == null) {
-      final i = Random().nextInt(ColorSelector.colors.length);
-      color = ColorSelector.colors[i];
-    }
-    this.color = color;
-  }
+class ColorController {
+  Color color;
+
+  ColorController({Color? color}) : color = color ?? _colors.random;
 }
 
 class ColorSelector extends StatefulWidget {
-  static const colors = [
-    Colors.purpleAccent,
-    Colors.red,
-    Colors.orange,
-    Colors.green,
-    Colors.blue,
-    Colors.purple,
-  ];
-
   final ColorController controller;
 
   const ColorSelector({Key? key, required this.controller}) : super(key: key);
@@ -161,7 +153,7 @@ class _ColorSelectorState extends State<ColorSelector> {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: ColorSelector.colors
+      children: _colors
           .map(
             (color) => ColorButton(
               color: color,
@@ -193,7 +185,7 @@ class ColorButton extends StatelessWidget {
       minWidth: 40,
       height: 40,
       color: color,
-      shape: CircleBorder(),
+      shape: const CircleBorder(),
       onPressed: onPressed,
       child: Icon(
         Icons.check,

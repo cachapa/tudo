@@ -39,7 +39,7 @@ class ListProvider with ChangeNotifier {
     // Sanity check: remove duplicate list ids
     final set = listIds.toSet();
     if (set.length != listIds.length) {
-      print('WARNING: Detected duplicate list ids. Fixing…');
+      'WARNING: Detected duplicate list ids. Fixing…'.log;
       _listIds = set.toList();
     }
 
@@ -67,11 +67,11 @@ class ListProvider with ChangeNotifier {
         .replaceFirst('list/', '');
 
     if (listIds.contains(id)) {
-      print('Import: already have $id');
+      'Import: already have $id'.log;
       return;
     }
 
-    print('Importing $id');
+    'Importing $id'.log;
     _listIds =
         index == null ? (listIds..add(id)) : (listIds..insert(index, id));
     _toDoLists[id] = await ToDoList.import(this, id);
@@ -100,9 +100,9 @@ class ListProvider with ChangeNotifier {
 }
 
 class ToDoList {
-  static final nameKey = '__name__';
-  static final colorKey = '__color__';
-  static final orderKey = '__order__';
+  static const nameKey = '__name__';
+  static const colorKey = '__color__';
+  static const orderKey = '__order__';
 
   final ListProvider _parent;
   final String id;
@@ -163,11 +163,11 @@ class ToDoList {
 
   static Future<ToDoList> open(
       ListProvider parent, String id, String? name, Color? color) async {
-    late final crdt;
+    late final Crdt<String, dynamic> crdt;
     try {
       crdt = await HiveCrdt.open<String, dynamic>(id, parent.nodeId);
     } catch (e) {
-      print('$e\nResetting store');
+      '$e\nResetting store'.log;
       await Hive.deleteBoxFromDisk(id);
       crdt = await HiveCrdt.open<String, dynamic>(id, parent.nodeId);
     }

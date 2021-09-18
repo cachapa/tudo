@@ -1,6 +1,20 @@
+import 'dart:math';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 export 'package:provider/provider.dart';
+
+extension StringX on String {
+  void get log {
+    // ignore: avoid_print
+    if (!kReleaseMode) print(this);
+  }
+}
+
+extension ListX<T> on List<T> {
+  T get random => this[Random().nextInt(length)];
+}
 
 extension ColorExtensions on Color {
   String get hexValue =>

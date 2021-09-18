@@ -57,11 +57,11 @@ class _AnimatedCounterState extends State<AnimatedCounter> {
   @override
   Widget build(BuildContext context) {
     return AnimatedSwitcher(
-      duration: Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 200),
       transitionBuilder: (child, animation) {
         final d = (child.key as ValueKey<int>).value == widget.value ? 1 : -1;
         final offsetAnimation = Tween<Offset>(
-                begin: Offset(0.0, direction * d * 0.5), end: Offset(0.0, 0.0))
+                begin: Offset(0.0, direction * d * 0.5), end: Offset.zero)
             .animate(animation);
         return SlideTransition(
           position: offsetAnimation,

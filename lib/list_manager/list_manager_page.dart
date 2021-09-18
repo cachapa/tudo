@@ -18,10 +18,10 @@ import 'package:tudo_client/util/settings_provider.dart';
 final _controller = ScrollController();
 
 class ListManagerPage extends StatelessWidget {
+  const ListManagerPage({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    print('bot: ${context.padding.bottom}');
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.theme.brightness.invert,
@@ -34,9 +34,9 @@ class ListManagerPage extends StatelessWidget {
             padding: EdgeInsets.only(bottom: context.padding.bottom),
             items: listManager.lists,
             shrinkWrap: true,
-            areItemsTheSame: (oldItem, newItem) => oldItem?.id == newItem?.id,
-            onReorderFinished: (_, from, to, __) => listManager.swap(from!, to),
-            header: Logo(),
+            areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
+            onReorderFinished: (_, from, to, __) => listManager.swap(from, to),
+            header: const Logo(),
             itemBuilder: (_, itemAnimation, item, __) => Reorderable(
               key: ValueKey(item.id),
               builder: (_, __, ___) => SizeFadeTransition(
@@ -56,7 +56,7 @@ class ListManagerPage extends StatelessWidget {
             alignment: Alignment.center,
             children: [
               Image.asset('assets/images/icon_bg.png'),
-              Text(
+              const Text(
                 't',
                 style: TextStyle(
                   fontFamily: 'WaitingfortheSunrise',
@@ -77,10 +77,10 @@ class ListManagerPage extends StatelessWidget {
     if (result ?? false) {
       // Scroll to the bottom of the list
       Future.delayed(
-        Duration(milliseconds: 400),
+        const Duration(milliseconds: 400),
         () => _controller.animateTo(
           _controller.position.maxScrollExtent + 200,
-          duration: Duration(milliseconds: 400),
+          duration: const Duration(milliseconds: 400),
           curve: Curves.fastOutSlowIn,
         ),
       );
@@ -89,16 +89,17 @@ class ListManagerPage extends StatelessWidget {
 }
 
 class Logo extends StatelessWidget {
+  const Logo({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) => SafeArea(
         bottom: false,
         child: Stack(
-          alignment: Alignment.topRight,
           children: [
             Container(
               height: 120,
               alignment: Alignment.center,
-              child: Text(
+              child: const Text(
                 'tudo',
                 style: TextStyle(
                   fontFamily: 'WaitingfortheSunrise',
@@ -147,7 +148,7 @@ class Logo extends StatelessWidget {
       ScanMode.QR,
     );
     if (code == '-1') return;
-    print('Read QR: $code');
+    'Read QR: $code'.log;
     await context.read<ListProvider>().import(code);
   }
 }
@@ -155,7 +156,7 @@ class Logo extends StatelessWidget {
 class _ListItem extends StatelessWidget {
   final ToDoList list;
 
-  _ListItem({Key? key, required this.list}) : super(key: key);
+  const _ListItem({Key? key, required this.list}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -165,7 +166,7 @@ class _ListItem extends StatelessWidget {
         list.name,
         style: context.theme.textTheme.headline6,
       ),
-      trailing: DragHandle(),
+      trailing: const DragHandle(),
       onTap: () => _openList(context),
       onLongPress: () => _editList(context),
     );
@@ -176,7 +177,7 @@ class _ListItem extends StatelessWidget {
     if (action != null && action == ListAction.delete) {
       Future.delayed(
         // Wait for pop animation to complete
-        Duration(milliseconds: 310),
+        const Duration(milliseconds: 310),
         () => _deleteList(context),
       );
     }
