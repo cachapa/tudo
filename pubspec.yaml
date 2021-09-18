@@ -24,6 +24,7 @@ dependencies:
   qr_flutter: ^4.0.0
   share: ^2.0.0
   uni_links2: any
+  uuid: ^3.0.4
 
 dev_dependencies:
   flutter_test:

@@ -16,7 +16,6 @@ import 'package:tudo_client/util/settings_provider.dart';
 import 'list_manager/list_manager_page.dart';
 import 'list_manager/list_provider.dart';
 import 'util/hive/hive_adapters.dart';
-import 'util/random_id.dart';
 import 'util/sync_provider.dart';
 
 void main() async {

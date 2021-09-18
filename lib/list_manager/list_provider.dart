@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_crdt/hive_crdt.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/util/random_id.dart';
+import 'package:tudo_client/util/uuid.dart';
 
 const listIdsKey = 'list_id_keys';
 
@@ -52,7 +52,7 @@ class ListProvider with ChangeNotifier {
   Future<void> create(String name, Color color) async {
     await _initFuture;
 
-    final id = generateRandomId();
+    final id = uuid();
     _listIds = listIds..add(id);
     _toDoLists[id] = await ToDoList.open(this, id, name, color);
     notify();
@@ -177,7 +177,7 @@ class ToDoList {
   static Future<ToDoList> import(ListProvider parent, String id) =>
       open(parent, id, null, null);
 
-  ToDo add(String name) => set(generateRandomId(), name: name, checked: false)!;
+  ToDo add(String name) => set(uuid(), name: name, checked: false)!;
 
   ToDo? set(String id,
       {String? name, bool? checked, int? index, bool? isDeleted}) {

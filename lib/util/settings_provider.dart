@@ -14,9 +14,7 @@ class SettingsProvider with ChangeNotifier {
     return _box.get(key);
   }
 
-  ThemeMode get theme => ThemeMode.values[
-    _box.get('theme', defaultValue: 0)
-  ];
+  ThemeMode get theme => ThemeMode.values[_box.get('theme', defaultValue: 0)];
 
   set theme(ThemeMode value) => _box.put('theme', value.index);
 
