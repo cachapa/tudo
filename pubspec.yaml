@@ -20,6 +20,7 @@ dependencies:
   flutter_barcode_scanner: ^2.0.0-nullsafety.0
   implicitly_animated_reorderable_list: ^0.4.0-dev+1
   path_provider: ^2.0.1
+  device_info_plus: ^2.1.0
   qr_flutter: ^4.0.0
   share: ^2.0.0
   uni_links2: any
