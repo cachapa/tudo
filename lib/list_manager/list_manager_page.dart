@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
@@ -8,11 +9,11 @@ import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
-import 'package:tudo_client/common/offline_indicator.dart';
 import 'package:tudo_client/common/progress.dart';
 import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/list_manager/list_provider.dart';
 import 'package:tudo_client/to_to_list/to_do_list_page.dart';
+import 'package:tudo_client/util/settings_provider.dart';
 
 final _controller = ScrollController();
 
@@ -67,7 +68,6 @@ class ListManagerPage extends StatelessWidget {
             ],
           ),
         ),
-        bottomNavigationBar: OfflineIndicator(),
       ),
     );
   }
@@ -108,14 +108,36 @@ class Logo extends StatelessWidget {
               ),
             ),
             IconButton(
-              padding: EdgeInsets.all(20),
-              icon: Icon(Icons.qr_code_scanner),
-              tooltip: 'Import using QR code',
-              onPressed: () => _launchQrScanner(context),
+              padding: const EdgeInsets.all(20),
+              icon: Selector<SettingsProvider, ThemeMode>(
+                selector: (_, settingsProvider) => settingsProvider.theme,
+                builder: (_, theme, __) => Icon(theme == ThemeMode.system
+                    ? Icons.brightness_auto
+                    : theme == ThemeMode.light
+                        ? Icons.light_mode_outlined
+                        : Icons.mode_night_outlined),
+              ),
+              tooltip: 'Toggle theme',
+              onPressed: () => _toggleTheme(context),
+            ),
+            Positioned(
+              right: 0,
+              child: IconButton(
+                padding: const EdgeInsets.all(20),
+                icon: const Icon(Icons.qr_code_scanner),
+                tooltip: 'Import using QR code',
+                onPressed: () => _launchQrScanner(context),
+              ),
             ),
           ],
         ),
       );
+
+  void _toggleTheme(BuildContext context) {
+    final settingsProvider = context.read<SettingsProvider>();
+    settingsProvider.theme = ThemeMode
+        .values[(settingsProvider.theme.index + 1) % ThemeMode.values.length];
+  }
 
   Future<void> _launchQrScanner(BuildContext context) async {
     final code = await FlutterBarcodeScanner.scanBarcode(

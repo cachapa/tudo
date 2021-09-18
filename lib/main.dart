@@ -10,6 +10,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:uni_links2/uni_links.dart';
 import 'package:tudo_client/common/offline_indicator.dart';
+import 'package:tudo_client/extensions.dart';
+import 'package:tudo_client/util/settings_provider.dart';
 
 import 'list_manager/list_manager_page.dart';
 import 'list_manager/list_provider.dart';
@@ -37,20 +39,20 @@ void main() async {
   Hive.registerAdapter(ToDoAdapter(3));
   Hive.registerAdapter(ColorAdapter(4));
 
-  final listManager = await ListProvider.open(nodeId);
-  _monitorDeeplinks(listManager);
+  final settingsProvider = await SettingsProvider.open();
+  final nodeId = settingsProvider.nodeId;
 
-  _deleteStaleLists(dir, listManager);
+  final listProvider = await ListProvider.open(nodeId);
+  _monitorDeeplinks(listProvider);
+
+  _deleteStaleLists(dir, listProvider);
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: listManager),
-        ChangeNotifierProxyProvider<ListProvider, SyncManager>(
-          create: (_) => SyncManager(),
-          update: (_, listManager, syncManager) =>
-              syncManager!..listManager = listManager,
-        )
+        ChangeNotifierProvider.value(value: settingsProvider),
+        ChangeNotifierProvider.value(value: listProvider),
+        ChangeNotifierProvider(create: (_) => SyncProvider(listProvider)),
       ],
       child: MyApp(),
     ),
@@ -64,7 +66,7 @@ void _deleteStaleLists(String dir, ListProvider listManager) {
       .map((e) => e.path)
       .where((e) => e.endsWith('.hive'))
       .map((e) => e.substring(e.lastIndexOf('/') + 1, e.lastIndexOf('.')))
-      .where((e) => e != 'store')
+      .where((e) => e != 'store' && e != 'settings')
       .toSet();
   (allLists..removeAll(existingLists))
       .forEach((e) => Hive.deleteBoxFromDisk(e));
@@ -125,6 +127,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
               primaryColor: Colors.blue,
               brightness: Brightness.dark,
             ),
+            themeMode: context.select<SettingsProvider, ThemeMode>(
+                (provider) => provider.theme),
             home: const ListManagerPage(),
           ),
         ),
