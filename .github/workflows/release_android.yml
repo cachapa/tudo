@@ -1,4 +1,4 @@
-name: Release
+name: Release Android
 on:
   push:
     tags:
@@ -23,7 +23,11 @@ jobs:
           key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}
       - uses: subosito/flutter-action@v1
         with:
-          channel: 'dev'
+          channel: 'stable'
+
+      - name: Retrieve build name from tag
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
       - name: Load secrets
         working-directory: android
@@ -31,10 +35,16 @@ jobs:
           echo "${{ secrets.KEYSTORE }}" | base64 -d > app/keystore.jks
           echo "${{ secrets.KEYSTORE_PROPERTIES }}" > app/keystore.properties
           echo '${{ secrets.PLAY_STORE }}' > app/play-store.json
-      - name: Precache Flutter
-        run: flutter precache
-      - name: Fetch dependencies
-        run: flutter pub get
+      - name: Build app
+        env:
+          BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}
+        run: flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME --bundle-sksl-path flutter_01.sksl.json
+
       - name: Publish Android
-        working-directory: android
-        run: ./gradlew publishBundle --no-daemon
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: de.storyark.app
+          releaseFiles: build/app/outputs/bundle/release/*.aab
+          mappingFile: build/app/outputs/mapping/release/mapping.txt
+          track: alpha

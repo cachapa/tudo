@@ -1,11 +1,3 @@
-import com.github.triplet.gradle.androidpublisher.ResolutionStrategy
-
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'com.github.triplet.play' version '3.3.0'
-}
-
 def localProperties = new Properties()
 def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
@@ -19,6 +11,18 @@ if (flutterRoot == null) {
     throw new GradleException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
 }
 
+def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
+if (flutterVersionCode == null) {
+    flutterVersionCode = '1'
+}
+
+def flutterVersionName = localProperties.getProperty('flutter.versionName')
+if (flutterVersionName == null) {
+    flutterVersionName = '1.0'
+}
+
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 def keystoreProperties = new Properties()
@@ -26,44 +30,6 @@ def keystorePropertiesFile = file('keystore.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
-
-def getVersionName = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags'
-        standardOutput = stdout
-    }
-    def versionName = stdout.toString().trim()
-    if (project.gradle.startParameter.taskNames.any { it.toLowerCase().contains('release') } && versionName.contains('-')) {
-        throw new Exception("Invalid version name: $versionName")
-    }
-    return versionName
-}
-
-def getPreviousVersion = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'describe', '--tags', '--abbrev=0', '@^'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
-def getChangelog = { ->
-//    git log --oneline $(git describe --tags --abbrev=0 @^)..@
-    def previousVersion = getPreviousVersion()
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'log', '--pretty=%s', '--reverse', "$previousVersion..@"
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
-}
-
-task generateChangelog {
-    new File("$projectDir/src/main/play/release-notes/en-US", "default.txt").text = getChangelog()
-}
-tasks.publishBundle.dependsOn(generateChangelog)
 
 android {
     compileSdkVersion 30
@@ -80,8 +46,9 @@ android {
         applicationId "net.cachapa.tudo"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode 1  // Will be overridden on release
-        versionName getVersionName()
+        versionCode flutterVersionCode.toInteger()
+        versionName flutterVersionName
+        multiDexEnabled true
     }
 
     signingConfigs {
@@ -96,6 +63,10 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix ".beta"
+        }
+
+        profile {
+            applicationIdSuffix ".profile"
         }
 
         release {
@@ -116,12 +87,5 @@ flutter {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-}
-
-play {
-    defaultToAppBundles.set(true)
-    serviceAccountCredentials.set(file("play-store.json"))
-    userFraction.set(1.0d)
-    resolutionStrategy.set(ResolutionStrategy.AUTO)
-    track.set("beta")
+    implementation "androidx.multidex:multidex:2.0.1"
 }
