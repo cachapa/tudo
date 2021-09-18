@@ -62,7 +62,9 @@ class ListProvider with ChangeNotifier {
     await _initFuture;
 
     // Remove url section if present
-    id = id.replaceFirst('https://tudo.cachapa.net/', '');
+    id = id
+        .replaceFirst('https://tudo.cachapa.net/', '')
+        .replaceFirst('list/', '');
 
     if (listIds.contains(id)) {
       print('Import: already have $id');
