@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:tudo_client/config.dart';
 import 'package:tudo_client/extensions.dart';
+import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class SyncClient {
@@ -26,7 +27,9 @@ class SyncClient {
     if (isConnected) return;
 
     final endpoint = '$serverAddress/$id/ws';
-    channel = WebSocketChannel.connect(Uri.parse(endpoint));
+    channel = IOWebSocketChannel.connect(Uri.parse(endpoint), headers: {
+      'api_secret': apiSecret,
+    });
 
     subscription = channel!.stream.listen(
       (message) {

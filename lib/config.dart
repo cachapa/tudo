@@ -1,2 +1,2 @@
-const serverAddress = 'wss://tudo-api.cachapa.net';
-// const serverAddress = 'ws://localhost:8080';
+const apiSecret = '';
+const serverAddress = 'ws://localhost:8080';
