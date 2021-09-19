@@ -28,7 +28,9 @@ class ListProvider with ChangeNotifier {
 
   static Future<ListProvider> open(String nodeId) async {
     final box = await Hive.openBox<List<String>>('store');
-    return ListProvider._(nodeId, box);
+    final provider = ListProvider._(nodeId, box);
+    await provider._initFuture;
+    return provider;
   }
 
   ListProvider._(this.nodeId, this._box) {
