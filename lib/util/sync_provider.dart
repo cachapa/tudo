@@ -1,16 +1,19 @@
 import 'package:crdt/crdt.dart';
 import 'package:flutter/foundation.dart';
+import 'package:tudo_client/extensions.dart';
 
 import '../list_manager/list_provider.dart';
 import 'sync_client.dart';
 
 class SyncProvider with ChangeNotifier {
-  final ListProvider _listProvider;
+  late ListProvider _listProvider;
   final _clientMap = <String, SyncClient>{};
 
   Hlc? _lastSync;
 
-  SyncProvider(this._listProvider) {
+  set listProvider(ListProvider listProvider) {
+    _listProvider = listProvider;
+
     _listProvider.lists.map((e) => e.id).forEach((id) {
       if (!_clientMap.containsKey(id)) {
         _clientMap[id] = SyncClient(id)
@@ -58,7 +61,7 @@ class SyncProvider with ChangeNotifier {
   void sync() {
     for (var list in _listProvider.lists) {
       final changeset = list.toJson(_lastSync);
-      // print('=> ${list.name}: $changeset');
+      '=> ${list.name}: $changeset'.log;
       _clientMap[list.id]!.send(changeset);
     }
   }

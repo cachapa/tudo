@@ -51,7 +51,11 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: settingsProvider),
         ChangeNotifierProvider.value(value: listProvider),
-        ChangeNotifierProvider(create: (_) => SyncProvider(listProvider)),
+        ChangeNotifierProxyProvider<ListProvider, SyncProvider>(
+          create: (_) => SyncProvider(),
+          update: (_, listProvider, syncProvider) =>
+              syncProvider!..listProvider = listProvider,
+        ),
       ],
       child: const MyApp(),
     ),
