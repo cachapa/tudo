@@ -72,19 +72,20 @@ void _deleteStaleLists(String dir, ListProvider listManager) {
   }
 }
 
-void _monitorDeeplinks(ListProvider listManager) {
+void _monitorDeeplinks(ListProvider listProvider) {
   try {
     if (Platform.isAndroid || Platform.isIOS) {
-      getInitialLink().then((link) async {
-        // ignore: unnecessary_null_comparison
-        if (link != null) {
-          'Initial link: $link'.log;
-          await listManager.import(link);
+      getInitialUri().then((uri) async {
+        if (uri != null) {
+          'Initial link: $uri'.log;
+          await listProvider.import(uri.pathSegments.last);
         }
       });
-      linkStream.where((e) => e != null).listen((link) async {
-        'Stream link: $link'.log;
-        await listManager.import(link!);
+      uriLinkStream.where((e) => e != null).listen((uri) async {
+        if (uri != null) {
+          'Stream link: $uri'.log;
+          await listProvider.import(uri.pathSegments.last);
+        }
       }).onError((e) => e.log);
     }
   } catch (_) {}

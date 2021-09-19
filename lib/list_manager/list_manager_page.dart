@@ -172,7 +172,8 @@ class Logo extends StatelessWidget {
     );
     if (code == '-1') return;
     'Read QR: $code'.log;
-    await context.read<ListProvider>().import(code);
+    final uri = Uri.parse(code);
+    await context.read<ListProvider>().import(uri.pathSegments.last);
   }
 }
 

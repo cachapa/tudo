@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:tudo_client/config.dart';
+import 'package:tudo_client/extensions.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class SyncClient {
@@ -29,20 +30,19 @@ class SyncClient {
 
     subscription = channel!.stream.listen(
       (message) {
+        'connected'.log;
         _connectionStateController.sink.add(true);
         _messageController.add(message);
       },
       onDone: () => disconnect(),
       onError: (e) => disconnect(),
     );
-
-    // print('connected');
   }
 
   void send(String message) => channel!.sink.add(message);
 
   void disconnect() {
-    // print('disconnected');
+    'disconnected'.log;
     _connectionStateController.sink.add(false);
     subscription?.cancel();
     subscription = null;

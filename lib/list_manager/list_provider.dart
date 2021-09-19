@@ -61,11 +61,6 @@ class ListProvider with ChangeNotifier {
   Future<void> import(String id, [int? index]) async {
     await _initFuture;
 
-    // Remove url section if present
-    id = id
-        .replaceFirst('https://tudo.cachapa.net/', '')
-        .replaceFirst('list/', '');
-
     if (listIds.contains(id)) {
       'Import: already have $id'.log;
       return;

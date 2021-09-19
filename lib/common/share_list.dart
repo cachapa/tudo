@@ -17,7 +17,7 @@ void shareToDoList(BuildContext context, ToDoList list) {
 class _ShareListForm extends StatelessWidget {
   final ToDoList list;
 
-  String get shareUrl => 'https://tudo.cachapa.net/list/${list.id}';
+  String get shareUrl => 'https://tudo.cachapa.net/${list.id}';
 
   const _ShareListForm({Key? key, required this.list}) : super(key: key);
 

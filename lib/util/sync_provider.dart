@@ -13,7 +13,7 @@ class SyncProvider with ChangeNotifier {
   SyncProvider(this._listProvider) {
     _listProvider.lists.map((e) => e.id).forEach((id) {
       if (!_clientMap.containsKey(id)) {
-        _clientMap[id] ??= SyncClient(id)
+        _clientMap[id] = SyncClient(id)
           ..connectionState.listen((connected) {
             // print(
             //     '${id.substring(0, 4)}… ${connected ? 'Connected' : 'Disconnected'}');
