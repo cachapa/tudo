@@ -32,14 +32,14 @@ void main() async {
       : 'store';
   Hive.init(dir);
 
-  // Adapters
-  Hive.registerAdapter(RecordAdapter(0));
-  Hive.registerAdapter(HlcAdapter(2));
-  Hive.registerAdapter(ToDoAdapter(3));
-  Hive.registerAdapter(ColorAdapter(4));
-
   final settingsProvider = await SettingsProvider.open();
   final nodeId = settingsProvider.nodeId;
+
+  // Adapters
+  Hive.registerAdapter(RecordAdapter(0));
+  Hive.registerAdapter(HlcCompatAdapter(2, nodeId));
+  Hive.registerAdapter(ToDoAdapter(3));
+  Hive.registerAdapter(ColorAdapter(4));
 
   final listProvider = await ListProvider.open(nodeId);
   _monitorDeeplinks(listProvider);
