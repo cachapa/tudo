@@ -46,7 +46,7 @@ android {
         applicationId "net.cachapa.tudo"
         minSdkVersion 16
         targetSdkVersion 30
-        versionCode flutterVersionCode.toInteger()
+        versionCode flutterVersionCode.toInteger() + 32
         versionName flutterVersionName
         multiDexEnabled true
     }
@@ -89,3 +89,4 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.multidex:multidex:2.0.1"
 }
+
