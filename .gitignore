@@ -42,3 +42,6 @@ app.*.map.json
 
 # Store
 store
+
+# Secrets
+lib/config.dart
