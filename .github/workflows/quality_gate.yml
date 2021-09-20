@@ -21,10 +21,10 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Load config
-        run: echo "${{ secrets.CONFIG }}" > lib/config.dart
       - name: Verify code formatting
         run: dart format --output none --set-exit-if-changed .
+      - name: Load config
+        run: echo "${{ secrets.CONFIG }}" > lib/config.dart
       - name: Static code analysis
         run: flutter analyze
 #      - name: Run tests
