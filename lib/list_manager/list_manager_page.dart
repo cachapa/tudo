@@ -119,7 +119,7 @@ class Logo extends StatelessWidget {
             child: Stack(
               children: [
                 Image.asset(
-                  'assets/images/tudo_rainbow_blur.png',
+                  'assets/images/tudo_rainbow_bold.png',
                   height: 72,
                 ),
                 Image.asset(
