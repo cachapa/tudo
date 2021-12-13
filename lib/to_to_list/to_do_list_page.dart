@@ -1,12 +1,10 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
-import 'package:provider/provider.dart';
 import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
 import 'package:tudo_client/common/empty_page.dart';

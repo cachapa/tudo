@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_crdt/hive_adapters.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
 import 'package:tudo_client/common/offline_indicator.dart';
 import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/util/settings_provider.dart';

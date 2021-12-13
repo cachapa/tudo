@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:tudo_client/extensions.dart';
 import 'package:tudo_client/list_manager/list_provider.dart';
 
