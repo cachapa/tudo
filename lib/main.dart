@@ -5,17 +5,18 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import 'package:hive_crdt/hive_adapters.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:tudo_client/common/offline_indicator.dart';
+import 'package:tudo_client/auth/auth_provider.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/util/settings_provider.dart';
+import 'package:tudo_client/settings/settings_provider.dart';
+import 'package:tudo_client/util/store.dart';
 import 'package:uni_links/uni_links.dart';
 
-import 'list_manager/list_manager_page.dart';
-import 'list_manager/list_provider.dart';
-import 'util/hive/hive_adapters.dart';
-import 'util/sync_provider.dart';
+import 'crdt/hive_adapters.dart';
+import 'crdt/tudo_crdt.dart';
+import 'lists/list_manager_page.dart';
+import 'lists/list_provider.dart';
+import 'sync/sync_provider.dart';
 
 void main() async {
   // Emulate platform
@@ -30,49 +31,31 @@ void main() async {
       ? (await getApplicationDocumentsDirectory()).path
       : 'store';
   Hive.init(dir);
+  Hive.registerAdapter(HlcAdapter(1));
 
-  final settingsProvider = await SettingsProvider.open();
-  final nodeId = settingsProvider.nodeId;
+  final crdt = TudoCrdt();
+  final storeProvider = await StoreProvider.open();
+  await crdt.init(dir, 'tudo');
 
-  // Adapters
-  Hive.registerAdapter(RecordAdapter(0));
-  Hive.registerAdapter(HlcCompatAdapter(2, nodeId));
-  Hive.registerAdapter(ToDoAdapter(3));
-  Hive.registerAdapter(ColorAdapter(4));
-
-  final listProvider = await ListProvider.open(nodeId);
-  _monitorDeeplinks(listProvider);
-
-  _deleteStaleLists(dir, listProvider);
+  // _monitorDeeplinks(listProvider);
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider.value(value: settingsProvider),
-        ChangeNotifierProvider.value(value: listProvider),
-        ChangeNotifierProxyProvider<ListProvider, SyncProvider>(
-          create: (_) => SyncProvider(),
-          update: (_, listProvider, syncProvider) =>
-              syncProvider!..listProvider = listProvider,
-        ),
+        Provider.value(value: storeProvider),
+        ChangeNotifierProvider(
+            create: (c) => SettingsProvider(c.storeProvider)),
+        Provider(create: (c) => AuthProvider(c.storeProvider)),
+        Provider(
+            create: (c) =>
+                ListProvider(c.authProvider.userId, crdt, c.storeProvider)),
+        Provider(
+            create: (c) => SyncProvider(
+                c.authProvider.userId, c.storeProvider, c.listProvider)),
       ],
       child: const MyApp(),
     ),
   );
-}
-
-void _deleteStaleLists(String dir, ListProvider listManager) {
-  final existingLists = listManager.listIds.map((e) => e.toLowerCase()).toSet();
-  final allLists = Directory(dir)
-      .listSync()
-      .map((e) => e.path)
-      .where((e) => e.endsWith('.hive'))
-      .map((e) => e.substring(e.lastIndexOf('/') + 1, e.lastIndexOf('.')))
-      .where((e) => e != 'store' && e != 'settings')
-      .toSet();
-  for (var e in (allLists..removeAll(existingLists))) {
-    Hive.deleteBoxFromDisk(e);
-  }
 }
 
 void _monitorDeeplinks(ListProvider listProvider) {
@@ -102,8 +85,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
-  Timer? reconnectTimer;
-
   @override
   void initState() {
     super.initState();
@@ -119,27 +100,20 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            title: 'tudo',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-            ),
-            darkTheme: ThemeData(
-              primarySwatch: Colors.blue,
-              primaryColor: Colors.blue,
-              brightness: Brightness.dark,
-            ),
-            themeMode: context.select<SettingsProvider, ThemeMode>(
-                (provider) => provider.theme),
-            home: const ListManagerPage(),
-          ),
-        ),
-        const OfflineIndicator(),
-      ],
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'tudo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      darkTheme: ThemeData(
+        primarySwatch: Colors.blue,
+        primaryColor: Colors.blue,
+        brightness: Brightness.dark,
+      ),
+      themeMode: context
+          .select<SettingsProvider, ThemeMode>((provider) => provider.theme),
+      home: const ListManagerPage(),
     );
   }
 
@@ -148,13 +122,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     final appVisible = (state == AppLifecycleState.resumed ||
         state == AppLifecycleState.inactive);
     if (appVisible) {
-      if (!(reconnectTimer?.isActive ?? false)) {
-        reconnectTimer = Timer.periodic(
-            const Duration(seconds: 10), (_) => syncProvider.connect());
-        syncProvider.connect();
-      }
+      syncProvider.connect();
     } else {
-      reconnectTimer?.cancel();
       syncProvider.disconnect();
     }
   }

@@ -111,7 +111,7 @@ class _ChartPainter extends CustomPainter {
 
     // Draw Progress
     _ringPaint.color = color;
-    final startAngle = -pi / 2;
+    const startAngle = -pi / 2;
     final endAngle = 2 * pi * ratio;
     canvas.drawArc(Rect.fromCircle(center: center, radius: radius), startAngle,
         endAngle, false, _ringPaint);

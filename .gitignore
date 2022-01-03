@@ -44,4 +44,4 @@ app.*.map.json
 store
 
 # Secrets
-lib/config.dart
+release_config.dart

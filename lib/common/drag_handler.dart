@@ -8,9 +8,9 @@ class DragHandle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onLongPress: () => 'tap'.log,
-      onHorizontalDragStart: (_) => 'tap'.log,
-      onVerticalDragStart: (_) => 'tap'.log,
+      // onLongPress: () => 'tap'.log,
+      // onHorizontalDragStart: (_) => 'tap'.log,
+      // onVerticalDragStart: (_) => 'tap'.log,
       child: Handle(
         vibrate: true,
         child: Padding(

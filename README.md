@@ -1,9 +1,6 @@
 ![tudo](tudo.svg)
 
-To-do lists are supposed to be easy, yet everyone seems to be making them complicated.
-You just want to write down a simple shopping list but then find yourself dealing with user accounts, permissions, roles, ads, autocompleters, AI helpers, location-based services, user tracking, etc.
-
-tudo is an experiment on simple, private, yet synchronized to-do lists.
+tudo is an experiment on simple, private, synchronized to-do lists.
 
 ## Try it out
 
@@ -15,25 +12,22 @@ The server part of this project is maintained separately: [tudo_server](https://
 ## Features
 
 * **Anonymous**<br/>
-No user accounts, registrations or tracking of any sort. The web client creates a couple of cookies used to store local data but those aren't tracked by the server.
+No mandatory user accounts or tracking of any sort.
 
 * **Shareable**<br/>
 Lists can be shared between your devices or trusted contacts simply using the list id.
 
 * **Real-time**<br/>
-Changes to lists appear immediately in every connected device where the app is open and online.
+Changes to lists propagate immediately to every connected device where the app is open and online.
 
 * **Private**<br/>
-Each to-do list has a 128 character-long random unique identifier that should make it effectively impossible to guess.
+Each to-do list has a random unique identifier that is effectively impossible to guess.
 
 * **Offline-first**<br/>
-Any changes made to the list are stored locally on the device and synchronized whenever network is available.
+No loading screens. The app stores all the data it needs locally and works perfectly without a connection.
 
 * **Multiplatform**<br/>
-Installable apps for Android and iOS, and a web interface for everything else.
-
-* **Forgetful**<br/>
-Lists exist on the server for relatively short timespans, just enough to perform synchronization between active devices.
+Mobile apps for Android and iOS, and more to come.
 
 * **Open-source**<br/>
 Look at how it's built. Modify it. Host it yourself. Maybe help me improve it?
@@ -44,11 +38,8 @@ To do lists are stored on the device as [CRDT](https://github.com/cachapa/crdt) 
 
 A live websocket connection to the server is kept open whenever the app is active and network is available. Local changes are immediately pushed to the network, and remote changes are pulled in real-time. This promotes rapid consistency of the database between all active devices in the network, and allows users to see those changes happen in the user interface.
 
-On the server side the data is only stored temporarily - currently in volatile memory but this may be changed to temporary disk storage in the future. Because all clients keep a complete local copy of the database locally, the data is completely restored whenever any client restores the socket connection.<br/>
-The side-effect of this behaviour is that lists that are regularly updated effectively exist permanently on the server, those which are updated infrequently may not benefit from proper multi-device synchronization, and those which are deleted from all devices can be truly said to be lost in the ether.
+The clients are built using [Flutter](https://flutter.io), which makes it possible to build applications for all popular platforms from a single shared codebase.
 
-The clients use the Flutter framework, which makes it possible to build Android, iOS and Web applications from a single shared codebase.
-
-## Features and bugs
+## How to contribute
 
 Please file feature requests and bugs at the [issue tracker](https://github.com/cachapa/tudo_client/issues).

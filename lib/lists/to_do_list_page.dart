@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -10,8 +9,10 @@ import 'package:tudo_client/common/edit_list.dart';
 import 'package:tudo_client/common/empty_page.dart';
 import 'package:tudo_client/common/progress.dart';
 import 'package:tudo_client/common/text_input_dialog.dart';
+import 'package:tudo_client/common/value_builders.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/list_manager/list_provider.dart';
+
+import 'list_provider.dart';
 
 const titleBarHeight = 60.0;
 const inputBarHeight = 60.0;
@@ -20,21 +21,21 @@ const blurSigma = 14.0;
 enum ListAction { delete }
 
 class ToDoListPage extends StatelessWidget {
-  final String id;
+  final String listId;
   final _listKey = GlobalKey();
   final _uncheckedListKey = GlobalKey();
   final _controller = ScrollController();
 
-  ToDoListPage({Key? key, required this.id}) : super(key: key);
+  ToDoListPage({Key? key, required this.listId}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       // Close keyboard when tapping a non-focusable area
       onTap: () => FocusScope.of(context).unfocus(),
-      child: Selector<ListProvider, ToDoList>(
-        selector: (_, listManager) => listManager.get(id)!,
-        builder: (_, list, __) => Theme(
+      child: ValueStreamBuilder<ToDoList>(
+        stream: context.listProvider.getList(listId),
+        builder: (_, list) => Theme(
           data: context.theme.copyWith(
             colorScheme:
                 context.theme.colorScheme.copyWith(primary: list.color),
@@ -66,13 +67,13 @@ class ToDoListPage extends StatelessWidget {
                 ? const EmptyPage(text: 'Create a new to-do item below')
                 : ToDoListView(
                     key: _listKey,
+                    list: list,
                     checkedListKey: _uncheckedListKey,
                     controller: _controller,
-                    toDoList: list,
                   ),
             floatingActionButton: InputBar(
               // key: inputKey,
-              onSubmitted: (value) => _addItem(list, value),
+              onSubmitted: (value) => _addItem(context, list.id, value),
             ),
             floatingActionButtonLocation:
                 FloatingActionButtonLocation.centerFloat,
@@ -82,28 +83,29 @@ class ToDoListPage extends StatelessWidget {
     );
   }
 
-  void _addItem(ToDoList list, String value) {
-    list.add(value);
-    Future.delayed(
-      const Duration(milliseconds: 400),
-      () {
-        final screenHeight =
-            MediaQuery.of(_listKey.currentContext!).size.height;
-        final uncheckedListHeight = ((_uncheckedListKey.currentContext!
-                .findRenderObject()) as RenderBox)
-            .size
-            .height;
-        final maxOffset = uncheckedListHeight;
-        final minOffset =
-            max<double>(0.0, uncheckedListHeight - screenHeight) + 200.0;
-        final offset = _controller.offset.clamp(minOffset, maxOffset);
-        _controller.animateTo(
-          offset,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.fastOutSlowIn,
-        );
-      },
-    );
+  void _addItem(BuildContext context, String listID, String name) {
+    context.listProvider.createItem(listId, name);
+    // list.add(value);
+    // Future.delayed(
+    //   const Duration(milliseconds: 400),
+    //   () {
+    //     final screenHeight =
+    //         MediaQuery.of(_listKey.currentContext!).size.height;
+    //     final uncheckedListHeight = ((_uncheckedListKey.currentContext!
+    //             .findRenderObject()) as RenderBox)
+    //         .size
+    //         .height;
+    //     final maxOffset = uncheckedListHeight;
+    //     final minOffset =
+    //         max<double>(0.0, uncheckedListHeight - screenHeight) + 200.0;
+    //     final offset = _controller.offset.clamp(minOffset, maxOffset);
+    //     _controller.animateTo(
+    //       offset,
+    //       duration: const Duration(milliseconds: 400),
+    //       curve: Curves.fastOutSlowIn,
+    //     );
+    //   },
+    // );
   }
 }
 
@@ -148,7 +150,11 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Positioned(
                   right: 4,
-                  child: Progress(list: list),
+                  child: Progress(
+                    progress: list.doneCount,
+                    total: list.itemCount,
+                    color: list.color,
+                  ),
                 ),
               ],
             ),
@@ -225,89 +231,95 @@ class _InputBarState extends State<InputBar> {
 }
 
 class ToDoListView extends StatelessWidget {
-  final ToDoList toDoList;
+  final ToDoList list;
   final Key checkedListKey;
   final ScrollController controller;
 
-  const ToDoListView(
-      {Key? key,
-      required this.checkedListKey,
-      required this.controller,
-      required this.toDoList})
-      : super(key: key);
+  const ToDoListView({
+    Key? key,
+    required this.list,
+    required this.checkedListKey,
+    required this.controller,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final items = toDoList.toDos;
-    final uncheckedItems = items.where((item) => !item.checked).toList();
-    final checkedItems = items.where((item) => item.checked).toList();
+    return ValueStreamBuilder<List<ToDo>>(
+        stream: context.listProvider.getItems(list.id),
+        builder: (_, items) {
+          final uncheckedItems = items.where((item) => !item.done).toList();
+          final checkedItems = items.where((item) => item.done).toList();
 
-    return ListView(
-      controller: controller,
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: EdgeInsets.only(
-          top: context.padding.top,
-          bottom: context.padding.bottom + inputBarHeight + 40),
-      children: [
-        ImplicitlyAnimatedReorderableList<ToDo>(
-          key: checkedListKey,
-          items: uncheckedItems,
-          shrinkWrap: true,
-          physics: const ClampingScrollPhysics(),
-          reorderDuration: const Duration(milliseconds: 200),
-          areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-          onReorderFinished: (_, from, to, __) {
-            if (from == to) return;
-            // Query the real position of the items in the complete list
-            from = items.indexOf(uncheckedItems[from]);
-            to = items.indexOf(uncheckedItems[to]);
-            toDoList.swap(from, to);
-          },
-          itemBuilder: (_, itemAnimation, item, __) => Reorderable(
-            key: Key(item.id),
-            builder: (context, animation, inDrag) => SizeFadeTransition(
-              sizeFraction: 0.7,
-              curve: Curves.easeInOut,
-              animation: itemAnimation,
-              child: _ListTile(
-                item: item,
-                onToggle: () => _toggle(item),
-                onEdit: () => _editItem(context, item),
-                onDelete: () => _deleteItem(context, item),
-              ),
-            ),
-          ),
-        ),
-        ImplicitlyAnimatedList<ToDo>(
-          items: [
-            if (checkedItems.isNotEmpty) ToDo('header', '', false),
-            ...checkedItems,
-          ],
-          shrinkWrap: true,
-          physics: const ClampingScrollPhysics(),
-          areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-          itemBuilder: (context, itemAnimation, item, i) => SizeFadeTransition(
-            sizeFraction: 0.7,
-            curve: Curves.easeInOut,
-            animation: itemAnimation,
-            child: item.id == 'header'
-                ? _CompletedHeader(
-                    color: toDoList.color,
-                    onClear: () => _clearCompleted(context, toDoList),
-                  )
-                : _ListTile(
-                    item: item,
-                    onToggle: () => _toggle(item),
-                    onEdit: () => _editItem(context, item),
-                    onDelete: () => _deleteItem(context, item),
+          return ListView(
+            controller: controller,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.only(
+                top: context.padding.top,
+                bottom: context.padding.bottom + inputBarHeight + 40),
+            children: [
+              ImplicitlyAnimatedReorderableList<ToDo>(
+                key: checkedListKey,
+                items: uncheckedItems,
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                reorderDuration: const Duration(milliseconds: 200),
+                areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
+                onReorderFinished: (_, from, to, __) {
+                  if (from == to) return;
+                  // Query the real position of the items in the complete list
+                  from = items.indexOf(uncheckedItems[from]);
+                  to = items.indexOf(uncheckedItems[to]);
+                  _swap(context, items, from, to);
+                },
+                itemBuilder: (_, itemAnimation, item, __) => Reorderable(
+                  key: Key(item.id),
+                  builder: (context, animation, inDrag) => SizeFadeTransition(
+                    sizeFraction: 0.7,
+                    curve: Curves.easeInOut,
+                    animation: itemAnimation,
+                    child: _ListTile(
+                      item: item,
+                      onToggle: () => _toggle(context, item),
+                      onEdit: () => _editItem(context, item),
+                      onDelete: () => _deleteItem(context, item),
+                    ),
                   ),
-          ),
-        ),
-      ],
-    );
+                ),
+              ),
+              ImplicitlyAnimatedList<ToDo>(
+                items: [
+                  if (checkedItems.isNotEmpty)
+                    ToDo('header', '', false, 0, null, null),
+                  ...checkedItems,
+                ],
+                shrinkWrap: true,
+                physics: const ClampingScrollPhysics(),
+                areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
+                itemBuilder: (context, itemAnimation, item, i) =>
+                    SizeFadeTransition(
+                  sizeFraction: 0.7,
+                  curve: Curves.easeInOut,
+                  animation: itemAnimation,
+                  child: item.id == 'header'
+                      ? _CompletedHeader(
+                          color: list.color,
+                          onClear: () => _clearCompleted(context, list),
+                        )
+                      : _ListTile(
+                          item: item,
+                          onToggle: () => _toggle(context, item),
+                          onEdit: () => _editItem(context, item),
+                          onDelete: () => _deleteItem(context, item),
+                        ),
+                ),
+              ),
+            ],
+          );
+        });
   }
 
-  void _toggle(ToDo toDo) => toDoList.set(toDo.id, checked: !toDo.checked);
+  void _toggle(BuildContext context, ToDo toDo) =>
+      context.listProvider.setDone(toDo.id, !toDo.done);
 
   void _editItem(BuildContext context, ToDo toDo) {
     showDialog<String>(
@@ -316,16 +328,15 @@ class ToDoListView extends StatelessWidget {
         title: 'Edit Item',
         value: toDo.name,
         positiveLabel: 'Update',
-        onSet: (value) => toDoList.set(toDo.id, name: value),
+        onSet: (value) => context.listProvider.setItemName(toDo.id, value),
       ),
     );
   }
 
-  Future<void> _deleteItem(BuildContext context, ToDo toDo) async {
-    // Mark item as deleted to account for implicit removal animations
-    toDoList.set(toDo.id, isDeleted: true);
-    await Future.delayed(Duration.zero);
-    final index = toDoList.remove(toDo.id);
+  void _deleteItem(BuildContext context, ToDo toDo) {
+    // Hide item while the list removal animation runs
+    toDo.isDeleted = true;
+    context.listProvider.deleteItem(toDo.id);
 
     context.showSnackBar(
       SnackBar(
@@ -333,18 +344,20 @@ class ToDoListView extends StatelessWidget {
         content: Text('Deleted "${toDo.name}"'),
         action: SnackBarAction(
           label: 'UNDO',
-          onPressed: () => toDoList.set(toDo.id,
-              name: toDo.name, checked: toDo.checked, index: index),
+          onPressed: () => context.listProvider.undeleteItem(toDo.id),
         ),
       ),
     );
   }
 
-  void _clearCompleted(BuildContext context, ToDoList list) {
-    var checked = list.toDos.where((item) => item.checked).toList();
+  Future<void> _clearCompleted(BuildContext context, ToDoList list) async {
+    var checked = (await context.listProvider.getItems(list.id).first)
+        .where((item) => item.done)
+        .toList();
     if (checked.isEmpty) return;
 
-    var indexes = checked.map((e) => list.remove(e.id)).toList();
+    var indexes =
+        checked.map((e) => context.listProvider.deleteItem(e.id)).toList();
 
     // Insert in reverse order when undoing so the old indexes match
     checked = checked.reversed.toList();
@@ -357,16 +370,23 @@ class ToDoListView extends StatelessWidget {
         content:
             Text('Cleared $count completed ${count == 1 ? 'item' : 'items'}'),
         action: SnackBarAction(
-            label: 'UNDO',
-            onPressed: () {
-              for (var i = 0; i < checked.length; i++) {
-                final item = checked[i];
-                list.set(item.id,
-                    name: item.name, checked: item.checked, index: indexes[i]);
-              }
-            }),
+          label: 'UNDO',
+          onPressed: () {
+            for (var i = 0; i < checked.length; i++) {
+              final item = checked[i];
+              context.listProvider.undeleteItem(item.id);
+            }
+          },
+        ),
       ),
     );
+  }
+
+  void _swap(BuildContext context, List<ToDo> items, int from, int to) {
+    items = items.toList();
+    final item = items.removeAt(from);
+    items.insert(to, item);
+    context.listProvider.setItemOrder(items);
   }
 }
 
@@ -376,13 +396,13 @@ class _ListTile extends StatelessWidget {
   final Function() onEdit;
   final Function() onDelete;
 
-  const _ListTile(
-      {Key? key,
-      required this.item,
-      required this.onToggle,
-      required this.onEdit,
-      required this.onDelete})
-      : super(key: key);
+  const _ListTile({
+    Key? key,
+    required this.item,
+    required this.onToggle,
+    required this.onEdit,
+    required this.onDelete,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -419,10 +439,10 @@ class _ListTile extends StatelessWidget {
         child: ListTile(
           leading: Checkbox(
             onChanged: (_) => onToggle(),
-            value: item.checked,
+            value: item.done,
           ),
           title: Text(item.name),
-          trailing: item.checked ? null : const DragHandle(),
+          trailing: item.done ? null : const DragHandle(),
           onTap: () => onToggle(),
           onLongPress: onEdit,
         ),
@@ -459,7 +479,7 @@ class _CompletedHeader extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: const Icon(Icons.delete_sweep_outlined),
             onPressed: onClear,
           ),
         ],

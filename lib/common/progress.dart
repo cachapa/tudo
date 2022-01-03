@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:tudo_client/list_manager/list_provider.dart';
 
 import 'ring_chart.dart';
 
 class Progress extends StatelessWidget {
   final double size;
-  final ToDoList list;
+  final int progress;
+  final int total;
+  final Color color;
 
-  int get progress => list.completedLength;
-
-  int get total => list.length;
-
-  const Progress({Key? key, this.size = 30, required this.list})
-      : super(key: key);
+  const Progress({
+    Key? key,
+    this.size = 30,
+    required this.progress,
+    required this.total,
+    required this.color,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +25,12 @@ class Progress extends StatelessWidget {
           size: size,
           progress: progress.toDouble(),
           total: total.toDouble(),
-          color: list.color,
+          color: color,
         ),
-        AnimatedCounter(value: total),
+        AnimatedCounter(
+          value: total,
+          size: size * 0.4,
+        ),
       ],
     );
   }
@@ -33,8 +38,10 @@ class Progress extends StatelessWidget {
 
 class AnimatedCounter extends StatefulWidget {
   final int value;
+  final double size;
 
-  const AnimatedCounter({Key? key, required this.value}) : super(key: key);
+  const AnimatedCounter({Key? key, required this.value, required this.size})
+      : super(key: key);
 
   @override
   _AnimatedCounterState createState() => _AnimatedCounterState();
@@ -59,7 +66,7 @@ class _AnimatedCounterState extends State<AnimatedCounter> {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       transitionBuilder: (child, animation) {
-        final d = (child.key as ValueKey<int>).value == widget.value ? 1 : -1;
+        final d = (child.key as ValueKey<int>).value == widget.value ? -1 : 1;
         final offsetAnimation = Tween<Offset>(
                 begin: Offset(0.0, direction * d * 0.5), end: Offset.zero)
             .animate(animation);
@@ -74,7 +81,10 @@ class _AnimatedCounterState extends State<AnimatedCounter> {
       child: Text(
         widget.value.toString(),
         key: ValueKey(widget.value),
-        style: Theme.of(context).primaryTextTheme.bodyText2,
+        style: Theme.of(context)
+            .primaryTextTheme
+            .bodyText2!
+            .copyWith(fontSize: widget.size),
       ),
     );
   }

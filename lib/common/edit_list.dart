@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/list_manager/list_provider.dart';
+import 'package:tudo_client/lists/list_provider.dart';
 
 import 'share_list.dart';
 
@@ -103,10 +103,10 @@ class _EditListForm extends StatelessWidget {
     if (name.isEmpty) return;
 
     if (editMode) {
-      list!.name = name;
-      list!.color = color;
+      context.listProvider.setName(list!.id, name);
+      context.listProvider.setColor(list!.id, color);
     } else {
-      context.read<ListProvider>().create(name, color);
+      context.read<ListProvider>().createList(name, color);
     }
 
     context.pop();

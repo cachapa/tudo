@@ -1,21 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:tudo_client/common/drag_handler.dart';
 import 'package:tudo_client/common/edit_list.dart';
+import 'package:tudo_client/common/offline_indicator.dart';
 import 'package:tudo_client/common/progress.dart';
+import 'package:tudo_client/common/value_builders.dart';
 import 'package:tudo_client/extensions.dart';
-import 'package:tudo_client/list_manager/list_provider.dart';
-import 'package:tudo_client/to_to_list/to_do_list_page.dart';
-import 'package:tudo_client/util/settings_provider.dart';
+import 'package:tudo_client/lists/to_do_list_page.dart';
+import 'package:tudo_client/settings/settings_provider.dart';
+
+import 'list_provider.dart';
 
 final _controller = ScrollController();
 
-class ListManagerPage extends StatelessWidget {
+class ListManagerPage extends StatefulWidget {
   const ListManagerPage({Key? key}) : super(key: key);
+
+  @override
+  State<ListManagerPage> createState() => _ListManagerPageState();
+}
+
+class _ListManagerPageState extends State<ListManagerPage> {
+  late final OfflineIndicator _offlineIndicator;
+
+  @override
+  void initState() {
+    super.initState();
+    SchedulerBinding.instance!.addPostFrameCallback((_) {
+      _offlineIndicator = OfflineIndicator(context);
+    });
+  }
+
+  @override
+  void dispose() {
+    _offlineIndicator.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,15 +48,16 @@ class ListManagerPage extends StatelessWidget {
         statusBarIconBrightness: context.theme.brightness.invert,
       ),
       child: Scaffold(
-        body: Consumer<ListProvider>(
-          builder: (_, listManager, __) =>
-              ImplicitlyAnimatedReorderableList<ToDoList>(
+        body: ValueStreamBuilder<List<ToDoList>>(
+          stream: context.listProvider.lists,
+          builder: (_, lists) => ImplicitlyAnimatedReorderableList<ToDoList>(
             controller: _controller,
             padding: EdgeInsets.only(bottom: context.padding.bottom),
-            items: listManager.lists,
+            items: lists,
             shrinkWrap: true,
             areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
-            onReorderFinished: (_, from, to, __) => listManager.swap(from, to),
+            onReorderFinished: (_, from, to, __) =>
+                _swap(context, lists, from, to),
             header: const Logo(),
             itemBuilder: (_, itemAnimation, item, __) => Reorderable(
               key: ValueKey(item.id),
@@ -78,6 +103,13 @@ class ListManagerPage extends StatelessWidget {
         ),
       );
     }
+  }
+
+  void _swap(BuildContext context, List<ToDoList> lists, int from, int to) {
+    lists = lists.toList();
+    final item = lists.removeAt(from);
+    lists.insert(to, item);
+    context.listProvider.setListOrder(lists);
   }
 }
 
@@ -180,20 +212,72 @@ class _ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: Progress(list: list),
-      title: Text(
-        list.name,
-        style: context.theme.textTheme.headline6,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: MaterialButton(
+        padding: EdgeInsets.zero,
+        elevation: 4,
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        onPressed: () => _openList(context),
+        onLongPress: () => _editList(context),
+        child: Ink(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [list.color, list.color.darken(0.2)],
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16),
+                    child: Text(
+                      '🛒',
+                      style: context.theme.primaryTextTheme.bodyText1!
+                          .copyWith(fontSize: 36),
+                    ),
+                  ),
+                  // const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          list.name,
+                          style: context.theme.primaryTextTheme.headline6,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'You, Ramona',
+                          style: context.theme.primaryTextTheme.subtitle2!
+                              .copyWith(
+                                  color: context
+                                      .theme.primaryTextTheme.subtitle2!.color!
+                                      .withOpacity(0.8)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Progress(
+                    progress: list.doneCount,
+                    total: list.itemCount,
+                    color: list.color.darken(0.5),
+                    size: 40,
+                  ),
+                ],
+              ),
+            )),
       ),
-      trailing: const DragHandle(),
-      onTap: () => _openList(context),
-      onLongPress: () => _editList(context),
     );
   }
 
   void _openList(BuildContext context) async {
-    final action = await context.push(() => ToDoListPage(id: list.id));
+    final action = await context.push(() => ToDoListPage(listId: list.id));
     if (action != null && action == ListAction.delete) {
       Future.delayed(
         // Wait for pop animation to complete
@@ -206,9 +290,9 @@ class _ListItem extends StatelessWidget {
   void _editList(BuildContext context) =>
       editToDoList(context, list, () => _deleteList(context));
 
-  void _deleteList(BuildContext context) {
+  Future<void> _deleteList(BuildContext context) async {
     final listManager = context.read<ListProvider>();
-    final index = listManager.remove(list.id);
+    final index = await listManager.delete(list.id);
     context.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
