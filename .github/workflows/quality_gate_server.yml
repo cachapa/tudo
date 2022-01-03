@@ -1,0 +1,25 @@
+name: Quality Gate (server)
+
+on: push
+
+defaults:
+  run:
+    working-directory: server
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: google/dart:latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Verify code formatting
+        run: dart format --output none --set-exit-if-changed .
+      - name: Get dependencies
+        run: pub get
+      - name: Static code analysis
+        run: dart analyze --fatal-infos
+#      - name: Run tests
+#        run: pub run test
