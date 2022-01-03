@@ -1,8 +1,7 @@
 name: Release Android
 on:
-  push:
-    tags:
-      - '[0-9]+.[0-9]+.[0-9]+'
+  release:
+    types: [ published ]
 
 defaults:
   run:
@@ -34,7 +33,7 @@ jobs:
         run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
 
       - name: Load secrets
-        working-directory: android
+        working-directory: app/android
         run: |
           echo "${{ secrets.KEYSTORE }}" | base64 -d > app/keystore.jks
           echo "${{ secrets.KEYSTORE_PROPERTIES }}" > app/keystore.properties
