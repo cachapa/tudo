@@ -5,6 +5,7 @@ import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/offline_indicator.dart';
 import 'package:tudo_app/common/progress.dart';
@@ -212,67 +213,19 @@ class _ListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: MaterialButton(
-        padding: EdgeInsets.zero,
-        elevation: 4,
-        clipBehavior: Clip.antiAlias,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        onPressed: () => _openList(context),
-        onLongPress: () => _editList(context),
-        child: Ink(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [list.color, list.color.darken(0.2)],
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 16),
-                    child: Text(
-                      '🛒',
-                      style: context.theme.primaryTextTheme.bodyText1!
-                          .copyWith(fontSize: 36),
-                    ),
-                  ),
-                  // const SizedBox(width: 8),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          list.name,
-                          style: context.theme.primaryTextTheme.headline6,
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'You, Ramona',
-                          style: context.theme.primaryTextTheme.subtitle2!
-                              .copyWith(
-                                  color: context
-                                      .theme.primaryTextTheme.subtitle2!.color!
-                                      .withOpacity(0.8)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Progress(
-                    progress: list.doneCount,
-                    total: list.itemCount,
-                    color: list.color.darken(0.5),
-                    size: 40,
-                  ),
-                ],
-              ),
-            )),
+    return ListTile(
+      leading: Progress(
+        color: list.color,
+        progress: list.doneCount,
+        total: list.itemCount,
       ),
+      title: Text(
+        list.name,
+        style: context.theme.textTheme.headline6,
+      ),
+      trailing: const DragHandle(),
+      onTap: () => _openList(context),
+      onLongPress: () => _editList(context),
     );
   }
 
