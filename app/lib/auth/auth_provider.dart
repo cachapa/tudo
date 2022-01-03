@@ -1,4 +1,5 @@
 import 'package:tudo_app/util/store.dart';
+import 'package:tudo_app/util/uuid.dart';
 
 class AuthProvider {
   final Store _store;
@@ -8,8 +9,7 @@ class AuthProvider {
   AuthProvider(StoreProvider storeProvider)
       : _store = storeProvider.getStore('auth') {
     if (!_store.contains('user_id')) {
-      // _store.put('user_id', uuid());
-      _store.put('user_id', '41ec6412-05e5-4bab-8129-856ab9e57cf7');
+      _store.put('user_id', uuid());
     }
   }
 }
