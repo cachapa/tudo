@@ -47,11 +47,11 @@ jobs:
         # --bundle-sksl-path flutter_01.sksl.json
 
       - name: Publish Android
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@v1.0.15
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.cachapa.tudo
-          releaseFiles: build/app/outputs/bundle/release/*.aab
-          mappingFile: build/app/outputs/mapping/release/mapping.txt
+          releaseFiles: app/build/app/outputs/bundle/release/*.aab
+          mappingFile: app/build/app/outputs/mapping/release/mapping.txt
           track: internal
 
