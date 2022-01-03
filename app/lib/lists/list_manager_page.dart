@@ -13,6 +13,7 @@ import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/lists/to_do_list_page.dart';
 import 'package:tudo_app/settings/settings_provider.dart';
+import 'package:uni_links/uni_links.dart';
 
 import 'list_provider.dart';
 
@@ -34,6 +35,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
     SchedulerBinding.instance!.addPostFrameCallback((_) {
       _offlineIndicator = OfflineIndicator(context);
     });
+    _monitorDeeplinks();
   }
 
   @override
@@ -57,8 +59,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
             items: lists,
             shrinkWrap: true,
             areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
-            onReorderFinished: (_, from, to, __) =>
-                _swap(context, lists, from, to),
+            onReorderFinished: (_, from, to, __) => _swap(lists, from, to),
             header: const Logo(),
             itemBuilder: (_, itemAnimation, item, __) => Reorderable(
               key: ValueKey(item.id),
@@ -74,7 +75,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
         floatingActionButton: FloatingActionButton(
           clipBehavior: Clip.antiAlias,
           backgroundColor: Colors.transparent,
-          onPressed: () => _createList(context),
+          onPressed: _createList,
           child: Stack(
             alignment: Alignment.center,
             children: [
@@ -91,7 +92,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
     );
   }
 
-  Future<void> _createList(BuildContext context) async {
+  Future<void> _createList() async {
     final result = await editToDoList(context);
     if (result ?? false) {
       // Scroll to the bottom of the list
@@ -106,11 +107,30 @@ class _ListManagerPageState extends State<ListManagerPage> {
     }
   }
 
-  void _swap(BuildContext context, List<ToDoList> lists, int from, int to) {
+  void _swap(List<ToDoList> lists, int from, int to) {
     lists = lists.toList();
     final item = lists.removeAt(from);
     lists.insert(to, item);
     context.listProvider.setListOrder(lists);
+  }
+
+  void _monitorDeeplinks() {
+    try {
+      if (PlatformX.isMobile) {
+        getInitialUri().then((uri) async {
+          if (uri != null) {
+            'Initial link: $uri'.log;
+            await context.listProvider.import(uri.pathSegments.last);
+          }
+        });
+        uriLinkStream.where((e) => e != null).listen((uri) async {
+          if (uri != null) {
+            'Stream link: $uri'.log;
+            await context.listProvider.import(uri.pathSegments.last);
+          }
+        }).onError((e) => e.log);
+      }
+    } catch (_) {}
   }
 }
 

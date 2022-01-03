@@ -10,7 +10,6 @@ import 'package:tudo_app/auth/auth_provider.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/settings/settings_provider.dart';
 import 'package:tudo_app/util/store.dart';
-import 'package:uni_links/uni_links.dart';
 
 import 'crdt/hive_adapters.dart';
 import 'crdt/tudo_crdt.dart';
@@ -37,8 +36,6 @@ void main() async {
   final storeProvider = await StoreProvider.open();
   await crdt.init(dir, 'tudo');
 
-  // _monitorDeeplinks(listProvider);
-
   runApp(
     MultiProvider(
       providers: [
@@ -56,25 +53,6 @@ void main() async {
       child: const MyApp(),
     ),
   );
-}
-
-void _monitorDeeplinks(ListProvider listProvider) {
-  try {
-    if (Platform.isAndroid || Platform.isIOS) {
-      getInitialUri().then((uri) async {
-        if (uri != null) {
-          'Initial link: $uri'.log;
-          await listProvider.import(uri.pathSegments.last);
-        }
-      });
-      uriLinkStream.where((e) => e != null).listen((uri) async {
-        if (uri != null) {
-          'Stream link: $uri'.log;
-          await listProvider.import(uri.pathSegments.last);
-        }
-      }).onError((e) => e.log);
-    }
-  } catch (_) {}
 }
 
 class MyApp extends StatefulWidget {
