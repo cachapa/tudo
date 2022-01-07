@@ -95,9 +95,10 @@ class ListProvider {
     return 0;
   }
 
-  Future<void> deleteItem(id) => _crdt.setDeleted('todos', id);
+  Future<void> deleteItem(String id) => _crdt.setDeleted('todos', [id]);
 
-  Future<void> undeleteItem(id) => _crdt.setDeleted('todos', id, false);
+  Future<void> undeleteItem(String id) =>
+      _crdt.setDeleted('todos', [id], false);
 
   Future<void> setDone(String itemId, bool isDone) =>
       _crdt.setField('todos', [itemId], 'done', isDone);
