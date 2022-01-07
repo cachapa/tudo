@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/empty_page.dart';
@@ -14,8 +15,6 @@ import 'package:tudo_app/extensions.dart';
 
 import 'list_provider.dart';
 
-const titleBarHeight = 60.0;
-const inputBarHeight = 60.0;
 const blurSigma = 14.0;
 
 enum ListAction { delete }
@@ -52,6 +51,7 @@ class ToDoListPage extends StatelessWidget {
           ),
           child: Scaffold(
             extendBodyBehindAppBar: true,
+            extendBody: true,
             appBar: TitleBar(
               brightness: context.theme.brightness,
               list: list,
@@ -71,7 +71,7 @@ class ToDoListPage extends StatelessWidget {
                     checkedListKey: _uncheckedListKey,
                     controller: _controller,
                   ),
-            floatingActionButton: InputBar(
+            bottomNavigationBar: InputBar(
               // key: inputKey,
               onSubmitted: (value) => _addItem(context, list.id, value),
             ),
@@ -245,77 +245,79 @@ class ToDoListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ValueStreamBuilder<List<ToDo>>(
-        stream: context.listProvider.getItems(list.id),
-        builder: (_, items) {
-          final uncheckedItems = items.where((item) => !item.done).toList();
-          final checkedItems = items.where((item) => item.done).toList();
+      stream: context.listProvider
+          .getItems(list.id)
+          .debounceTime(const Duration(milliseconds: 10)),
+      builder: (_, items) {
+        final uncheckedItems = items.where((item) => !item.done).toList();
+        final checkedItems = items.where((item) => item.done).toList();
 
-          return ListView(
-            controller: controller,
-            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: EdgeInsets.only(
-                top: context.padding.top,
-                bottom: context.padding.bottom + inputBarHeight + 40),
-            children: [
-              ImplicitlyAnimatedReorderableList<ToDo>(
-                key: checkedListKey,
-                items: uncheckedItems,
-                shrinkWrap: true,
-                physics: const ClampingScrollPhysics(),
-                reorderDuration: const Duration(milliseconds: 200),
-                areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-                onReorderFinished: (_, from, to, __) {
-                  if (from == to) return;
-                  // Query the real position of the items in the complete list
-                  from = items.indexOf(uncheckedItems[from]);
-                  to = items.indexOf(uncheckedItems[to]);
-                  _swap(context, items, from, to);
-                },
-                itemBuilder: (_, itemAnimation, item, __) => Reorderable(
-                  key: Key(item.id),
-                  builder: (context, animation, inDrag) => SizeFadeTransition(
-                    sizeFraction: 0.7,
-                    curve: Curves.easeInOut,
-                    animation: itemAnimation,
-                    child: _ListTile(
-                      item: item,
-                      onToggle: () => _toggle(context, item),
-                      onEdit: () => _editItem(context, item),
-                      onDelete: () => _deleteItem(context, item),
-                    ),
-                  ),
-                ),
-              ),
-              ImplicitlyAnimatedList<ToDo>(
-                items: [
-                  if (checkedItems.isNotEmpty)
-                    ToDo('header', '', false, 0, null, null),
-                  ...checkedItems,
-                ],
-                shrinkWrap: true,
-                physics: const ClampingScrollPhysics(),
-                areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-                itemBuilder: (context, itemAnimation, item, i) =>
-                    SizeFadeTransition(
+        return ListView(
+          controller: controller,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          padding: EdgeInsets.only(
+              top: context.padding.top, bottom: context.padding.bottom),
+          children: [
+            ImplicitlyAnimatedReorderableList<ToDo>(
+              key: checkedListKey,
+              items: uncheckedItems,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              reorderDuration: const Duration(milliseconds: 200),
+              areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
+              onReorderFinished: (_, from, to, __) {
+                if (from == to) return;
+                // Query the real position of the items in the complete list
+                from = items.indexOf(uncheckedItems[from]);
+                to = items.indexOf(uncheckedItems[to]);
+                _swap(context, items, from, to);
+              },
+              itemBuilder: (_, itemAnimation, item, __) => Reorderable(
+                key: Key(item.id),
+                builder: (context, animation, inDrag) => SizeFadeTransition(
                   sizeFraction: 0.7,
                   curve: Curves.easeInOut,
                   animation: itemAnimation,
-                  child: item.id == 'header'
-                      ? _CompletedHeader(
-                          color: list.color,
-                          onClear: () => _clearCompleted(context, list),
-                        )
-                      : _ListTile(
-                          item: item,
-                          onToggle: () => _toggle(context, item),
-                          onEdit: () => _editItem(context, item),
-                          onDelete: () => _deleteItem(context, item),
-                        ),
+                  child: _ListTile(
+                    item: item,
+                    onToggle: () => _toggle(context, item),
+                    onEdit: () => _editItem(context, item),
+                    onDelete: () => _deleteItem(context, item),
+                  ),
                 ),
               ),
-            ],
-          );
-        });
+            ),
+            ImplicitlyAnimatedList<ToDo>(
+              items: [
+                if (checkedItems.isNotEmpty)
+                  ToDo('header', '', false, 0, null, null),
+                ...checkedItems,
+              ],
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
+              itemBuilder: (context, itemAnimation, item, i) =>
+                  SizeFadeTransition(
+                sizeFraction: 0.7,
+                curve: Curves.easeInOut,
+                animation: itemAnimation,
+                child: item.id == 'header'
+                    ? _CompletedHeader(
+                        color: list.color,
+                        onClear: () => _clearCompleted(context, list),
+                      )
+                    : _ListTile(
+                        item: item,
+                        onToggle: () => _toggle(context, item),
+                        onEdit: () => _editItem(context, item),
+                        onDelete: () => _deleteItem(context, item),
+                      ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _toggle(BuildContext context, ToDo toDo) =>
