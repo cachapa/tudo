@@ -55,7 +55,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
           stream: context.listProvider.lists,
           builder: (_, lists) => ImplicitlyAnimatedReorderableList<ToDoList>(
             controller: _controller,
-            padding: EdgeInsets.only(bottom: context.padding.bottom),
+            padding: EdgeInsets.only(bottom: context.padding.bottom + 88),
             items: lists,
             shrinkWrap: true,
             areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
