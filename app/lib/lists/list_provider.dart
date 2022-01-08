@@ -50,7 +50,7 @@ class ListProvider {
     await _crdt.commit(batch);
   }
 
-  Future<void> import(String listId, [int? position]) async {
+  Future<void> import(String listId) async {
     final exists = await _crdt.queryAsync('''
       SELECT EXISTS (
         SELECT * FROM user_lists WHERE user_id = ? AND list_id = ? AND is_deleted = 0
@@ -94,6 +94,14 @@ class ListProvider {
     await _crdt.setDeleted('lists', [listId]);
     return 0;
   }
+
+  /// Removes the list from the user's references
+  /// Does not actually delete the list, since it could be used by others
+  Future<void> removeList(String listId) =>
+      _crdt.setDeleted('user_lists', [userId, listId]);
+
+  Future<void> undoRemoveList(String listId) =>
+      _crdt.setDeleted('user_lists', [userId, listId], false);
 
   Future<void> deleteItem(String id) => _crdt.setDeleted('todos', [id]);
 

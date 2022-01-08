@@ -265,14 +265,15 @@ class _ListItem extends StatelessWidget {
 
   Future<void> _deleteList(BuildContext context) async {
     final listManager = context.read<ListProvider>();
-    final index = await listManager.delete(list.id);
+    final index = list.position;
+    await listManager.removeList(list.id);
     context.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
         content: Text('${list.name} deleted'),
         action: SnackBarAction(
           label: 'UNDO',
-          onPressed: () => listManager.import(list.id, index),
+          onPressed: () => listManager.undoRemoveList(list.id),
         ),
       ),
     );
