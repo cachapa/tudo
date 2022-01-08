@@ -4,6 +4,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:tudo_app/config.dart';
 import 'package:tudo_app/crdt/hlc.dart';
 import 'package:tudo_app/extensions.dart';
+import 'package:tudo_app/util/build_info.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -25,6 +26,8 @@ class SyncClient {
 
     const endpoint = '$serverAddress/ws';
     channel = IOWebSocketChannel.connect(Uri.parse(endpoint), headers: {
+      'user_agent':
+          'tudo/${BuildInfo.version} ${BuildInfo.platform}/${BuildInfo.platformVersion} (${BuildInfo.deviceModel})',
       'api_secret': apiSecret,
       'user_id': userId,
       if (lastReceive != null) 'last_receive': lastReceive,

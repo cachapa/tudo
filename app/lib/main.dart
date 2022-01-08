@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tudo_app/auth/auth_provider.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/settings/settings_provider.dart';
+import 'package:tudo_app/util/build_info.dart';
 import 'package:tudo_app/util/store.dart';
 
 import 'crdt/hive_adapters.dart';
@@ -31,6 +32,8 @@ void main() async {
       : 'store';
   Hive.init(dir);
   Hive.registerAdapter(HlcAdapter(1));
+
+  await BuildInfo.init();
 
   final crdt = TudoCrdt();
   final storeProvider = await StoreProvider.open();
