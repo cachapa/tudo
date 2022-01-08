@@ -63,20 +63,26 @@ class ToDoListPage extends StatelessWidget {
                 ),
               ],
             ),
-            body: list.isEmpty
-                ? const EmptyPage(text: 'Create a new to-do item below')
-                : ToDoListView(
-                    key: _listKey,
-                    list: list,
-                    checkedListKey: _uncheckedListKey,
-                    controller: _controller,
+            body: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                list.isEmpty
+                    ? const EmptyPage(text: 'Create a new to-do item below')
+                    : ToDoListView(
+                        key: _listKey,
+                        list: list,
+                        checkedListKey: _uncheckedListKey,
+                        controller: _controller,
+                      ),
+                SafeArea(
+                  top: false,
+                  child: InputBar(
+                    // key: inputKey,
+                    onSubmitted: (value) => _addItem(context, list.id, value),
                   ),
-            bottomNavigationBar: InputBar(
-              // key: inputKey,
-              onSubmitted: (value) => _addItem(context, list.id, value),
+                ),
+              ],
             ),
-            floatingActionButtonLocation:
-                FloatingActionButtonLocation.centerFloat,
           ),
         ),
       ),
