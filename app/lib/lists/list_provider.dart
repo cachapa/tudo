@@ -14,16 +14,8 @@ class ListProvider {
 
   Stream get allChanges => _crdt.allChanges;
 
-  Stream<List<ToDoList>> get lists => _crdt.query('''
-        SELECT * FROM user_lists
-        LEFT JOIN lists ON user_lists.list_id = id
-        LEFT JOIN (
-          SELECT list_id as count_list_id, count(*) as item_count, sum(done) as done_count
-          FROM todos WHERE is_deleted = 0 GROUP BY list_id
-        ) ON count_list_id = id
-        WHERE user_lists.is_deleted = 0
-        ORDER BY position
-      ''').map((l) => l.map(ToDoList.fromMap).toList());
+  Stream<List<ToDoList>> get lists =>
+      _queryLists().map((l) => l.map(ToDoList.fromMap).toList());
 
   ListProvider(this.userId, this._crdt, StoreProvider storeProvider) {
     final legacyLists = storeProvider.legacyListIds;
@@ -78,22 +70,29 @@ class ListProvider {
       ..setField('user_lists', [userId, listId], 'position', maxPosition + 1);
   }
 
-  Stream<ToDoList> getList(String listId) =>
-      lists.map((e) => e.firstWhere((e) => e.id == listId));
+  Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
+      _crdt.query('''
+        SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count FROM user_lists
+        LEFT JOIN lists ON user_lists.list_id = id
+        LEFT JOIN (
+          SELECT list_id as count_list_id, count(*) as item_count, sum(done) as done_count
+          FROM todos WHERE is_deleted = 0 GROUP BY list_id
+        ) ON count_list_id = id
+        WHERE user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
+        ORDER BY position
+      ''', [if (listId != null) listId]);
 
-  Stream<List<ToDo>> getItems(String listId) => _crdt.query(
-        '''
-          SELECT * FROM todos
-          WHERE list_id = ? AND is_deleted = 0
-          ORDER BY position
-        ''',
-        [listId],
-      ).map((l) => l.map(ToDo.fromMap).toList());
-
-  Future<int> delete(String listId) async {
-    await _crdt.setDeleted('lists', [listId]);
-    return 0;
-  }
+  Stream<ToDoListWithItems> getList(String listId) =>
+      _queryLists(listId).map((e) => e.first).asyncMap((listMap) => _crdt
+          // Get items for this list
+          .queryAsync('''
+            SELECT * FROM todos
+            WHERE list_id = ? AND is_deleted = 0
+            ORDER BY position
+          ''', [listId])
+          .then((l) => l.map(ToDo.fromMap).toList())
+          // Join list data and items together
+          .then((items) => ToDoListWithItems.fromMap(listMap, items)));
 
   /// Removes the list from the user's references
   /// Does not actually delete the list, since it could be used by others
@@ -165,6 +164,13 @@ class ListProvider {
     }
     await _crdt.commit(batch);
   }
+}
+
+class ToDoListWithItems extends ToDoList {
+  final List<ToDo> items;
+
+  ToDoListWithItems.fromMap(Map<String, dynamic> map, this.items)
+      : super.fromMap(map);
 }
 
 class ToDoList {
