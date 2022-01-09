@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -28,6 +29,9 @@ class ToDoListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bottom = max(MediaQuery.of(context).viewInsets.bottom,
+        MediaQuery.of(context).viewPadding.bottom);
+
     return GestureDetector(
       // Close keyboard when tapping a non-focusable area
       onTap: () => FocusScope.of(context).unfocus(),
@@ -62,26 +66,20 @@ class ToDoListPage extends StatelessWidget {
                 ),
               ],
             ),
-            body: Column(
-              children: [
-                Expanded(
-                  child: list.isEmpty
-                      ? const EmptyPage(text: 'Create a new to-do item below')
-                      : ToDoListView(
-                          key: _listKey,
-                          list: list,
-                          checkedListKey: _uncheckedListKey,
-                          controller: _controller,
-                        ),
-                ),
-                SafeArea(
-                  top: false,
-                  child: InputBar(
-                    // key: inputKey,
-                    onSubmitted: (value) => _addItem(context, list.id, value),
+            body: list.isEmpty
+                ? const EmptyPage(text: 'Create a new to-do item below')
+                : ToDoListView(
+                    key: _listKey,
+                    list: list,
+                    checkedListKey: _uncheckedListKey,
+                    controller: _controller,
                   ),
-                ),
-              ],
+            bottomNavigationBar: Padding(
+              padding: EdgeInsets.only(bottom: bottom),
+              child: InputBar(
+                // key: inputKey,
+                onSubmitted: (value) => _addItem(context, list.id, value),
+              ),
             ),
           ),
         ),
