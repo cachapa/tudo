@@ -216,10 +216,13 @@ class _InputBarState extends State<InputBar> {
               suffixIcon: IconButton(
                 padding: const EdgeInsets.only(right: 10),
                 icon: const Icon(Icons.add),
-                onPressed: () => _onSubmitted(_controller.text),
+                onPressed: _controller.text.isEmpty
+                    ? null
+                    : () => _onSubmitted(_controller.text),
               ),
             ),
             maxLines: 1,
+            onChanged: (_) => setState(() {}),
             onSubmitted: (text) => _onSubmitted(text),
           ),
         ),
@@ -228,6 +231,8 @@ class _InputBarState extends State<InputBar> {
   }
 
   void _onSubmitted(String text) {
+    if (text.isEmpty) return;
+
     widget.onSubmitted(text);
     _controller.clear();
     _focusNode.requestFocus();
