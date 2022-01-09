@@ -62,17 +62,18 @@ class ToDoListPage extends StatelessWidget {
                 ),
               ],
             ),
-            body: Stack(
-              alignment: Alignment.bottomCenter,
+            body: Column(
               children: [
-                list.isEmpty
-                    ? const EmptyPage(text: 'Create a new to-do item below')
-                    : ToDoListView(
-                        key: _listKey,
-                        list: list,
-                        checkedListKey: _uncheckedListKey,
-                        controller: _controller,
-                      ),
+                Expanded(
+                  child: list.isEmpty
+                      ? const EmptyPage(text: 'Create a new to-do item below')
+                      : ToDoListView(
+                          key: _listKey,
+                          list: list,
+                          checkedListKey: _uncheckedListKey,
+                          controller: _controller,
+                        ),
+                ),
                 SafeArea(
                   top: false,
                   child: InputBar(
@@ -254,9 +255,8 @@ class ToDoListView extends StatelessWidget {
 
     return ListView(
       controller: controller,
+      clipBehavior: Clip.none,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      padding: EdgeInsets.only(
-          top: context.padding.top, bottom: context.padding.bottom),
       children: [
         ImplicitlyAnimatedReorderableList<ToDo>(
           key: checkedListKey,
