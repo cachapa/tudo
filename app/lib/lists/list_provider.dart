@@ -229,10 +229,14 @@ class ToDo {
       );
 
   @override
-  bool operator ==(Object other) => other is ToDo && other.id == id;
+  bool operator ==(Object other) =>
+      other is ToDo &&
+      other.id == id &&
+      other.name == name &&
+      other.done == done;
 
   @override
-  int get hashCode => id.hashCode;
+  int get hashCode => hashValues(id, name, done);
 
   @override
   String toString() => '$name ${done ? '🗹' : '☐'}';
