@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/lists/list_provider.dart';
 
+import 'color_selector.dart';
 import 'share_list.dart';
 
 Future<dynamic> editToDoList(BuildContext context,
@@ -26,6 +27,10 @@ class _EditListForm extends StatelessWidget {
   final Function()? onDelete;
 
   bool get editMode => list != null;
+
+  String get name => _textController.text;
+
+  Color get color => _colorController.color;
 
   _EditListForm({Key? key, this.list, this.onDelete})
       : _textController = TextEditingController(text: list?.name),
@@ -97,14 +102,15 @@ class _EditListForm extends StatelessWidget {
   }
 
   void _create(BuildContext context) {
-    final name = _textController.text;
-    final color = _colorController.color;
-
     if (name.isEmpty) return;
 
     if (editMode) {
-      context.listProvider.setName(list!.id, name);
-      context.listProvider.setColor(list!.id, color);
+      if (list!.name != name) {
+        context.listProvider.setName(list!.id, name);
+      }
+      if (list!.color != color) {
+        context.listProvider.setColor(list!.id, color);
+      }
     } else {
       context.read<ListProvider>().createList(name, color);
     }
@@ -120,77 +126,5 @@ class _EditListForm extends StatelessWidget {
   void _delete(BuildContext context) {
     context.pop();
     onDelete!();
-  }
-}
-
-const _colors = <Color>[
-  Colors.purpleAccent,
-  Colors.red,
-  Colors.orange,
-  Colors.green,
-  Colors.blue,
-  Colors.purple,
-];
-
-class ColorController {
-  Color color;
-
-  ColorController({Color? color}) : color = color ?? _colors.random;
-}
-
-class ColorSelector extends StatefulWidget {
-  final ColorController controller;
-
-  const ColorSelector({Key? key, required this.controller}) : super(key: key);
-
-  @override
-  _ColorSelectorState createState() => _ColorSelectorState();
-}
-
-class _ColorSelectorState extends State<ColorSelector> {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: _colors
-          .map(
-            (color) => ColorButton(
-              color: color,
-              selected: color.value == widget.controller.color.value,
-              onPressed: () => setState(() => widget.controller.color = color),
-            ),
-          )
-          .toList(),
-    );
-  }
-}
-
-class ColorButton extends StatelessWidget {
-  final Color color;
-  final bool selected;
-  final VoidCallback onPressed;
-
-  const ColorButton({
-    Key? key,
-    required this.color,
-    required this.selected,
-    required this.onPressed,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialButton(
-      elevation: selected ? null : 0,
-      minWidth: 40,
-      height: 40,
-      color: color,
-      shape: const CircleBorder(),
-      onPressed: onPressed,
-      child: Icon(
-        Icons.check,
-        size: 18,
-        color: selected ? Theme.of(context).dialogBackgroundColor : color,
-      ),
-    );
   }
 }

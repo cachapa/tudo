@@ -35,8 +35,12 @@ extension ColorX on Color {
   String get hexValue =>
       '#${(value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
 
-  Color darken(double strength) =>
-      Color.alphaBlend(Colors.black.withOpacity(strength), this);
+  Color blend(Color color, double strength) =>
+      Color.alphaBlend(color.withOpacity(strength), this);
+
+  Color lighten(double strength) => blend(Colors.white, strength);
+
+  Color darken(double strength) => blend(Colors.black, strength);
 }
 
 extension BrightnessExtensions on Brightness {
