@@ -27,7 +27,7 @@ void main() async {
 
   _setSystemColors();
 
-  final dir = Platform.isAndroid || Platform.isIOS
+  final dir = PlatformX.isMobile
       ? (await getApplicationDocumentsDirectory()).path
       : 'store';
   Hive.init(dir);

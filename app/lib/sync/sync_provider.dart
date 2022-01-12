@@ -16,9 +16,9 @@ class SyncProvider {
   var _online = false;
   Timer? _reconnectTimer;
 
-  set _lastReceive(Hlc? value) => _store.put('last_receive', value);
+  set _lastReceive(Hlc? value) => _store.put('last_recv', value);
 
-  Hlc? get _lastReceive => _store.get('last_receive');
+  Hlc? get _lastReceive => _store.get('last_recv');
 
   set _lastSend(Hlc? value) => _store.put('last_send', value);
 
@@ -41,7 +41,7 @@ class SyncProvider {
             // Merge remote changeset
             final changeset =
                 (map['data'] as List).cast<Map<String, dynamic>>();
-            '<= ${changeset.length} records'.log;
+            'RECV ${changeset.length} records'.log;
 
             // Store last receive time
             final canonicalTime = await _listProvider.merge(changeset);
@@ -94,7 +94,7 @@ class SyncProvider {
     final changeset = await _listProvider.changeset(_lastSend);
     if (changeset.records.isEmpty) return;
 
-    '=> ${changeset.records.length} records'.log;
+    'SEND ${changeset.records.length} records'.log;
     _client.send(jsonEncode({
       'type': 'changeset',
       'data': changeset.records,
