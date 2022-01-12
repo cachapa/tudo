@@ -20,7 +20,6 @@ class TudoServer {
 
     var router = Router()
       ..get('/ws', _wsHandler)
-      ..get('/<ignored|.*>/ws', _wsHandlerCompat)
       // Return 404 for everything else
       ..all('/<ignored|.*>', _notFoundHandler);
 
@@ -31,170 +30,6 @@ class TudoServer {
 
     var server = await io.serve(handler, '0.0.0.0', port);
     print('Serving at http://${server.address.host}:${server.port}');
-  }
-
-  Future<Response> _wsHandlerCompat(Request request) async {
-    print('Legacy client connected');
-    var handler = webSocketHandler((WebSocketChannel webSocket) async {
-      StreamSubscription? changesSubscription;
-      final listId = request.url.pathSegments.first;
-
-      // Send changeset on connect
-      changesSubscription = _crdt.query('''
-          SELECT collection, id, field, value, hlc, modified FROM crdt
-            WHERE collection = 'lists' AND id = ?1
-          UNION ALL
-          SELECT collection, crdt.id, field, value, hlc, modified FROM todos
-            JOIN crdt ON todos.id = crdt.id
-            WHERE list_id = ?1 AND is_deleted = 0
-          UNION ALL
-          SELECT collection, crdt.id, field, value, hlc, modified FROM todos
-            JOIN crdt ON todos.id = crdt.id
-            WHERE list_id = ?1 AND field = 'is_deleted' AND value = 1
-          ORDER BY value
-        ''', [listId]).listen((changeset) {
-        final compatChangeset = <String, Map<String, dynamic>?>{};
-        final order = <String>{};
-        String orderHlc = '';
-        for (var map in changeset) {
-          final collection = map['collection'];
-          final id = map['id'];
-          final field = map['field'];
-          final value = map['value'];
-          final hlc = map['hlc'] as String;
-
-          if (collection == 'lists') {
-            if (field == 'color') {
-              compatChangeset['__color__'] = {'value': value, 'hlc': hlc};
-            }
-            if (field == 'name') {
-              compatChangeset['__name__'] = {'value': value, 'hlc': hlc};
-            }
-          } else if (collection == 'todos') {
-            compatChangeset[id] ??= {};
-            compatChangeset[id]!['hlc'] =
-                hlc.compareTo(compatChangeset[id]!['hlc'] ?? '') < 0
-                    ? compatChangeset[id]!['hlc']
-                    : hlc;
-            if (field == 'is_deleted' && value == 1) {
-              compatChangeset[id]!['value'] = null;
-            } else {
-              compatChangeset[id]!['value'] ??= <String, dynamic>{'id': id};
-              if (field == 'name') {
-                compatChangeset[id]!['value']['name'] = value;
-              }
-              if (field == 'done') {
-                compatChangeset[id]!['value']['checked'] = value == 1;
-              }
-              if (field == 'position') {
-                order.add(id);
-                orderHlc = orderHlc.compareTo(hlc) > 0 ? orderHlc : hlc;
-              }
-            }
-          }
-        }
-        if (order.isNotEmpty && orderHlc.isNotEmpty) {
-          compatChangeset['__order__'] = {
-            'value': order.toList(),
-            'hlc': orderHlc
-          };
-        }
-
-        webSocket.sink.add(jsonEncode(compatChangeset));
-      });
-
-      // Monitor remote changesets
-      webSocket.stream.listen((message) async {
-        final changeset = jsonDecode(message) as Map;
-        'RECV ${changeset.length} legacy records'.log;
-
-        final newChangeset = <Map<String, dynamic>>[];
-        changeset.forEach((key, map) {
-          switch (key) {
-            case '__color__':
-              newChangeset.add({
-                'collection': 'lists',
-                'id': listId,
-                'field': 'color',
-                'value': map['value'],
-                'hlc': map['hlc'],
-              });
-              break;
-            case '__name__':
-              newChangeset.add({
-                'collection': 'lists',
-                'id': listId,
-                'field': 'name',
-                'value': map['value'],
-                'hlc': map['hlc'],
-              });
-              break;
-            case '__order__':
-              final order = map['value'] as List;
-              for (var i = 0; i < order.length; i++) {
-                newChangeset.add({
-                  'collection': 'todos',
-                  'id': order[i],
-                  'field': 'position',
-                  'value': i,
-                  'hlc': map['hlc'],
-                });
-              }
-              break;
-            default:
-              if (map['value'] == null) {
-                newChangeset.add({
-                  'collection': 'todos',
-                  'id': key,
-                  'field': 'is_deleted',
-                  'value': 1,
-                  'hlc': map['hlc'],
-                });
-              } else {
-                newChangeset.add({
-                  'collection': 'todos',
-                  'id': key,
-                  'field': 'is_deleted',
-                  'value': 0,
-                  'hlc': map['hlc'],
-                });
-                newChangeset.add({
-                  'collection': 'todos',
-                  'id': key,
-                  'field': 'list_id',
-                  'value': listId,
-                  'hlc': map['hlc'],
-                });
-                newChangeset.add({
-                  'collection': 'todos',
-                  'id': key,
-                  'field': 'name',
-                  'value': map['value']['name'],
-                  'hlc': map['hlc'],
-                });
-                newChangeset.add({
-                  'collection': 'todos',
-                  'id': key,
-                  'field': 'done',
-                  'value': map['value']['checked'],
-                  'hlc': map['hlc'],
-                });
-              }
-          }
-        });
-
-        if (newChangeset.isNotEmpty) {
-          await _crdt.merge(newChangeset);
-        }
-      }, onDone: () {
-        changesSubscription?.cancel();
-        print('Legacy client disconnected from ${request.url.path}');
-      }, onError: (e) {
-        print(e);
-      });
-    });
-
-    return await handler(request);
   }
 
   Future<Response> _wsHandler(Request request) async {
@@ -304,9 +139,7 @@ class TudoServer {
   Response _notFoundHandler(Request request) => Response.notFound('Not found');
 
   Handler _validateSecret(Handler innerHandler) => (request) async {
-        // TODO Remove url check once all clients are upgraded to v2
-        if (request.url.pathSegments.first != 'ws' ||
-            request.headers['api_secret'] == apiSecret) {
+        if (request.headers['api_secret'] == apiSecret) {
           return innerHandler(request);
         } else {
           print('Invalid secret: ${request.headers['api_secret']}');
