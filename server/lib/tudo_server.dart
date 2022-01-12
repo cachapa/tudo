@@ -230,8 +230,21 @@ class TudoServer {
             final changeset =
                 (map['data'] as List).cast<Map<String, dynamic>>();
             print('RECV ${changeset.length} records');
-            changeset.forEach(print);
+
             await _crdt.merge(changeset);
+
+            // HACK Recognize if the user added a new list and re-create the record to trigger
+            // the entire list to be sent.
+            // This gets around the problem where the changeset wouldn't contain list data older than lastSend
+            for (final map in changeset) {
+              if (map['collection'] == 'user_lists' &&
+                  map['field'] == 'created_at') {
+                final listId = (map['id'] as String).split(':')[1];
+                await _crdt.setField(
+                    'user_lists', [userId, listId], map['field'], map['value']);
+                print('hacked new list');
+              }
+            }
 
             // Notify client
             webSocket.sink.add(jsonEncode({
@@ -257,20 +270,28 @@ class TudoServer {
 
   Future<void> _sendChangeset(WebSocketChannel webSocket, String userId,
       String? lastSend, String? nodeId) async {
-    final changeset = await _crdt.queryAsync('''
+    var changeset = await _crdt.queryAsync('''
           SELECT collection, id, field, value, hlc, modified FROM user_lists
             JOIN crdt
               ON (collection = 'user_lists' AND id LIKE '%' || list_id)
               OR (collection = 'lists' AND id = list_id)
-            WHERE user_id = ? AND modified > ?2 AND hlc NOT LIKE '%' || ?3
+            WHERE user_id = ?1 AND modified > ?2 AND hlc NOT LIKE '%' || ?3
           UNION ALL
           SELECT collection, crdt.id, field, value, hlc, modified FROM user_lists
             JOIN todos ON user_lists.list_id = todos.list_id
             JOIN crdt ON todos.id = crdt.id
             WHERE user_id = ?1 AND modified > ?2 AND hlc NOT LIKE '%' || ?3
-          ORDER BY modified DESC
           ''', [userId, lastSend ?? '', nodeId ?? '---']);
     if (changeset.isEmpty) return;
+
+    // Detect if this user joined a new list and send all its data.
+    for (final map in changeset) {
+      if (map['collection'] == 'user_lists' && map['field'] == 'created_at') {
+        final listId = (map['id'] as String).split(':')[1];
+        final listChangeset = await _listChangeset(listId);
+        changeset = [...changeset, ...listChangeset];
+      }
+    }
 
     'SEND ${changeset.length} records'.log;
     webSocket.sink.add(jsonEncode({
@@ -292,6 +313,20 @@ class TudoServer {
           return Response.forbidden('Invalid secret');
         }
       };
+
+  Future<List<Map<String, dynamic>>> _listChangeset(String listId) =>
+      _crdt.queryAsync('''
+        SELECT collection, id, field, value, hlc, modified FROM crdt
+          WHERE collection = 'user_lists' AND id LIKE '%:' || ?1
+        UNION ALL
+        SELECT collection, id, field, value, hlc, modified FROM crdt
+          WHERE collection = 'lists' AND id = ?1
+        UNION ALL
+        SELECT collection, crdt.id, field, value, hlc, modified FROM todos
+          JOIN crdt ON todos.id = crdt.id
+          WHERE list_id = ?1
+        ORDER BY value
+      ''', [listId]);
 }
 
 class CrdtStream {
