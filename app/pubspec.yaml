@@ -12,15 +12,15 @@ dependencies:
 
   provider: ^6.0.2
 
-  hive: ^2.0.4
+  hive: ^2.0.5
   http: ^0.13.4
   web_socket_channel: ^2.1.0
 
   rxdart: ^0.27.2
   sqflite: ^2.0.0+4
   sqflite_common_ffi: ^2.1.0
-  # Required for Android because UPSERTs are not supported there
-  sqlite3_flutter_libs: ^0.5.1
+  # Required for Android and iOS because UPSERTs are only supported on very recent OS versions
+  sqlite3_flutter_libs: ^0.5.3
 
   clipboard: ^0.1.2+8
   device_info_plus: ^3.2.1
