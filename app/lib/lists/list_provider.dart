@@ -73,14 +73,14 @@ class ListProvider {
   Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
       _crdt.query('''
         SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count FROM user_lists
-        LEFT JOIN lists ON user_lists.list_id = id
+        LEFT JOIN lists ON user_lists.user_id = ? AND user_lists.list_id = id
         LEFT JOIN (
           SELECT list_id as count_list_id, count(*) as item_count, sum(done) as done_count
           FROM todos WHERE is_deleted = 0 GROUP BY list_id
         ) ON count_list_id = id
-        WHERE user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
+        WHERE id IS NOT NULL AND user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
         ORDER BY position
-      ''', [if (listId != null) listId]);
+      ''', [userId, if (listId != null) listId]);
 
   Stream<ToDoListWithItems> getList(String listId) =>
       _queryLists(listId).map((e) => e.first).asyncMap((listMap) => _crdt
