@@ -16,14 +16,17 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0
+
       - uses: actions/setup-java@v1
         with:
           java-version: '12.x'
+
       - name: Cache Flutter dependencies
         uses: actions/cache@v1
         with:
           path: /opt/hostedtoolcache/flutter
           key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}
+
       - uses: subosito/flutter-action@v1
         with:
           channel: 'stable'
@@ -38,8 +41,10 @@ jobs:
           echo "${{ secrets.KEYSTORE }}" | base64 -d > app/keystore.jks
           echo "${{ secrets.KEYSTORE_PROPERTIES }}" > app/keystore.properties
           echo '${{ secrets.PLAY_STORE }}' > app/play-store.json
+
       - name: Load config
         run: echo "${{ secrets.CONFIG }}" > lib/config.dart
+
       - name: Build app
         env:
           BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}

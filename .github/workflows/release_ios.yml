@@ -1,0 +1,60 @@
+name: Release iOS
+on:
+  release:
+    types: [ published ]
+
+defaults:
+  run:
+    working-directory: app
+
+jobs:
+  build:
+    timeout-minutes: 25
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Import signing certificate
+        env:
+          SIGNING_CERTIFICATE_P12_DATA: ${{ secrets.SIGNING_CERTIFICATE_P12_DATA }}
+          SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
+        run: |
+          exec ../.github/scripts/import-certificate.sh
+
+      - name: Import provisioning profile
+        env:
+          PROVISIONING_PROFILE_DATA: ${{ secrets.PROVISIONING_PROFILE_DATA }}
+        run: |
+          exec ../.github/scripts/import-profile.sh
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v1
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}
+
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: 'stable'
+
+      - name: Retrieve build name from tag
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+
+      - name: Load config
+        run: echo "${{ secrets.CONFIG }}" > lib/config.dart
+
+      - name: Build app
+        env:
+          BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}
+        run: flutter build ipa --export-options-plist=../.github/provisioning/ExportOptions.plist --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME --bundle-sksl-path flutter_01.sksl.json
+
+      - name: Upload app to App Store Connect
+        env:
+          APP_STORE_CONNECT_USERNAME: ${{ secrets.APP_STORE_CONNECT_USERNAME }}
+          APP_STORE_CONNECT_PASSWORD: ${{ secrets.APP_STORE_CONNECT_PASSWORD }}
+        run: xcrun altool --upload-app -t ios -f "build/ios/ipa/tudo.ipa" -u "$APP_STORE_CONNECT_USERNAME" -p "$APP_STORE_CONNECT_PASSWORD"
+
