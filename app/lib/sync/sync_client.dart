@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:rxdart/rxdart.dart';
 import 'package:tudo_app/config.dart';
@@ -24,10 +25,12 @@ class SyncClient {
   void connect(Hlc? lastReceive) {
     if (isConnected) return;
 
+    // Dart's WebSocket uses a shared static client, so the user agent needs to be set like so:
+    WebSocket.userAgent =
+        'tudo/${BuildInfo.version} ${BuildInfo.platform}/${BuildInfo.platformVersion} (${BuildInfo.deviceModel})';
+
     const endpoint = '$serverAddress/ws';
     channel = IOWebSocketChannel.connect(Uri.parse(endpoint), headers: {
-      'user_agent':
-          'tudo/${BuildInfo.version} ${BuildInfo.platform}/${BuildInfo.platformVersion} (${BuildInfo.deviceModel})',
       'api_secret': apiSecret,
       'user_id': userId,
       if (lastReceive != null) 'last_receive': lastReceive,
