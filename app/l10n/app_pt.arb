@@ -1,0 +1,19 @@
+{
+  "theme": "Tema",
+  "scanQrCode": "Ler código QR",
+  "close": "Fechar",
+  "listDeleted": "{name} apagada",
+  "undo": "Desfazer",
+  "createList": "Criar lista",
+  "editList": "Alterar lista",
+  "name": "Nome",
+  "ok": "Ok",
+  "update": "Atualizar",
+  "cancel": "Cancelar",
+  "addItem": "Adicionar item",
+  "editItem": "Editar item",
+  "toDoListEmptyMessage": "Cria um item novo em baixo",
+  "itemDeleted": "\"{name}\" apagado",
+  "itemsCleared": "{count, plural, =1{item apagado} other{{count} itens apagados}}",
+  "completed": "Completos"
+}
