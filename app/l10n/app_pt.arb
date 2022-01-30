@@ -3,7 +3,6 @@
   "scanQrCode": "Ler código QR",
   "close": "Fechar",
   "listDeleted": "{name} apagada",
-  "undo": "Desfazer",
   "createList": "Criar lista",
   "editList": "Alterar lista",
   "name": "Nome",

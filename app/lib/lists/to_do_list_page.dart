@@ -341,14 +341,8 @@ class ToDoListView extends StatelessWidget {
     listProvider.deleteItem(toDo.id);
 
     context.showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(context.t.itemDeleted(toDo.name)),
-        action: SnackBarAction(
-          label: context.t.undo.toUpperCase(),
-          onPressed: () => listProvider.undeleteItem(toDo.id),
-        ),
-      ),
+      context.t.itemDeleted(toDo.name),
+      () => listProvider.undeleteItem(toDo.id),
     );
   }
 
@@ -365,19 +359,13 @@ class ToDoListView extends StatelessWidget {
     final count = checked.length;
 
     context.showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(context.t.itemsCleared(count)),
-        action: SnackBarAction(
-          label: context.t.undo.toUpperCase(),
-          onPressed: () {
-            for (var i = 0; i < checked.length; i++) {
-              final item = checked[i];
-              context.listProvider.undeleteItem(item.id);
-            }
-          },
-        ),
-      ),
+      context.t.itemsCleared(count),
+      () {
+        for (var i = 0; i < checked.length; i++) {
+          final item = checked[i];
+          context.listProvider.undeleteItem(item.id);
+        }
+      },
     );
   }
 

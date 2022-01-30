@@ -59,8 +59,30 @@ extension ContextExtensions on BuildContext {
 
   void pop<T>([T? result]) => Navigator.of(this).pop<T>(result);
 
-  void showSnackBar(SnackBar snackBar) =>
-      ScaffoldMessenger.of(this).showSnackBar(snackBar);
+  void showSnackBar(String message, VoidCallback onUndo) {
+    final scaffold = ScaffoldMessenger.of(this);
+    scaffold.showSnackBar(
+      SnackBar(
+        behavior: SnackBarBehavior.floating,
+        content: Row(
+          children: [
+            Expanded(child: Text(message)),
+            IconButton(
+              icon: Icon(
+                Icons.undo,
+                color: theme.primaryColor,
+              ),
+              onPressed: () {
+                onUndo();
+                scaffold.hideCurrentSnackBar(
+                    reason: SnackBarClosedReason.action);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   EdgeInsets get padding => MediaQuery.of(this).padding;
 

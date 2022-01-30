@@ -268,14 +268,8 @@ class _ListItem extends StatelessWidget {
     final listManager = context.read<ListProvider>();
     await listManager.removeList(list.id);
     context.showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.floating,
-        content: Text(context.t.listDeleted(list.name)),
-        action: SnackBarAction(
-          label: context.t.undo.toUpperCase(),
-          onPressed: () => listManager.undoRemoveList(list.id),
-        ),
-      ),
+      context.t.listDeleted(list.name),
+      () => listManager.undoRemoveList(list.id),
     );
   }
 }
