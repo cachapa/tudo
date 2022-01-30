@@ -21,7 +21,7 @@ enum ListAction { delete }
 
 class ToDoListPage extends StatelessWidget {
   final ToDoList list;
-  final _listKey = GlobalKey();
+  final _listKey = GlobalKey<_ToDoListViewState>();
   final _uncheckedListKey = GlobalKey();
   final _controller = ScrollController();
 
@@ -89,29 +89,13 @@ class ToDoListPage extends StatelessWidget {
     );
   }
 
-  void _addItem(BuildContext context, String listID, String name) {
-    context.listProvider.createItem(list.id, name);
-    // list.add(value);
-    // Future.delayed(
-    //   const Duration(milliseconds: 400),
-    //   () {
-    //     final screenHeight =
-    //         MediaQuery.of(_listKey.currentContext!).size.height;
-    //     final uncheckedListHeight = ((_uncheckedListKey.currentContext!
-    //             .findRenderObject()) as RenderBox)
-    //         .size
-    //         .height;
-    //     final maxOffset = uncheckedListHeight;
-    //     final minOffset =
-    //         max<double>(0.0, uncheckedListHeight - screenHeight) + 200.0;
-    //     final offset = _controller.offset.clamp(minOffset, maxOffset);
-    //     _controller.animateTo(
-    //       offset,
-    //       duration: const Duration(milliseconds: 400),
-    //       curve: Curves.fastOutSlowIn,
-    //     );
-    //   },
-    // );
+  Future<void> _addItem(
+      BuildContext context, String listID, String name) async {
+    final itemId = await context.listProvider.createItem(list.id, name);
+
+    // Wait for item insertion animation to complete
+    await Future.delayed(const Duration(milliseconds: 400));
+    _listKey.currentState?.scrollToItem(itemId);
   }
 }
 
@@ -248,7 +232,7 @@ class _InputBarState extends State<InputBar> {
   }
 }
 
-class ToDoListView extends StatelessWidget {
+class ToDoListView extends StatefulWidget {
   final ToDoListWithItems list;
   final Key checkedListKey;
   final ScrollController controller;
@@ -261,17 +245,25 @@ class ToDoListView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<ToDoListView> createState() => _ToDoListViewState();
+}
+
+class _ToDoListViewState extends State<ToDoListView> {
+  final _itemKeys = <String, GlobalKey>{};
+
+  @override
   Widget build(BuildContext context) {
-    final uncheckedItems = list.items.where((item) => !item.done).toList();
-    final checkedItems = list.items.where((item) => item.done).toList();
+    final uncheckedItems =
+        widget.list.items.where((item) => !item.done).toList();
+    final checkedItems = widget.list.items.where((item) => item.done).toList();
 
     return ListView(
-      controller: controller,
+      controller: widget.controller,
       clipBehavior: Clip.none,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       children: [
         ImplicitlyAnimatedReorderableList<ToDo>(
-          key: checkedListKey,
+          key: widget.checkedListKey,
           items: uncheckedItems,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -288,6 +280,7 @@ class ToDoListView extends StatelessWidget {
               curve: Curves.easeInOut,
               animation: itemAnimation,
               child: _ListTile(
+                key: _itemKeys[item.id] ??= GlobalKey(),
                 item: item,
                 onToggle: () => _toggle(context, item),
                 onEdit: () => _editItem(context, item),
@@ -311,7 +304,7 @@ class ToDoListView extends StatelessWidget {
             animation: itemAnimation,
             child: item.id == 'header'
                 ? _CompletedHeader(
-                    color: list.color,
+                    color: widget.list.color,
                     onClear: () => _clearCompleted(context),
                   )
                 : _ListTile(
@@ -324,6 +317,17 @@ class ToDoListView extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  void scrollToItem(String id) {
+    final itemContext = _itemKeys[id]?.currentContext;
+    if (itemContext != null) {
+      Scrollable.ensureVisible(
+        itemContext,
+        duration: const Duration(milliseconds: 300),
+        alignment: 0.90,
+      );
+    }
   }
 
   void _toggle(BuildContext context, ToDo toDo) =>
@@ -355,7 +359,7 @@ class ToDoListView extends StatelessWidget {
   }
 
   Future<void> _clearCompleted(BuildContext context) async {
-    var checked = list.items.where((item) => item.done).toList();
+    var checked = widget.list.items.where((item) => item.done).toList();
     if (checked.isEmpty) return;
 
     var indexes =
@@ -378,11 +382,11 @@ class ToDoListView extends StatelessWidget {
   }
 
   void _swap(BuildContext context, ToDo from, ToDo to) {
-    final fromIndex = list.items.indexOf(from);
-    final toIndex = list.items.indexOf(to);
+    final fromIndex = widget.list.items.indexOf(from);
+    final toIndex = widget.list.items.indexOf(to);
 
     // Copy list
-    final items = list.items.toList();
+    final items = widget.list.items.toList();
     final item = items.removeAt(fromIndex);
     items.insert(toIndex, item);
     context.listProvider.setItemOrder(items);

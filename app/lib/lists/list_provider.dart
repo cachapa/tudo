@@ -125,7 +125,7 @@ class ListProvider {
   void setColor(String listId, Color color) =>
       _crdt.setField('lists', [listId], 'color', color.hexValue);
 
-  Future<void> createItem(String listId, String name) async {
+  Future<String> createItem(String listId, String name) async {
     final id = uuid();
     final maxPosition = (await _crdt.queryAsync('''
         SELECT max(position) AS max_position FROM todos
@@ -141,6 +141,7 @@ class ListProvider {
       'creator_id': userId,
       'created_at': DateTime.now(),
     });
+    return id;
   }
 
   Future<void> setListOrder(List<ToDoList> lists) async {
