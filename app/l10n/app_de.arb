@@ -1,0 +1,18 @@
+{
+  "theme": "Theme",
+  "scanQrCode": "QR code scannen",
+  "close": "Schließen",
+  "listDeleted": "{name} gelöscht",
+  "createList": "Liste erstellen",
+  "editList": "Liste bearbeiten",
+  "name": "Name",
+  "ok": "Ok",
+  "update": "Aktualisieren",
+  "cancel": "Abbrechen",
+  "addItem": "Eintrag hinzufügen",
+  "editItem": "Eintrag bearbeiten",
+  "toDoListEmptyMessage": "Neuen Eintrag unten anlegen",
+  "itemDeleted": "\"{name}\" gelöscht",
+  "itemsCleared": "{count, plural, =1{Eintrag} other{{count} Einträge} gelöscht}",
+  "completed": "Erledigt"
+}
