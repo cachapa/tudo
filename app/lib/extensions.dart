@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_app/util/store.dart';
 
@@ -50,6 +51,8 @@ extension BrightnessExtensions on Brightness {
 
 extension ContextExtensions on BuildContext {
   ThemeData get theme => Theme.of(this);
+
+  AppLocalizations get t => AppLocalizations.of(this)!;
 
   Future<T?> push<T>(Widget Function() builder) =>
       Navigator.of(this).push<T>(MaterialPageRoute(builder: (_) => builder()));

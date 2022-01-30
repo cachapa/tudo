@@ -8,6 +8,7 @@
 .buildlog/
 .history
 .svn/
+missing_translations.txt
 
 # IntelliJ related
 *.iml

@@ -139,6 +139,7 @@ class Logo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final color = context.theme.textTheme.bodyText1!.color;
 
     return SafeArea(
@@ -159,7 +160,7 @@ class Logo extends StatelessWidget {
                 color: color,
               ),
             ),
-            tooltip: 'Toggle theme',
+            tooltip: t.theme,
             onPressed: () => _toggleTheme(context),
           ),
           MaterialButton(
@@ -185,7 +186,7 @@ class Logo extends StatelessWidget {
               Icons.qr_code_scanner,
               color: color,
             ),
-            tooltip: 'Import using QR code',
+            tooltip: t.scanQrCode,
             onPressed: () => _launchQrScanner(context),
           ),
         ],
@@ -215,7 +216,7 @@ class Logo extends StatelessWidget {
   Future<void> _launchQrScanner(BuildContext context) async {
     final code = await FlutterBarcodeScanner.scanBarcode(
       '#00000000',
-      'CLOSE',
+      context.t.close.toUpperCase(),
       false,
       ScanMode.QR,
     );
@@ -269,9 +270,9 @@ class _ListItem extends StatelessWidget {
     context.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        content: Text('${list.name} deleted'),
+        content: Text(context.t.listDeleted(list.name)),
         action: SnackBarAction(
-          label: 'UNDO',
+          label: context.t.undo.toUpperCase(),
           onPressed: () => listManager.undoRemoveList(list.id),
         ),
       ),

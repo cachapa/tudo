@@ -29,6 +29,7 @@ class ToDoListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final bottom = max(MediaQuery.of(context).viewInsets.bottom,
         MediaQuery.of(context).viewPadding.bottom);
 
@@ -67,7 +68,7 @@ class ToDoListPage extends StatelessWidget {
               ],
             ),
             body: list.isEmpty
-                ? const EmptyPage(text: 'Create a new to-do item below')
+                ? EmptyPage(text: t.toDoListEmptyMessage)
                 : ToDoListView(
                     key: _listKey,
                     list: list,
@@ -211,7 +212,7 @@ class _InputBarState extends State<InputBar> {
               filled: true,
               fillColor: primaryColor.withAlpha(30),
               contentPadding: const EdgeInsets.all(20),
-              hintText: 'Add Item',
+              hintText: context.t.addItem,
               border: InputBorder.none,
               suffixIcon: IconButton(
                 padding: const EdgeInsets.only(right: 10),
@@ -324,9 +325,9 @@ class ToDoListView extends StatelessWidget {
     showDialog<String>(
       context: context,
       builder: (context) => TextInputDialog(
-        title: 'Edit Item',
+        title: context.t.editItem,
         value: toDo.name,
-        positiveLabel: 'Update',
+        positiveLabel: context.t.update,
         onSet: (value) => context.listProvider.setItemName(toDo.id, value),
       ),
     );
@@ -342,9 +343,9 @@ class ToDoListView extends StatelessWidget {
     context.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        content: Text('Deleted "${toDo.name}"'),
+        content: Text(context.t.itemDeleted(toDo.name)),
         action: SnackBarAction(
-          label: 'UNDO',
+          label: context.t.undo.toUpperCase(),
           onPressed: () => listProvider.undeleteItem(toDo.id),
         ),
       ),
@@ -366,10 +367,9 @@ class ToDoListView extends StatelessWidget {
     context.showSnackBar(
       SnackBar(
         behavior: SnackBarBehavior.floating,
-        content:
-            Text('Cleared $count completed ${count == 1 ? 'item' : 'items'}'),
+        content: Text(context.t.itemsCleared(count)),
         action: SnackBarAction(
-          label: 'UNDO',
+          label: context.t.undo.toUpperCase(),
           onPressed: () {
             for (var i = 0; i < checked.length; i++) {
               final item = checked[i];
@@ -477,7 +477,7 @@ class _CompletedHeader extends StatelessWidget {
         children: [
           Expanded(
             child: Text(
-              'Completed',
+              context.t.completed,
               style: context.theme.textTheme.subtitle2!.copyWith(color: color),
             ),
           ),

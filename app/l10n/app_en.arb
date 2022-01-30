@@ -1,0 +1,34 @@
+{
+  "theme": "Theme",
+  "scanQrCode": "Scan QR code",
+  "close": "Close",
+  "listDeleted": "{name} deleted",
+  "@listDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "undo": "Undo",
+  "createList": "Create list",
+  "editList": "Edit list",
+  "name": "Name",
+  "ok": "Ok",
+  "update": "Update",
+  "cancel": "Cancel",
+  "addItem": "Add item",
+  "editItem": "Edit item",
+  "toDoListEmptyMessage": "Create a new to-do item below",
+  "itemDeleted": "Deleted \"{name}\"",
+  "@itemDeleted": {
+    "placeholders": {
+      "name": {}
+    }
+  },
+  "itemsCleared": "Cleared {count, plural, =1{item} other{{count} items}}",
+  "@itemsCleared": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "completed": "Completed"
+}

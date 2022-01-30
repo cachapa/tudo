@@ -39,7 +39,9 @@ class _EditListForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
     final keyboardInset = MediaQuery.of(context).viewInsets.bottom;
+
     return Padding(
       padding: EdgeInsets.only(
           left: 24,
@@ -51,7 +53,7 @@ class _EditListForm extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            editMode ? 'Edit list' : 'Create list',
+            editMode ? t.editList : t.createList,
             style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
@@ -59,7 +61,7 @@ class _EditListForm extends StatelessWidget {
             controller: _textController,
             textCapitalization: TextCapitalization.sentences,
             autofocus: !editMode,
-            decoration: const InputDecoration(labelText: 'Name'),
+            decoration: InputDecoration(labelText: t.name),
             onSubmitted: (_) => _create(context),
           ),
           const SizedBox(height: 20),
@@ -92,7 +94,7 @@ class _EditListForm extends StatelessWidget {
                 color: context.theme.primaryColor,
                 shape: const CircleBorder(),
                 onPressed: () => _create(context),
-                child: const Text('OK'),
+                child: Text(t.ok.toUpperCase()),
               ),
             ],
           ),
