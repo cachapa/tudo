@@ -67,16 +67,20 @@ extension ContextExtensions on BuildContext {
         content: Row(
           children: [
             Expanded(child: Text(message)),
-            IconButton(
-              icon: Icon(
-                Icons.undo,
-                color: theme.primaryColor,
+            SizedBox(
+              height: 24,
+              child: IconButton(
+                padding: EdgeInsets.zero,
+                icon: Icon(
+                  Icons.undo,
+                  color: theme.primaryColor,
+                ),
+                onPressed: () {
+                  onUndo();
+                  scaffold.hideCurrentSnackBar(
+                      reason: SnackBarClosedReason.action);
+                },
               ),
-              onPressed: () {
-                onUndo();
-                scaffold.hideCurrentSnackBar(
-                    reason: SnackBarClosedReason.action);
-              },
             ),
           ],
         ),

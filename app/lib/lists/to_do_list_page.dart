@@ -20,12 +20,12 @@ const blurSigma = 14.0;
 enum ListAction { delete }
 
 class ToDoListPage extends StatelessWidget {
-  final String listId;
+  final ToDoList list;
   final _listKey = GlobalKey();
   final _uncheckedListKey = GlobalKey();
   final _controller = ScrollController();
 
-  ToDoListPage({Key? key, required this.listId}) : super(key: key);
+  ToDoListPage({Key? key, required this.list}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,8 @@ class ToDoListPage extends StatelessWidget {
       // Close keyboard when tapping a non-focusable area
       onTap: () => FocusScope.of(context).unfocus(),
       child: ValueStreamBuilder<ToDoListWithItems>(
-        stream: context.listProvider.getList(listId),
+        stream: context.listProvider.getList(list.id),
+        initialData: ToDoListWithItems.fromList(list, []),
         builder: (_, list) => Theme(
           data: context.theme.copyWith(
             colorScheme:
@@ -89,7 +90,7 @@ class ToDoListPage extends StatelessWidget {
   }
 
   void _addItem(BuildContext context, String listID, String name) {
-    context.listProvider.createItem(listId, name);
+    context.listProvider.createItem(list.id, name);
     // list.add(value);
     // Future.delayed(
     //   const Duration(milliseconds: 400),
@@ -155,18 +156,25 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
                 Positioned(
                   right: 4,
-                  child: Progress(
-                    progress: list.doneCount,
-                    total: list.itemCount,
-                    color: list.color,
+                  child: Hero(
+                    tag: 'progress_${list.id}',
+                    child: Progress(
+                      progress: list.doneCount,
+                      total: list.itemCount,
+                      color: list.color,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
-          title: Text(
-            list.name,
-            overflow: TextOverflow.fade,
+          title: Hero(
+            tag: 'name_${list.id}',
+            child: Text(
+              list.name,
+              style: context.theme.textTheme.headline6!
+                  .copyWith(color: context.theme.primaryColor),
+            ),
           ),
           actions: actions,
         ),

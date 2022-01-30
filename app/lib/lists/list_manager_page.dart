@@ -235,14 +235,20 @@ class _ListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: Progress(
-        color: list.color,
-        progress: list.doneCount,
-        total: list.itemCount,
+      leading: Hero(
+        tag: 'progress_${list.id}',
+        child: Progress(
+          color: list.color,
+          progress: list.doneCount,
+          total: list.itemCount,
+        ),
       ),
-      title: Text(
-        list.name,
-        style: context.theme.textTheme.headline6,
+      title: Hero(
+        tag: 'name_${list.id}',
+        child: Text(
+          list.name,
+          style: context.theme.textTheme.headline6,
+        ),
       ),
       trailing: const DragHandle(),
       onTap: () => _openList(context),
@@ -251,7 +257,7 @@ class _ListItem extends StatelessWidget {
   }
 
   void _openList(BuildContext context) async {
-    final action = await context.push(() => ToDoListPage(listId: list.id));
+    final action = await context.push(() => ToDoListPage(list: list));
     if (action != null && action == ListAction.delete) {
       Future.delayed(
         // Wait for pop animation to complete

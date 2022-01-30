@@ -169,6 +169,10 @@ class ListProvider {
 class ToDoListWithItems extends ToDoList {
   final List<ToDo> items;
 
+  ToDoListWithItems.fromList(ToDoList list, this.items)
+      : super(list.id, list.name, list.color, list.creatorId, list.createdAt,
+            list.position, list.itemCount, list.doneCount);
+
   ToDoListWithItems.fromMap(Map<String, dynamic> map, this.items)
       : super.fromMap(map);
 }
