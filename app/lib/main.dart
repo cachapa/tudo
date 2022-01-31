@@ -93,6 +93,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       darkTheme: ThemeData(
         primarySwatch: Colors.blue,
         primaryColor: Colors.blue,
+        canvasColor: Colors.grey[900],
         brightness: Brightness.dark,
       ),
       themeMode: context
