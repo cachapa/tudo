@@ -58,7 +58,6 @@ class ToDoListPage extends StatelessWidget {
             extendBodyBehindAppBar: true,
             extendBody: true,
             appBar: TitleBar(
-              brightness: context.theme.brightness,
               list: list,
               actions: [
                 IconButton(
@@ -68,11 +67,11 @@ class ToDoListPage extends StatelessWidget {
                 ),
               ],
             ),
-            body: list.isEmpty
+            body: list.items.isEmpty
                 ? EmptyPage(text: t.toDoListEmptyMessage)
                 : ToDoListView(
                     key: _listKey,
-                    list: list,
+                    items: list.items,
                     checkedListKey: _uncheckedListKey,
                     controller: _controller,
                   ),
@@ -100,15 +99,10 @@ class ToDoListPage extends StatelessWidget {
 }
 
 class TitleBar extends StatelessWidget implements PreferredSizeWidget {
-  final Brightness brightness;
   final ToDoList list;
   final List<Widget> actions;
 
-  const TitleBar(
-      {Key? key,
-      required this.brightness,
-      required this.list,
-      required this.actions})
+  const TitleBar({Key? key, required this.list, required this.actions})
       : super(key: key);
 
   @override
@@ -233,13 +227,13 @@ class _InputBarState extends State<InputBar> {
 }
 
 class ToDoListView extends StatefulWidget {
-  final ToDoListWithItems list;
+  final List<ToDo> items;
   final Key checkedListKey;
   final ScrollController controller;
 
   const ToDoListView({
     Key? key,
-    required this.list,
+    required this.items,
     required this.checkedListKey,
     required this.controller,
   }) : super(key: key);
@@ -251,11 +245,14 @@ class ToDoListView extends StatefulWidget {
 class _ToDoListViewState extends State<ToDoListView> {
   final _itemKeys = <String, GlobalKey>{};
 
+  // Temporarily remember deleted items to fix an edge case in the removal anim
+  String? _lastDeletedItemId;
+
   @override
   Widget build(BuildContext context) {
-    final uncheckedItems =
-        widget.list.items.where((item) => !item.done).toList();
-    final checkedItems = widget.list.items.where((item) => item.done).toList();
+    final uncheckedItems = widget.items.where((item) => !item.done).toList();
+    final checkedItems = widget.items.where((item) => item.done).toList();
+    _itemKeys.clear();
 
     return ListView(
       controller: widget.controller,
@@ -271,7 +268,7 @@ class _ToDoListViewState extends State<ToDoListView> {
           areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
           onReorderFinished: (_, from, to, __) {
             if (from == to) return;
-            _swap(context, uncheckedItems[from], uncheckedItems[to]);
+            _swap(uncheckedItems[from], uncheckedItems[to]);
           },
           itemBuilder: (_, itemAnimation, item, __) => Reorderable(
             key: Key(item.id),
@@ -282,9 +279,10 @@ class _ToDoListViewState extends State<ToDoListView> {
               child: _ListTile(
                 key: _itemKeys[item.id] ??= GlobalKey(),
                 item: item,
-                onToggle: () => _toggle(context, item),
-                onEdit: () => _editItem(context, item),
-                onDelete: () => _deleteItem(context, item),
+                onToggle: () => _toggle(item),
+                onEdit: () => _editItem(item),
+                onDelete: () => _deleteItem(item),
+                isDeleted: item.id == _lastDeletedItemId,
               ),
             ),
           ),
@@ -292,7 +290,7 @@ class _ToDoListViewState extends State<ToDoListView> {
         ImplicitlyAnimatedList<ToDo>(
           items: [
             if (checkedItems.isNotEmpty)
-              ToDo('header', '', false, 0, null, null),
+              ToDo('header', '', false, null, 0, null, null),
             ...checkedItems,
           ],
           shrinkWrap: true,
@@ -304,14 +302,14 @@ class _ToDoListViewState extends State<ToDoListView> {
             animation: itemAnimation,
             child: item.id == 'header'
                 ? _CompletedHeader(
-                    color: widget.list.color,
-                    onClear: () => _clearCompleted(context),
+                    onClear: _clearCompleted,
                   )
                 : _ListTile(
                     item: item,
-                    onToggle: () => _toggle(context, item),
-                    onEdit: () => _editItem(context, item),
-                    onDelete: () => _deleteItem(context, item),
+                    onToggle: () => _toggle(item),
+                    onEdit: () => _editItem(item),
+                    onDelete: () => _deleteItem(item),
+                    isDeleted: item.id == _lastDeletedItemId,
                   ),
           ),
         ),
@@ -330,10 +328,9 @@ class _ToDoListViewState extends State<ToDoListView> {
     }
   }
 
-  void _toggle(BuildContext context, ToDo toDo) =>
-      context.listProvider.setDone(toDo.id, !toDo.done);
+  void _toggle(ToDo toDo) => context.listProvider.setDone(toDo.id, !toDo.done);
 
-  void _editItem(BuildContext context, ToDo toDo) {
+  void _editItem(ToDo toDo) {
     showDialog<String>(
       context: context,
       builder: (context) => TextInputDialog(
@@ -345,21 +342,24 @@ class _ToDoListViewState extends State<ToDoListView> {
     );
   }
 
-  void _deleteItem(BuildContext context, ToDo toDo) {
-    // Hide item while the list removal animation runs
-    toDo.isDeleted = true;
+  void _deleteItem(ToDo toDo) {
+    // Used to hide the item during its removal animation
+    _lastDeletedItemId = toDo.id;
 
     final listProvider = context.listProvider;
     listProvider.deleteItem(toDo.id);
 
     context.showSnackBar(
       context.t.itemDeleted(toDo.name),
-      () => listProvider.undeleteItem(toDo.id),
+      () {
+        _lastDeletedItemId = null;
+        listProvider.undeleteItem(toDo.id);
+      },
     );
   }
 
-  Future<void> _clearCompleted(BuildContext context) async {
-    var checked = widget.list.items.where((item) => item.done).toList();
+  Future<void> _clearCompleted() async {
+    var checked = widget.items.where((item) => item.done).toList();
     if (checked.isEmpty) return;
 
     var indexes =
@@ -381,15 +381,15 @@ class _ToDoListViewState extends State<ToDoListView> {
     );
   }
 
-  void _swap(BuildContext context, ToDo from, ToDo to) {
-    final fromIndex = widget.list.items.indexOf(from);
-    final toIndex = widget.list.items.indexOf(to);
+  void _swap(ToDo from, ToDo to) {
+    final fromIndex = widget.items.indexOf(from);
+    final toIndex = widget.items.indexOf(to);
 
     // Copy list
-    final items = widget.list.items.toList();
-    final item = items.removeAt(fromIndex);
-    items.insert(toIndex, item);
-    context.listProvider.setItemOrder(items);
+    final itemsCopy = widget.items.toList();
+    final item = itemsCopy.removeAt(fromIndex);
+    itemsCopy.insert(toIndex, item);
+    context.listProvider.setItemOrder(itemsCopy);
   }
 }
 
@@ -398,6 +398,7 @@ class _ListTile extends StatelessWidget {
   final Function() onToggle;
   final Function() onEdit;
   final Function() onDelete;
+  final bool isDeleted;
 
   const _ListTile({
     Key? key,
@@ -405,12 +406,13 @@ class _ListTile extends StatelessWidget {
     required this.onToggle,
     required this.onEdit,
     required this.onDelete,
+    required this.isDeleted,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Opacity(
-      opacity: item.isDeleted ? 0 : 1,
+      opacity: isDeleted ? 0 : 1,
       child: Dismissible(
         key: Key(item.id),
         background: Container(
@@ -459,14 +461,14 @@ class _ListTile extends StatelessWidget {
 }
 
 class _CompletedHeader extends StatelessWidget {
-  final Color color;
   final Function() onClear;
 
-  const _CompletedHeader({Key? key, required this.color, required this.onClear})
-      : super(key: key);
+  const _CompletedHeader({Key? key, required this.onClear}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final color = context.theme.primaryColor;
+
     return Container(
       decoration: BoxDecoration(
         border: Border(
