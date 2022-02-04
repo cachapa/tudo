@@ -5,7 +5,7 @@ import 'package:tudo_app/lists/list_provider.dart';
 import 'color_selector.dart';
 import 'share_list.dart';
 
-Future<dynamic> editToDoList(BuildContext context,
+Future<bool?> editToDoList(BuildContext context,
     [ToDoList? list, Function()? onDelete]) {
   return showModalBottomSheet<bool>(
     shape: const RoundedRectangleBorder(
@@ -117,16 +117,16 @@ class _EditListForm extends StatelessWidget {
       context.read<ListProvider>().createList(name, color);
     }
 
-    context.pop();
+    context.pop(true);
   }
 
   void _share(BuildContext context) {
-    context.pop();
+    context.pop(false);
     shareToDoList(context, list!);
   }
 
   void _delete(BuildContext context) {
-    context.pop();
+    context.pop(false);
     onDelete!();
   }
 }

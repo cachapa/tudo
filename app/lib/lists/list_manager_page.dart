@@ -28,6 +28,7 @@ class ListManagerPage extends StatefulWidget {
 
 class _ListManagerPageState extends State<ListManagerPage> {
   late final OfflineIndicator _offlineIndicator;
+  final _itemKeys = <String, GlobalKey>{};
 
   @override
   void initState() {
@@ -46,6 +47,8 @@ class _ListManagerPageState extends State<ListManagerPage> {
 
   @override
   Widget build(BuildContext context) {
+    _itemKeys.clear();
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.theme.brightness.invert,
@@ -67,7 +70,10 @@ class _ListManagerPageState extends State<ListManagerPage> {
                 sizeFraction: 0.7,
                 curve: Curves.easeInOut,
                 animation: itemAnimation,
-                child: _ListItem(list: item),
+                child: _ListItem(
+                  key: _itemKeys[item.id] ??= GlobalKey(),
+                  list: item,
+                ),
               ),
             ),
           ),
@@ -95,14 +101,19 @@ class _ListManagerPageState extends State<ListManagerPage> {
   Future<void> _createList() async {
     final result = await editToDoList(context);
     if (result ?? false) {
-      // Scroll to the bottom of the list
-      Future.delayed(
-        const Duration(milliseconds: 400),
-        () => _controller.animateTo(
-          _controller.position.maxScrollExtent + 200,
-          duration: const Duration(milliseconds: 400),
-          curve: Curves.fastOutSlowIn,
-        ),
+      // Scroll to the new item
+      await Future.delayed(const Duration(milliseconds: 400));
+      _scrollToLastItem();
+    }
+  }
+
+  void _scrollToLastItem() {
+    if (_itemKeys.isEmpty) return;
+    final itemContext = _itemKeys.values.last.currentContext;
+    if (itemContext != null) {
+      Scrollable.ensureVisible(
+        itemContext,
+        duration: const Duration(milliseconds: 300),
       );
     }
   }
@@ -130,7 +141,9 @@ class _ListManagerPageState extends State<ListManagerPage> {
           }
         }).onError((e) => e.log);
       }
-    } catch (_) {}
+    } catch (e) {
+      e.toString().log;
+    }
   }
 }
 
