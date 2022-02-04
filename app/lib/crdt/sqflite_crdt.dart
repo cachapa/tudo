@@ -56,6 +56,8 @@ abstract class SqfliteCrdt {
 
   Future<void> onCreate(Database db) async {}
 
+  Future<void> onUpgrade(Database db, int oldVersion, int newVersion) async {}
+
   Future<void> init(String basePath, String name) async {
     // Initialize FFI
     sqfliteFfiInit();
@@ -65,10 +67,15 @@ abstract class SqfliteCrdt {
     }
 
     var created = false;
+    var upgraded = false;
     _db = await openDatabase(
       '$basePath/$name.db',
       version: version,
       onCreate: (db, version) => created = true,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await onUpgrade(db, oldVersion, newVersion);
+        upgraded = true;
+      },
     );
 
     // Create shadow table
@@ -103,6 +110,9 @@ abstract class SqfliteCrdt {
     });
 
     if (created) await onCreate(_db);
+    if (upgraded) {
+      await _db.transaction((txn) => _updateTables(txn));
+    }
   }
 
   Future<void> _createTable(Transaction txn, String name, Schema schema) async {

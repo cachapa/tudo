@@ -14,5 +14,17 @@
   "toDoListEmptyMessage": "Cria um item novo em baixo",
   "itemDeleted": "\"{name}\" apagado",
   "itemsCleared": "{count, plural, =1{item apagado} other{{count} itens apagados}}",
-  "completed": "Completos"
+  "completed": "Completos",
+  "settings": "Configuração",
+  "sendFeedback": "Enviar comentários",
+  "reportIssues": "Relatar problemas",
+  "privacyPolicy": "Política de privacidade",
+  "licenses": "Licenças",
+  "version": "Versão {version}",
+  "aboutTudo": "Acerca da app",
+  "otherApps": "Outras apps",
+  "storyArkDescription": "Rede social para a partilha de média",
+  "libraDescription": "Gestor de peso com gráficos dinâmicos",
+  "today": "Hoje",
+  "yesterday": "Ontem"
 }

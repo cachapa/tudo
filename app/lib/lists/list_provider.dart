@@ -107,8 +107,12 @@ class ListProvider {
   Future<void> undeleteItem(String id) =>
       _crdt.setDeleted('todos', [id], false);
 
-  Future<void> setDone(String itemId, bool isDone) =>
-      _crdt.setField('todos', [itemId], 'done', isDone);
+  Future<void> setDone(String itemId, bool isDone) => _crdt.setFields('todos', [
+        itemId
+      ], {
+        'done_at': isDone ? DateTime.now() : null,
+        'done': isDone,
+      });
 
   Future<void> setItemName(String itemId, String name) =>
       _crdt.setField('todos', [itemId], 'name', name);
@@ -213,24 +217,22 @@ class ToDo {
   final String id;
   final String name;
   final bool done;
+  final DateTime? doneAt;
   final int position;
   final String? creatorId;
   final DateTime? createdAt;
 
-  // Transient marker while item is deleted
-  bool isDeleted;
-
-  ToDo(this.id, this.name, this.done, this.position, this.creatorId,
-      this.createdAt,
-      [this.isDeleted = false]);
+  ToDo(this.id, this.name, this.done, this.doneAt, this.position,
+      this.creatorId, this.createdAt);
 
   factory ToDo.fromMap(Map<String, dynamic> map) => ToDo(
         map['id'],
         map['name'],
         map['done'] == 1,
+        (map['done_at'] as String?)?.asDateTime.toLocal(),
         map['position'],
         map['creator_id'],
-        (map['created_at'] as String?)?.asDateTime,
+        (map['created_at'] as String?)?.asDateTime.toLocal(),
       );
 
   @override

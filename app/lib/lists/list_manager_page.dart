@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/offline_indicator.dart';
@@ -12,7 +11,7 @@ import 'package:tudo_app/common/progress.dart';
 import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/lists/to_do_list_page.dart';
-import 'package:tudo_app/settings/settings_provider.dart';
+import 'package:tudo_app/settings/settings_page.dart';
 import 'package:uni_links/uni_links.dart';
 
 import 'list_provider.dart';
@@ -157,73 +156,39 @@ class Logo extends StatelessWidget {
 
     return SafeArea(
       bottom: false,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Stack(
+        alignment: Alignment.center,
         children: [
-          IconButton(
-            padding: const EdgeInsets.all(20),
-            icon: Selector<SettingsProvider, ThemeMode>(
-              selector: (_, settingsProvider) => settingsProvider.theme,
-              builder: (_, theme, __) => Icon(
-                theme == ThemeMode.system
-                    ? Icons.brightness_auto
-                    : theme == ThemeMode.light
-                        ? Icons.light_mode_outlined
-                        : Icons.mode_night_outlined,
-                color: color,
-              ),
-            ),
-            tooltip: t.theme,
-            onPressed: () => _toggleTheme(context),
+          Image.asset(
+            'assets/images/tudo_rainbow_bold.png',
+            height: 40,
           ),
-          MaterialButton(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            onPressed: () => _showAbout(context),
-            child: Stack(
-              children: [
-                Image.asset(
-                  'assets/images/tudo_rainbow_bold.png',
-                  height: 72,
-                ),
-                Image.asset(
-                  'assets/images/tudo.png',
-                  height: 72,
+          Image.asset(
+            'assets/images/tudo.png',
+            height: 40,
+            color: color,
+          ),
+          ButtonBar(
+            buttonPadding: EdgeInsets.zero,
+            children: [
+              IconButton(
+                padding: const EdgeInsets.all(20),
+                icon: Icon(
+                  Icons.qr_code_scanner,
                   color: color,
                 ),
-              ],
-            ),
-          ),
-          IconButton(
-            padding: const EdgeInsets.all(20),
-            icon: Icon(
-              Icons.qr_code_scanner,
-              color: color,
-            ),
-            tooltip: t.scanQrCode,
-            onPressed: () => _launchQrScanner(context),
+                tooltip: t.scanQrCode,
+                onPressed: () => _launchQrScanner(context),
+              ),
+              IconButton(
+                icon: Icon(Icons.adaptive.more),
+                onPressed: () => context.push(() => const SettingsPage()),
+              ),
+            ],
           ),
         ],
       ),
     );
-  }
-
-  Future<void> _showAbout(BuildContext context) async {
-    final version = (await PackageInfo.fromPlatform()).version;
-    showAboutDialog(
-      context: context,
-      applicationVersion: version,
-      applicationIcon: Image.asset(
-        'assets/images/icon_rounded.png',
-        height: 48,
-        filterQuality: FilterQuality.high,
-      ),
-    );
-  }
-
-  void _toggleTheme(BuildContext context) {
-    final settingsProvider = context.read<SettingsProvider>();
-    settingsProvider.theme = ThemeMode
-        .values[(settingsProvider.theme.index + 1) % ThemeMode.values.length];
   }
 
   Future<void> _launchQrScanner(BuildContext context) async {

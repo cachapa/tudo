@@ -4,14 +4,17 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:tudo_app/util/store.dart';
 
 import 'auth/auth_provider.dart';
 import 'crdt/hlc.dart';
 import 'lists/list_provider.dart';
+import 'settings/settings_provider.dart';
 import 'sync/sync_provider.dart';
 
+export 'package:flutter_gen/gen_l10n/app_localizations.dart';
 export 'package:provider/provider.dart';
 
 extension StringX on String {
@@ -26,6 +29,28 @@ extension StringX on String {
 
   Color get asColor =>
       Color(int.parse(replaceFirst('#', ''), radix: 16) + 0xFF000000);
+}
+
+extension DateTimeX on DateTime {
+  String toTimeString(BuildContext context) =>
+      '${hour.toString()}:${minute.toString().padLeft(2, '0')}';
+
+  String toRelativeString(BuildContext context) {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final now = DateTime.now();
+
+    if (year == now.year) {
+      if (month == now.month) {
+        if (day == now.day) return context.t.today;
+        if (day == now.day - 1) return context.t.yesterday;
+        if (weekday < now.weekday && now.day - day < 7) {
+          return DateFormat.EEEE(languageCode).format(this);
+        }
+      }
+      return DateFormat.MMMEd(languageCode).format(this);
+    }
+    return DateFormat.yMMMd(languageCode).format(this);
+  }
 }
 
 extension ListX<T> on List<T> {
@@ -92,6 +117,8 @@ extension ContextExtensions on BuildContext {
 
   // Providers
   StoreProvider get storeProvider => read<StoreProvider>();
+
+  SettingsProvider get settingsProvider => read<SettingsProvider>();
 
   AuthProvider get authProvider => read<AuthProvider>();
 

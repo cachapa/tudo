@@ -445,6 +445,10 @@ class _ListTile extends StatelessWidget {
             value: item.done,
           ),
           title: Text(item.name),
+          subtitle: item.done && item.doneAt != null
+              ? Text(
+                  '${item.doneAt!.toRelativeString(context)} • ${item.doneAt!.toTimeString(context)}')
+              : null,
           trailing: item.done ? null : const DragHandle(),
           onTap: () => onToggle(),
           onLongPress: onEdit,

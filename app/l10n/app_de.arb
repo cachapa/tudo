@@ -14,5 +14,17 @@
   "toDoListEmptyMessage": "Neuen Eintrag unten anlegen",
   "itemDeleted": "\"{name}\" gelöscht",
   "itemsCleared": "{count, plural, =1{Eintrag} other{{count} Einträge} gelöscht}",
-  "completed": "Erledigt"
+  "completed": "Erledigt",
+  "settings": "Einstellungen",
+  "sendFeedback": "Feedback geben",
+  "reportIssues": "Probleme melden",
+  "privacyPolicy": "Datenschutzerklärung",
+  "licenses": "Lizenzen",
+  "version": "Version {version}",
+  "aboutTudo": "Über tudo",
+  "otherApps": "Weitere Apps",
+  "storyArkDescription": "Privates und sicheres soziales Mediennetzwerk",
+  "libraDescription": "Gewichtsmanager mit dynamischer grafischer Darstellung",
+  "today": "Heute",
+  "yesterday": "Gestern"
 }

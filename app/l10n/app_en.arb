@@ -5,7 +5,9 @@
   "listDeleted": "{name} deleted",
   "@listDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "createList": "Create list",
@@ -20,14 +22,37 @@
   "itemDeleted": "Deleted \"{name}\"",
   "@itemDeleted": {
     "placeholders": {
-      "name": {}
+      "name": {
+        "type": "String"
+      }
     }
   },
   "itemsCleared": "Cleared {count, plural, =1{item} other{{count} items}}",
   "@itemsCleared": {
     "placeholders": {
-      "count": {}
+      "count": {
+        "type": "int"
+      }
     }
   },
-  "completed": "Completed"
+  "completed": "Completed",
+  "settings": "Settings",
+  "aboutTudo": "About tudo",
+  "sendFeedback": "Send feedback",
+  "reportIssues": "Report issues",
+  "privacyPolicy": "Privacy policy",
+  "licenses": "Licenses",
+  "otherApps": "Other apps",
+  "storyArkDescription": "Private & secure social network dedicated media sharing",
+  "libraDescription": "Weight manager with smooth dynamic charts",
+  "version": "Version {version}",
+  "@version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "today": "Today",
+  "yesterday": "Yesterday"
 }

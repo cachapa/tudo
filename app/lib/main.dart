@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tudo_app/auth/auth_provider.dart';
@@ -13,6 +12,7 @@ import 'package:tudo_app/settings/settings_provider.dart';
 import 'package:tudo_app/util/build_info.dart';
 import 'package:tudo_app/util/store.dart';
 
+import 'common/value_builders.dart';
 import 'crdt/hive_adapters.dart';
 import 'crdt/tudo_crdt.dart';
 import 'lists/list_manager_page.dart';
@@ -44,8 +44,7 @@ void main() async {
     MultiProvider(
       providers: [
         Provider.value(value: storeProvider),
-        ChangeNotifierProvider(
-            create: (c) => SettingsProvider(c.storeProvider)),
+        Provider(create: (c) => SettingsProvider(c.storeProvider)),
         Provider(create: (c) => AuthProvider(c.storeProvider)),
         Provider(
             create: (c) =>
@@ -82,23 +81,25 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'tudo',
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return ValueStreamBuilder<ThemeMode>(
+      stream: context.settingsProvider.theme,
+      builder: (_, theme) => MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'tudo',
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        darkTheme: ThemeData(
+          primarySwatch: Colors.blue,
+          primaryColor: Colors.blue,
+          canvasColor: Colors.grey[900],
+          brightness: Brightness.dark,
+        ),
+        themeMode: theme,
+        home: const ListManagerPage(),
       ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.blue,
-        primaryColor: Colors.blue,
-        canvasColor: Colors.grey[900],
-        brightness: Brightness.dark,
-      ),
-      themeMode: context
-          .select<SettingsProvider, ThemeMode>((provider) => provider.theme),
-      home: const ListManagerPage(),
     );
   }
 
