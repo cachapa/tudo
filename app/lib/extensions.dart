@@ -41,15 +41,15 @@ extension DateTimeX on DateTime {
 
     if (year == now.year) {
       if (month == now.month) {
-        if (day == now.day) return context.t.today;
+        if (day == now.day) return toTimeString(context);
         if (day == now.day - 1) return context.t.yesterday;
         if (weekday < now.weekday && now.day - day < 7) {
           return DateFormat.EEEE(languageCode).format(this);
         }
       }
-      return DateFormat.MMMEd(languageCode).format(this);
+      return DateFormat.MMMM(languageCode).format(this);
     }
-    return DateFormat.yMMMd(languageCode).format(this);
+    return DateFormat.y(languageCode).format(this);
   }
 }
 
