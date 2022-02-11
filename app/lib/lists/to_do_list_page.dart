@@ -150,8 +150,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
             tag: 'name_${list.id}',
             child: Text(
               list.name,
-              style: context.theme.textTheme.headline6!
-                  .copyWith(color: context.theme.primaryColor),
+              style: context.theme.textTheme.headline6,
             ),
           ),
           actions: actions,

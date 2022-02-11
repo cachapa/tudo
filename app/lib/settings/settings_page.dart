@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:tudo_app/common/appbars.dart';
 import 'package:tudo_app/common/segmented_control.dart';
 import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
@@ -16,16 +16,7 @@ class SettingsPage extends StatelessWidget {
     final t = context.t;
 
     return Scaffold(
-      appBar: AppBar(
-        systemOverlayStyle: context.theme.brightness == Brightness.light
-            ? SystemUiOverlayStyle.dark
-            : SystemUiOverlayStyle.light,
-        elevation: 0,
-        foregroundColor: context.theme.textTheme.headline6!.color,
-        backgroundColor: context.theme.canvasColor,
-        centerTitle: true,
-        title: Text(t.settings),
-      ),
+      appBar: DiscreteAppBar(title: t.settings),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
