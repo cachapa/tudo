@@ -50,8 +50,8 @@ void main() async {
             create: (c) =>
                 ListProvider(c.authProvider.userId, crdt, c.storeProvider)),
         Provider(
-            create: (c) => SyncProvider(
-                c.authProvider.userId, c.storeProvider, c.listProvider)),
+            create: (c) =>
+                SyncProvider(c.authProvider, c.storeProvider, c.listProvider)),
       ],
       child: const MyApp(),
     ),

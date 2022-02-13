@@ -10,6 +10,7 @@ import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class SyncClient {
+  final String token;
   final String userId;
   WebSocketChannel? channel;
   StreamSubscription? subscription;
@@ -18,20 +19,21 @@ class SyncClient {
 
   final messages = PublishSubject<String>();
 
-  SyncClient(this.userId);
+  SyncClient(this.token, this.userId);
 
   bool get isConnected => connectionState.value;
 
   void connect(Hlc? lastReceive) {
     if (isConnected) return;
 
-    // Dart's WebSocket uses a shared static client, so the user agent needs to be set like so:
+    // Dart's WebSocket uses a global static client, so the user agent needs to be set like so:
     WebSocket.userAgent =
         'tudo/${BuildInfo.version} ${BuildInfo.platform}/${BuildInfo.platformVersion} (${BuildInfo.deviceModel})';
 
     const endpoint = '$serverAddress/ws';
     channel = IOWebSocketChannel.connect(Uri.parse(endpoint), headers: {
       'api_secret': apiSecret,
+      'token': token,
       'user_id': userId,
       if (lastReceive != null) 'last_receive': lastReceive,
     });

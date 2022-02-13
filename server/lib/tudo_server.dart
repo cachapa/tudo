@@ -26,6 +26,7 @@ class TudoServer {
     var handler = const Pipeline()
         .addMiddleware(logRequests())
         .addMiddleware(_validateSecret)
+        .addMiddleware(_validateCredentials)
         .addHandler(router);
 
     var server = await io.serve(handler, '0.0.0.0', port);
@@ -33,10 +34,6 @@ class TudoServer {
   }
 
   Future<Response> _wsHandler(Request request) async {
-    if (!request.headers.containsKey('user_id')) {
-      return Response.forbidden('Invalid user id');
-    }
-
     final userId = request.headers['user_id']!;
     var lastSend = request.headers['last_receive'];
 
@@ -77,7 +74,6 @@ class TudoServer {
                 final listId = (map['id'] as String).split(':')[1];
                 await _crdt.setField(
                     'user_lists', [userId, listId], map['field'], map['value']);
-                print('hacked new list');
               }
             }
 
@@ -139,13 +135,54 @@ class TudoServer {
   Response _notFoundHandler(Request request) => Response.notFound('Not found');
 
   Handler _validateSecret(Handler innerHandler) => (request) async {
-        if (request.headers['api_secret'] == apiSecret) {
+        final suppliedSecret = request.headers['api_secret'];
+        if (apiSecret == suppliedSecret) {
           return innerHandler(request);
         } else {
-          print('Invalid secret: ${request.headers['api_secret']}');
-          return Response.forbidden('Invalid secret');
+          return _forbidden('Invalid secret: $suppliedSecret');
         }
       };
+
+  Handler _validateCredentials(Handler innerHandler) => (request) async {
+        final userId = request.headers['user_id'];
+        final token = request.headers['token'];
+
+        // Validate user id length
+        if (userId == null || userId.length != 36) {
+          return _forbidden('Invalid user id: $userId');
+        }
+
+        if (token != null) {
+          // Validate token length
+          if (token.length != 128) {
+            return _forbidden('Invalid token size: $token');
+          }
+
+          final knownUserId = await _getUserId(token);
+          // Associate token with user id, if it doesn't exist yet
+          if (knownUserId == null) {
+            await _crdt.setFields(
+              'auth',
+              [token],
+              {
+                'user_id': userId,
+                'created_at': DateTime.now(),
+              },
+            );
+          } else if (userId != knownUserId) {
+            return _forbidden(
+                'Invalid token for supplied user id:\n  token: $token\n  user_id: $userId');
+          }
+        }
+
+        return innerHandler(request);
+      };
+
+  Future<String?> _getUserId(String token) async {
+    final result = await _crdt
+        .queryAsync('SELECT user_id FROM auth WHERE token = ?1', [token]);
+    return result.isEmpty ? null : result.first['user_id'];
+  }
 
   Future<List<Map<String, dynamic>>> _listChangeset(String listId) =>
       _crdt.queryAsync('''
@@ -160,6 +197,11 @@ class TudoServer {
           WHERE list_id = ?1
         ORDER BY value
       ''', [listId]);
+
+  Response _forbidden(String message) {
+    print('403 Forbidden: $message');
+    return Response.forbidden(message);
+  }
 }
 
 class CrdtStream {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:tudo_app/auth/auth_provider.dart';
 import 'package:tudo_app/crdt/hlc.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/lists/list_provider.dart';
@@ -26,9 +27,10 @@ class SyncProvider {
 
   Stream<bool> get connectionState => _client.connectionState;
 
-  SyncProvider(String userId, StoreProvider storeProvider, this._listProvider)
+  SyncProvider(AuthProvider authProvider, StoreProvider storeProvider,
+      this._listProvider)
       : _store = storeProvider.getStore('sync') {
-    _client = SyncClient(userId)
+    _client = SyncClient(authProvider.token, authProvider.userId)
       ..messages.listen((message) async {
         final map = jsonDecode(message) as Map;
         final type = map['type'];

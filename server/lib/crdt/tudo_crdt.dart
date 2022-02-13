@@ -5,6 +5,13 @@ class TudoCrdt extends SqfliteCrdt {
   final version = 1;
   @override
   final tableSchemas = <String, Schema>{
+    'auth': Schema(
+      keys: {'token'},
+      columns: {
+        'user_id': CrdtType.text,
+        'created_at': CrdtType.datetime,
+      },
+    ),
     'users': Schema(
       columns: {
         'name': CrdtType.text,

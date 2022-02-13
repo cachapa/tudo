@@ -4,6 +4,8 @@ import 'dart:io';
 
 import 'package:rxdart/rxdart.dart';
 import 'package:sqflite_common/sqlite_api.dart';
+// ignore: implementation_imports
+import 'package:sqflite_common/src/open_options.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:tudo_server/extensions.dart';
 import 'package:tudo_server/uuid.dart';
@@ -56,9 +58,23 @@ abstract class SqfliteCrdt {
 
   Future<void> onCreate(Database db) async {}
 
+  Future<void> onUpgrade(Database db, int oldVersion, int newVersion) async {}
+
   Future<void> init(String basePath, String name) async {
+    var created = false;
+    var upgraded = false;
     databaseFactoryFfi.setDatabasesPath('.');
-    _db = await databaseFactoryFfi.openDatabase('$basePath/$name.db');
+    _db = await databaseFactoryFfi.openDatabase(
+      '$basePath/$name.db',
+      options: SqfliteOpenDatabaseOptions(
+        version: version,
+        onCreate: (db, version) => created = true,
+        onUpgrade: (db, oldVersion, newVersion) async {
+          await onUpgrade(db, oldVersion, newVersion);
+          upgraded = true;
+        },
+      ),
+    );
 
     // Create shadow table
     await _db.transaction((txn) async {
@@ -90,6 +106,11 @@ abstract class SqfliteCrdt {
         await _createTable(txn, table, tableSchemas[table]!);
       }
     });
+
+    if (created) await onCreate(_db);
+    if (upgraded) {
+      await _db.transaction((txn) => _updateTables(txn));
+    }
   }
 
   Future<void> _createTable(Transaction txn, String name, Schema schema) async {
