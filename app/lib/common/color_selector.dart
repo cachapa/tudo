@@ -28,8 +28,13 @@ class ColorController {
 
 class ColorSelector extends StatefulWidget {
   final ColorController controller;
+  final void Function(Color color)? onColorSelected;
 
-  const ColorSelector({Key? key, required this.controller}) : super(key: key);
+  const ColorSelector({
+    Key? key,
+    required this.controller,
+    this.onColorSelected,
+  }) : super(key: key);
 
   @override
   _ColorSelectorState createState() => _ColorSelectorState();
@@ -43,7 +48,7 @@ class _ColorSelectorState extends State<ColorSelector> {
         child: ColorButton(
           color: color,
           selected: color.value == widget.controller.color.value,
-          onPressed: () => setState(() => widget.controller.color = color),
+          onPressed: () => _setColor(color),
         ),
       ),
     );
@@ -61,6 +66,11 @@ class _ColorSelectorState extends State<ColorSelector> {
         ),
       ),
     );
+  }
+
+  void _setColor(Color color) {
+    setState(() => widget.controller.color = color);
+    widget.onColorSelected?.call(color);
   }
 }
 

@@ -8,7 +8,9 @@ import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/empty_page.dart';
+import 'package:tudo_app/common/popup_menu.dart';
 import 'package:tudo_app/common/progress.dart';
+import 'package:tudo_app/common/share_list.dart';
 import 'package:tudo_app/common/text_input_dialog.dart';
 import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
@@ -61,9 +63,24 @@ class ToDoListPage extends StatelessWidget {
               list: list,
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => editToDoList(
-                      context, list, () => context.pop(ListAction.delete)),
+                  tooltip: t.share,
+                  icon: Icon(Icons.adaptive.share),
+                  onPressed: () => shareToDoList(context, list),
+                ),
+                PopupMenu(
+                  entries: [
+                    PopupEntry(
+                      Icons.edit,
+                      '${t.editList}…',
+                      () => editToDoList(context, list),
+                    ),
+                    PopupEntry(
+                      Icons.delete,
+                      t.delete,
+                      () => context.pop(ListAction.delete),
+                      context.theme.errorColor,
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -329,16 +346,18 @@ class _ToDoListViewState extends State<ToDoListView> {
 
   void _toggle(ToDo toDo) => context.listProvider.setDone(toDo.id, !toDo.done);
 
-  void _editItem(ToDo toDo) {
-    showDialog<String>(
+  Future<void> _editItem(ToDo toDo) async {
+    final title = await showDialog<String>(
       context: context,
       builder: (context) => TextInputDialog(
         title: context.t.editItem,
         value: toDo.name,
         positiveLabel: context.t.update,
-        onSet: (value) => context.listProvider.setItemName(toDo.id, value),
       ),
     );
+    if (title != null) {
+      context.listProvider.setItemName(toDo.id, title);
+    }
   }
 
   void _deleteItem(ToDo toDo) {

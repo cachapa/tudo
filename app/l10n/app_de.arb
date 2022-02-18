@@ -6,7 +6,6 @@
   "createList": "Liste erstellen",
   "editList": "Liste bearbeiten",
   "name": "Name",
-  "ok": "Ok",
   "update": "Aktualisieren",
   "cancel": "Abbrechen",
   "addItem": "Eintrag hinzufügen",
@@ -26,5 +25,8 @@
   "storyArkDescription": "Privates und sicheres soziales Mediennetzwerk",
   "libraDescription": "Gewichtsmanager mit dynamischer grafischer Darstellung",
   "today": "Heute",
-  "yesterday": "Gestern"
+  "yesterday": "Gestern",
+  "share": "Teilen",
+  "delete": "Löschen",
+  "create": "Erstellen"
 }

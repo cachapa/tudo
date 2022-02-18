@@ -6,7 +6,6 @@
   "createList": "Criar lista",
   "editList": "Alterar lista",
   "name": "Nome",
-  "ok": "Ok",
   "update": "Atualizar",
   "cancel": "Cancelar",
   "addItem": "Adicionar item",
@@ -26,5 +25,8 @@
   "storyArkDescription": "Rede social para a partilha de média",
   "libraDescription": "Gestor de peso com gráficos dinâmicos",
   "today": "Hoje",
-  "yesterday": "Ontem"
+  "yesterday": "Ontem",
+  "share":  "Partilhar",
+  "delete": "Eliminar",
+  "create": "Criar"
 }
