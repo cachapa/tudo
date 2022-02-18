@@ -181,7 +181,7 @@ class Logo extends StatelessWidget {
                 onPressed: () => _launchQrScanner(context),
               ),
               IconButton(
-                icon: Icon(Icons.adaptive.more),
+                icon: const Icon(Icons.tune_rounded),
                 onPressed: () => context.push(() => const SettingsPage()),
               ),
             ],

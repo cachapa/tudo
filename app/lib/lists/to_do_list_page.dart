@@ -442,8 +442,15 @@ class _ListTile extends StatelessWidget {
         },
         child: ListTile(
           leading: Checkbox(
-            onChanged: (_) => onToggle(),
             value: item.done,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+            side: BorderSide(
+              width: 2,
+              color: context.theme.primaryColor,
+            ),
+            checkColor: context.theme.canvasColor,
+            onChanged: (_) => onToggle(),
           ),
           title: Text(item.name),
           trailing: item.done

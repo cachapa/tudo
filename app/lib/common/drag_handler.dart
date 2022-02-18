@@ -7,18 +7,13 @@ class DragHandle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      // onLongPress: () => 'tap'.log,
-      // onHorizontalDragStart: (_) => 'tap'.log,
-      // onVerticalDragStart: (_) => 'tap'.log,
-      child: Handle(
-        vibrate: true,
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Icon(
-            Icons.reorder,
-            color: context.theme.dividerColor,
-          ),
+    return Handle(
+      vibrate: true,
+      child: Padding(
+        padding: const EdgeInsets.all(4),
+        child: Icon(
+          Icons.drag_indicator,
+          color: context.theme.dividerColor,
         ),
       ),
     );
