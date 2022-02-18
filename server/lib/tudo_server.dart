@@ -112,6 +112,11 @@ class TudoServer {
             JOIN todos ON user_lists.list_id = todos.list_id
             JOIN crdt ON todos.id = crdt.id
             WHERE user_id = ?1 AND modified > ?2 AND hlc NOT LIKE '%' || ?3
+          UNION ALL
+          SELECT DISTINCT collection, id, field, value, hlc, modified FROM user_lists 
+            JOIN (SELECT list_id FROM user_lists WHERE user_id = ?1 AND is_deleted = 0) AS l ON l.list_id = user_lists.list_id
+            JOIN crdt ON (collection = 'users' AND id = user_id)
+            WHERE is_deleted = 0
           ''', [userId, lastSend ?? '', nodeId ?? '---']);
     if (changeset.isEmpty) return;
 
@@ -194,6 +199,9 @@ class TudoServer {
         UNION ALL
         SELECT collection, crdt.id, field, value, hlc, modified FROM todos
           JOIN crdt ON todos.id = crdt.id
+          WHERE list_id = ?1
+        SELECT DISTINCT collection, id, field, value, hlc, modified FROM user_lists 
+          JOIN crdt ON user_lists.user_id = crdt.id
           WHERE list_id = ?1
         ORDER BY value
       ''', [listId]);

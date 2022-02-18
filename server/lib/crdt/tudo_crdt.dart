@@ -15,7 +15,6 @@ class TudoCrdt extends SqfliteCrdt {
     'users': Schema(
       columns: {
         'name': CrdtType.text,
-        'created_at': CrdtType.datetime,
       },
     ),
     'user_lists': Schema(
