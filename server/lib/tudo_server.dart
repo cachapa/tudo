@@ -200,6 +200,7 @@ class TudoServer {
         SELECT collection, crdt.id, field, value, hlc, modified FROM todos
           JOIN crdt ON todos.id = crdt.id
           WHERE list_id = ?1
+        UNION ALL
         SELECT DISTINCT collection, id, field, value, hlc, modified FROM user_lists 
           JOIN crdt ON user_lists.user_id = crdt.id
           WHERE list_id = ?1
