@@ -72,12 +72,16 @@ class ListProvider {
 
   Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
       _crdt.query('''
-        SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count FROM user_lists
+        SELECT id, name, color, creator_id, lists.created_at, position, share_count, item_count, done_count FROM user_lists
         LEFT JOIN lists ON user_lists.user_id = ? AND user_lists.list_id = id
         LEFT JOIN (
-          SELECT list_id as count_list_id, count(*) as item_count, sum(done) as done_count
+          SELECT list_id as share_count_list_id, count(*) as share_count
+          FROM user_lists WHERE is_deleted = 0 GROUP BY list_id
+        ) ON share_count_list_id = id
+        LEFT JOIN (
+          SELECT list_id as item_count_list_id, count(*) as item_count, sum(done) as done_count
           FROM todos WHERE is_deleted = 0 GROUP BY list_id
-        ) ON count_list_id = id
+        ) ON item_count_list_id = id
         WHERE id IS NOT NULL AND user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
         ORDER BY position
       ''', [userId, if (listId != null) listId]);
@@ -176,7 +180,7 @@ class ToDoListWithItems extends ToDoList {
 
   ToDoListWithItems.fromList(ToDoList list, this.items)
       : super(list.id, list.name, list.color, list.creatorId, list.createdAt,
-            list.position, list.itemCount, list.doneCount);
+            list.position, list.shareCount, list.itemCount, list.doneCount);
 
   ToDoListWithItems.fromMap(Map<String, dynamic> map, this.items)
       : super.fromMap(map);
@@ -189,13 +193,16 @@ class ToDoList {
   final String? creatorId;
   final DateTime? createdAt;
   final int position;
+  final int shareCount;
   final int itemCount;
   final int doneCount;
+
+  bool get isShared => shareCount > 1;
 
   bool get isEmpty => itemCount == 0;
 
   const ToDoList(this.id, this.name, this.color, this.creatorId, this.createdAt,
-      this.position, this.itemCount, this.doneCount);
+      this.position, this.shareCount, this.itemCount, this.doneCount);
 
   ToDoList.fromMap(Map<String, dynamic> map)
       : this(
@@ -205,6 +212,7 @@ class ToDoList {
           map['creator_id'],
           (map['created_at'] as String?)?.asDateTime,
           map['position'],
+          map['share_count'],
           map['item_count'] ?? 0,
           map['done_count'] ?? 0,
         );
