@@ -4,17 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
-import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/offline_indicator.dart';
-import 'package:tudo_app/common/progress.dart';
 import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/lists/to_do_list_page.dart';
 import 'package:tudo_app/settings/settings_page.dart';
 import 'package:uni_links/uni_links.dart';
 
 import 'list_provider.dart';
+import 'to_do_list_page.dart';
+import 'to_do_list_tile.dart';
 
 final _controller = ScrollController();
 
@@ -69,9 +68,11 @@ class _ListManagerPageState extends State<ListManagerPage> {
                 sizeFraction: 0.7,
                 curve: Curves.easeInOut,
                 animation: itemAnimation,
-                child: _ListItem(
+                child: ToDoListTile(
                   key: _itemKeys[item.id] ??= GlobalKey(),
                   list: item,
+                  onTap: () => _openList(context, item),
+                  onLongPress: () => _editList(context, item),
                 ),
               ),
             ),
@@ -104,6 +105,29 @@ class _ListManagerPageState extends State<ListManagerPage> {
       await Future.delayed(const Duration(milliseconds: 400));
       _scrollToLastItem();
     }
+  }
+
+  void _openList(BuildContext context, ToDoList list) async {
+    final action = await context.push(() => ToDoListPage(list: list));
+    if (action != null && action == ListAction.delete) {
+      Future.delayed(
+        // Wait for pop animation to complete
+        const Duration(milliseconds: 310),
+        () => _deleteList(context, list),
+      );
+    }
+  }
+
+  void _editList(BuildContext context, ToDoList list) =>
+      editToDoList(context, list);
+
+  Future<void> _deleteList(BuildContext context, ToDoList list) async {
+    final listManager = context.read<ListProvider>();
+    await listManager.removeList(list.id);
+    context.showSnackBar(
+      context.t.listDeleted(list.name),
+      () => listManager.undoRemoveList(list.id),
+    );
   }
 
   void _scrollToLastItem() {
@@ -182,6 +206,7 @@ class Logo extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.tune_rounded),
+                tooltip: t.settings,
                 onPressed: () => context.push(() => const SettingsPage()),
               ),
             ],
@@ -202,58 +227,5 @@ class Logo extends StatelessWidget {
     'Read QR: $code'.log;
     final uri = Uri.parse(code);
     await context.read<ListProvider>().import(uri.pathSegments.last);
-  }
-}
-
-class _ListItem extends StatelessWidget {
-  final ToDoList list;
-
-  const _ListItem({Key? key, required this.list}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      leading: Hero(
-        tag: 'progress_${list.id}',
-        child: Progress(
-          color: list.color,
-          progress: list.doneCount,
-          total: list.itemCount,
-        ),
-      ),
-      title: Hero(
-        tag: 'name_${list.id}',
-        child: Text(
-          list.name,
-          style: context.theme.textTheme.headline6,
-        ),
-      ),
-      trailing: const DragHandle(),
-      onTap: () => _openList(context),
-      onLongPress: () => _editList(context),
-    );
-  }
-
-  void _openList(BuildContext context) async {
-    final action = await context.push(() => ToDoListPage(list: list));
-    if (action != null && action == ListAction.delete) {
-      Future.delayed(
-        // Wait for pop animation to complete
-        const Duration(milliseconds: 310),
-        () => _deleteList(context),
-      );
-    }
-  }
-
-  void _editList(BuildContext context) =>
-      editToDoList(context, list, () => _deleteList(context));
-
-  Future<void> _deleteList(BuildContext context) async {
-    final listManager = context.read<ListProvider>();
-    await listManager.removeList(list.id);
-    context.showSnackBar(
-      context.t.listDeleted(list.name),
-      () => listManager.undoRemoveList(list.id),
-    );
   }
 }

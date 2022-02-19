@@ -13,6 +13,7 @@ import 'package:tudo_app/util/build_info.dart';
 import 'package:tudo_app/util/store.dart';
 
 import 'common/value_builders.dart';
+import 'contacts/contact_provider.dart';
 import 'crdt/hive_adapters.dart';
 import 'crdt/tudo_crdt.dart';
 import 'lists/list_manager_page.dart';
@@ -46,6 +47,7 @@ void main() async {
         Provider.value(value: storeProvider),
         Provider(create: (c) => SettingsProvider(c.storeProvider)),
         Provider(create: (c) => AuthProvider(c.storeProvider)),
+        Provider(create: (c) => ContactProvider(c.authProvider.userId, crdt)),
         Provider(
             create: (c) =>
                 ListProvider(c.authProvider.userId, crdt, c.storeProvider)),

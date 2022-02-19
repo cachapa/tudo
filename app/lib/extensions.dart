@@ -9,6 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:tudo_app/util/store.dart';
 
 import 'auth/auth_provider.dart';
+import 'contacts/contact_provider.dart';
 import 'crdt/hlc.dart';
 import 'lists/list_provider.dart';
 import 'settings/settings_provider.dart';
@@ -121,6 +122,8 @@ extension ContextExtensions on BuildContext {
   SettingsProvider get settingsProvider => read<SettingsProvider>();
 
   AuthProvider get authProvider => read<AuthProvider>();
+
+  ContactProvider get contactProvider => read<ContactProvider>();
 
   ListProvider get listProvider => read<ListProvider>();
 

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:tudo_app/common/appbars.dart';
 import 'package:tudo_app/common/segmented_control.dart';
+import 'package:tudo_app/common/text_input_dialog.dart';
 import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/util/build_info.dart';
@@ -20,6 +21,15 @@ class SettingsPage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          ValueStreamBuilder<String>(
+            stream: context.contactProvider.name,
+            builder: (_, name) => ListTile(
+              leading: const Icon(Icons.badge_outlined),
+              title: Text(t.name),
+              subtitle: name.isEmpty ? null : Text(name),
+              onTap: () => _setName(context, name),
+            ),
+          ),
           ListTile(
             leading: const Icon(Icons.style_outlined),
             title: Text(t.theme),
@@ -104,6 +114,22 @@ class SettingsPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _setName(BuildContext context, String? currentName) async {
+    final name = await showDialog<String>(
+      context: context,
+      builder: (context) => TextInputDialog(
+        title: context.t.name,
+        value: currentName ?? '',
+        caption: context.t.nameCaption,
+        textCapitalization: TextCapitalization.words,
+        positiveLabel: context.t.update,
+      ),
+    );
+    if (name != null) {
+      context.contactProvider.setName(name);
+    }
   }
 }
 
