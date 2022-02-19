@@ -100,10 +100,14 @@ class ListProvider {
 
   /// Removes the list from the user's references
   /// Does not actually delete the list, since it could be used by others
-  Future<void> removeList(String listId) =>
+  Future<void> removeList(String listId) => removeUser(userId, listId);
+
+  Future<void> removeUser(String userId, String listId) =>
       _crdt.setDeleted('user_lists', [userId, listId]);
 
-  Future<void> undoRemoveList(String listId) =>
+  Future<void> undoRemoveList(String listId) => undoRemoveUser(userId, listId);
+
+  Future<void> undoRemoveUser(String userId, String listId) =>
       _crdt.setDeleted('user_lists', [userId, listId], false);
 
   Future<void> deleteItem(String id) => _crdt.setDeleted('todos', [id]);

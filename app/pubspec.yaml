@@ -1,6 +1,6 @@
 name: tudo_app
 description: A simple to-do app
-version: 1.0.0
+version: 0.0.0
 homepage: https://github.com/cachapa/tudo
 
 environment:

@@ -16,6 +16,7 @@ import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
 
 import 'list_provider.dart';
+import 'manage_participants_page.dart';
 
 const blurSigma = 14.0;
 
@@ -41,6 +42,22 @@ class ToDoListPage extends StatelessWidget {
       child: ValueStreamBuilder<ToDoListWithItems>(
         stream: context.listProvider.getList(list.id),
         initialData: ToDoListWithItems.fromList(list, []),
+        errorWidget: Material(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                t.listUnavailable,
+                style: context.theme.textTheme.headline6,
+              ),
+              const SizedBox(height: 16),
+              MaterialButton(
+                child: Text(t.close),
+                onPressed: () => context.pop(),
+              ),
+            ],
+          ),
+        ),
         builder: (_, list) => Theme(
           data: context.theme.copyWith(
             colorScheme:
@@ -71,12 +88,18 @@ class ToDoListPage extends StatelessWidget {
                   entries: [
                     PopupEntry(
                       Icons.edit,
-                      '${t.editList}…',
+                      t.editList,
                       () => editToDoList(context, list),
                     ),
+                    if (list.isShared)
+                      PopupEntry(
+                        Icons.supervised_user_circle,
+                        t.participants,
+                        () => editParticipants(context),
+                      ),
                     PopupEntry(
-                      Icons.delete,
-                      t.delete,
+                      Icons.exit_to_app,
+                      t.leaveList,
                       () => context.pop(ListAction.delete),
                       context.theme.errorColor,
                     ),
@@ -104,6 +127,9 @@ class ToDoListPage extends StatelessWidget {
       ),
     );
   }
+
+  void editParticipants(BuildContext context) =>
+      context.push(() => ManageParticipantsPage(list: list));
 
   Future<void> _addItem(
       BuildContext context, String listID, String name) async {

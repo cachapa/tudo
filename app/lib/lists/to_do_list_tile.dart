@@ -60,23 +60,13 @@ class _ListParticipants extends StatelessWidget {
         Expanded(
           child: ValueStreamBuilder<List<User>>(
             stream: context.contactProvider.getListParticipants(list.id),
-            builder: (_, users) {
-              final anonCount = list.shareCount - users.length - 1;
-              final names = [];
-
-              if (users.isEmpty) {
-                names.add('$anonCount');
-              } else {
-                names.addAll(users.map((e) => e.name));
-                if (anonCount > 0) names.add('+$anonCount');
-              }
-
-              return Text(
-                names.join(', '),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              );
-            },
+            builder: (_, users) => Text(
+              users
+                  .map((e) => e.name.isEmpty ? context.t.anonymous : e.name)
+                  .join(', '),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
       ],

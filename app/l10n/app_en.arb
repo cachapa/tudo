@@ -12,10 +12,24 @@
   },
   "createList": "Create list",
   "editList": "Edit list",
+  "participants": "Participants",
+  "you": "You",
   "share": "Share",
-  "delete": "Delete",
+  "leaveList": "Leave list",
+  "listUnavailable": "List unavailable",
+  "anonymous": "Anonymous",
+  "removeConfirmation": "Remove user from list",
+  "remove": "Remove",
+  "userRemoved": "Removed {name}",
+  "@userRemoved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "name": "Name",
-  "nameCaption": "Visible to your friends on shared lists",
+  "nameCaption": "Visible on shared lists",
   "create": "Create",
   "update": "Update",
   "cancel": "Cancel",

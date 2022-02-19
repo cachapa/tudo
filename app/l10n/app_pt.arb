@@ -28,5 +28,14 @@
   "yesterday": "Ontem",
   "share":  "Partilhar",
   "delete": "Eliminar",
-  "create": "Criar"
+  "create": "Criar",
+  "participants": "Membros",
+  "you": "Tu",
+  "leaveList": "Sair da lista",
+  "listUnavailable": "Lista indisponível",
+  "anonymous": "Anónimo",
+  "removeConfirmation": "Remover utilizador da lista",
+  "remove": "Remover",
+  "userRemoved": "{name} foi removido/a",
+  "nameCaption": "Visível nas listas partilhadas"
 }

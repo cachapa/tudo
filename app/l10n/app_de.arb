@@ -28,5 +28,14 @@
   "yesterday": "Gestern",
   "share": "Teilen",
   "delete": "Löschen",
-  "create": "Erstellen"
+  "create": "Erstellen",
+  "participants" : "Teilnehmer",
+  "you": "Du",
+  "leaveList": "Liste verlassen",
+  "listUnavailable": "Liste nicht verfügbar",
+  "anonymous": "Anonym",
+  "removeConfirmation": "Benutzer entfernen",
+  "remove": "Entfernen",
+  "userRemoved": "{name} entfernt",
+  "nameCaption": "In geteilten Listen sichtbar"
 }
