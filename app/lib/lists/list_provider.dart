@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tudo_app/config.dart';
 import 'package:tudo_app/crdt/hlc.dart';
 import 'package:tudo_app/crdt/sqflite_crdt.dart';
 import 'package:tudo_app/crdt/tudo_crdt.dart';
@@ -216,7 +217,7 @@ class ToDoList {
           map['creator_id'],
           (map['created_at'] as String?)?.asDateTime,
           map['position'],
-          map['share_count'],
+          ignoreShares.contains(map['id']) ? 1 : map['share_count'],
           map['item_count'] ?? 0,
           map['done_count'] ?? 0,
         );
