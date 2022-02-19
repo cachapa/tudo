@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:tudo_app/common/check.dart';
 import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/empty_page.dart';
@@ -486,16 +487,9 @@ class _ListTile extends StatelessWidget {
           return false;
         },
         child: ListTile(
-          leading: Checkbox(
-            value: item.done,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-            side: BorderSide(
-              width: 2,
-              color: context.theme.primaryColor,
-            ),
-            checkColor: context.theme.canvasColor,
-            onChanged: (_) => onToggle(),
+          leading: Check(
+            checked: item.done,
+            onChanged: onToggle,
           ),
           title: Text(item.name),
           trailing: item.done
