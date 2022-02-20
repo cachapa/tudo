@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:tudo_app/common/appbars.dart';
+import 'package:tudo_app/common/badge.dart';
 import 'package:tudo_app/common/segmented_control.dart';
 import 'package:tudo_app/common/text_input_dialog.dart';
 import 'package:tudo_app/common/value_builders.dart';
@@ -24,7 +25,13 @@ class SettingsPage extends StatelessWidget {
           ValueStreamBuilder<String>(
             stream: context.contactProvider.name,
             builder: (_, name) => ListTile(
-              leading: const Icon(Icons.badge_outlined),
+              leading: ValueFutureBuilder<bool>(
+                  future: context.contactProvider.isNameSet,
+                  builder: (_, isNameSet) {
+                    return Badge(
+                        showBadge: !isNameSet,
+                        child: const Icon(Icons.badge_outlined));
+                  }),
               title: Text(t.name),
               subtitle: name.isEmpty ? null : Text(name),
               onTap: () => _setName(context, name),

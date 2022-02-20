@@ -4,6 +4,9 @@ class ContactProvider {
   final String userId;
   final TudoCrdt _crdt;
 
+  Future<bool> get isNameSet async =>
+      (await _crdt.getField('users', userId, 'name')) != null;
+
   Stream<String> get name =>
       _crdt.query('SELECT name FROM users WHERE id = ?', [userId]).map(
           (list) => list.isEmpty ? '' : list.first['name']);

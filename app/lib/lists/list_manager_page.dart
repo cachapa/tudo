@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:tudo_app/common/badge.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/offline_indicator.dart';
 import 'package:tudo_app/common/value_builders.dart';
@@ -205,7 +206,13 @@ class Logo extends StatelessWidget {
                 onPressed: () => _launchQrScanner(context),
               ),
               IconButton(
-                icon: const Icon(Icons.tune_rounded),
+                icon: ValueFutureBuilder<bool>(
+                  future: context.contactProvider.isNameSet,
+                  builder: (_, isNameSet) => Badge(
+                    showBadge: !isNameSet,
+                    child: const Icon(Icons.tune_rounded),
+                  ),
+                ),
                 tooltip: t.settings,
                 onPressed: () => context.push(() => const SettingsPage()),
               ),
