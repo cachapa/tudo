@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:tudo_app/crdt/tudo_crdt.dart';
+import 'package:tudo_app/extensions.dart';
 
 class ContactProvider {
   final String userId;
@@ -7,9 +9,9 @@ class ContactProvider {
   Future<bool> get isNameSet async =>
       (await _crdt.getField('users', userId, 'name')) != null;
 
-  Stream<String> get name =>
-      _crdt.query('SELECT name FROM users WHERE id = ?', [userId]).map(
-          (list) => list.isEmpty ? '' : list.first['name']);
+  Stream<User> get currentUser =>
+      _crdt.query('SELECT * FROM users WHERE id = ?', [userId]).map(
+          (l) => l.map((m) => User.fromMap(userId, m)).first);
 
   ContactProvider(this.userId, this._crdt);
 
@@ -24,7 +26,7 @@ class ContactProvider {
             AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
         ''',
         [listId],
-      ).map((l) => l.map((e) => User.fromMap(userId, e)).toList());
+      ).map((l) => l.map((m) => User.fromMap(userId, m)).toList());
 }
 
 class User {
@@ -36,6 +38,9 @@ class User {
 
   User.fromMap(String userId, Map<String, dynamic> map)
       : this(userId, map['user_id'], map['name'] ?? '');
+
+  String nameOr(BuildContext context) =>
+      name.isEmpty ? context.t.anonymous : name;
 
   @override
   String toString() => 'User: $name';

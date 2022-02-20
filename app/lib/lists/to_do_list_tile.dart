@@ -61,9 +61,7 @@ class _ListParticipants extends StatelessWidget {
           child: ValueStreamBuilder<List<User>>(
             stream: context.contactProvider.getListParticipants(list.id),
             builder: (_, users) => Text(
-              users
-                  .map((e) => e.name.isEmpty ? context.t.anonymous : e.name)
-                  .join(', '),
+              users.map((e) => e.nameOr(context)).join(' • '),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

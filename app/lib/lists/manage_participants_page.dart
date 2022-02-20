@@ -30,7 +30,7 @@ class ManageParticipantsPage extends StatelessWidget {
             curve: Curves.easeInOut,
             animation: itemAnimation,
             child: ListTile(
-              title: Text(user.name.isEmpty ? t.anonymous : user.name),
+              title: Text(user.nameOr(context)),
               subtitle: user.isCurrentUser ? Text(t.you) : null,
               trailing: !isOwner || user.isCurrentUser
                   ? null
@@ -52,7 +52,7 @@ class ManageParticipantsPage extends StatelessWidget {
       context: context,
       builder: (_) => AlertDialog(
         title: Text(t.removeConfirmation),
-        content: Text(user.name.isEmpty ? t.anonymous : user.name),
+        content: Text(user.nameOr(context)),
         actions: [
           TextButton(
             child: Text(t.cancel.toUpperCase()),

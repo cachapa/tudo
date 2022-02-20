@@ -6,6 +6,7 @@ import 'package:tudo_app/common/badge.dart';
 import 'package:tudo_app/common/segmented_control.dart';
 import 'package:tudo_app/common/text_input_dialog.dart';
 import 'package:tudo_app/common/value_builders.dart';
+import 'package:tudo_app/contacts/contact_provider.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/util/build_info.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -22,19 +23,19 @@ class SettingsPage extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          ValueStreamBuilder<String>(
-            stream: context.contactProvider.name,
-            builder: (_, name) => ListTile(
+          ValueStreamBuilder<User>(
+            stream: context.contactProvider.currentUser,
+            builder: (_, user) => ListTile(
               leading: ValueFutureBuilder<bool>(
-                  future: context.contactProvider.isNameSet,
-                  builder: (_, isNameSet) {
-                    return Badge(
-                        showBadge: !isNameSet,
-                        child: const Icon(Icons.badge_outlined));
-                  }),
+                future: context.contactProvider.isNameSet,
+                builder: (_, isNameSet) => Badge(
+                  showBadge: !isNameSet,
+                  child: const Icon(Icons.badge_outlined),
+                ),
+              ),
               title: Text(t.name),
-              subtitle: name.isEmpty ? null : Text(name),
-              onTap: () => _setName(context, name),
+              subtitle: Text(user.nameOr(context)),
+              onTap: () => _setName(context, user.name),
             ),
           ),
           ListTile(

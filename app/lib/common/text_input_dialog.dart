@@ -35,6 +35,7 @@ class TextInputDialog extends StatelessWidget {
             maxLines: 1,
             keyboardType: keyboardType,
             textCapitalization: textCapitalization,
+            decoration: InputDecoration(hintText: context.t.anonymous),
             onSubmitted: (value) => _set(context, value),
           ),
           const SizedBox(height: 16),
