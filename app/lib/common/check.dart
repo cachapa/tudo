@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tudo_app/common/shape_borders.dart';
 import 'package:tudo_app/extensions.dart';
 
-const _size = 22.0;
+const _size = 18.0;
 
 class Check extends StatelessWidget {
   final bool checked;
@@ -29,7 +29,7 @@ class Check extends StatelessWidget {
               ? Icon(
                   Icons.check,
                   color: context.theme.canvasColor,
-                  size: 20,
+                  size: 14,
                 )
               : null,
         ),
