@@ -85,16 +85,16 @@ class _EditListFormState extends State<_EditListForm> {
                 controller: _colorController,
                 onColorSelected: (_) => setState(() {}),
               ),
-              const SizedBox(height: 24),
-              MaterialButton(
-                height: 48,
-                color: context.theme.primaryColor,
-                disabledColor: context.theme.disabledColor,
-                textColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8)),
+              const SizedBox(height: 16),
+              TextButton(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    (editMode ? t.update : t.create).toUpperCase(),
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ),
                 onPressed: name.isEmpty ? null : () => _create(context),
-                child: Text((editMode ? t.update : t.create).toUpperCase()),
               ),
             ],
           ),
