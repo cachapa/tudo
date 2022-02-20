@@ -9,7 +9,7 @@ class Badge extends StatelessWidget {
   const Badge({
     Key? key,
     required this.child,
-    this.size = 10,
+    this.size = 6,
     this.showBadge = true,
   }) : super(key: key);
 
@@ -22,24 +22,17 @@ class Badge extends StatelessWidget {
         child,
         if (showBadge)
           Positioned(
-            top: -4,
-            right: -4,
+            top: -3,
+            right: -3,
             child: Container(
               width: size,
               height: size,
-              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: context.theme.canvasColor,
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: context.theme.errorColor,
-                ),
+                color: context.theme.errorColor,
               ),
             ),
-          )
+          ),
       ],
     );
   }
