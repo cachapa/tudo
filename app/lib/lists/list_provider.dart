@@ -119,8 +119,9 @@ class ListProvider {
   Future<void> setDone(String itemId, bool isDone) => _crdt.setFields('todos', [
         itemId
       ], {
-        'done_at': isDone ? DateTime.now() : null,
         'done': isDone,
+        'done_at': isDone ? DateTime.now() : null,
+        'done_by': isDone ? userId : null,
       });
 
   Future<void> setItemName(String itemId, String name) =>
@@ -231,11 +232,12 @@ class ToDo {
   final String name;
   final bool done;
   final DateTime? doneAt;
+  final String? doneBy;
   final int position;
   final String? creatorId;
   final DateTime? createdAt;
 
-  ToDo(this.id, this.name, this.done, this.doneAt, this.position,
+  ToDo(this.id, this.name, this.done, this.doneAt, this.doneBy, this.position,
       this.creatorId, this.createdAt);
 
   factory ToDo.fromMap(Map<String, dynamic> map) => ToDo(
@@ -243,6 +245,7 @@ class ToDo {
         map['name'],
         map['done'] == 1,
         (map['done_at'] as String?)?.asDateTime.toLocal(),
+        map['done_by'],
         map['position'],
         map['creator_id'],
         (map['created_at'] as String?)?.asDateTime.toLocal(),

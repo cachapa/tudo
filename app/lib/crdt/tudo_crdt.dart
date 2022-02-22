@@ -5,7 +5,7 @@ import 'sqflite_crdt.dart';
 
 class TudoCrdt extends SqfliteCrdt {
   @override
-  final version = 2;
+  final version = 3;
   @override
   final tableSchemas = <String, Schema>{
     'users': Schema(
@@ -34,6 +34,7 @@ class TudoCrdt extends SqfliteCrdt {
         'name': CrdtType.text,
         'done': CrdtType.bool,
         'done_at': CrdtType.datetime,
+        'done_by': CrdtType.text,
         'position': CrdtType.integer,
         'creator_id': CrdtType.text,
         'created_at': CrdtType.datetime,
@@ -50,8 +51,11 @@ class TudoCrdt extends SqfliteCrdt {
 
   @override
   Future<void> onUpgrade(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion == 1) {
+    if (oldVersion < 2) {
       await db.execute("ALTER TABLE todos ADD done_at TEXT");
+    }
+    if (oldVersion < 3) {
+      await db.execute("ALTER TABLE todos ADD done_by TEXT");
     }
   }
 

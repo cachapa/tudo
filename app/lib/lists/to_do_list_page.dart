@@ -333,7 +333,7 @@ class _ToDoListViewState extends State<ToDoListView> {
         ImplicitlyAnimatedList<ToDo>(
           items: [
             if (checkedItems.isNotEmpty)
-              ToDo('header', '', false, null, 0, null, null),
+              ToDo('header', '', false, null, '', 0, null, null),
             ...checkedItems,
           ],
           shrinkWrap: true,
