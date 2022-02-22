@@ -93,7 +93,7 @@ class ListProvider {
           .queryAsync('''
             SELECT * FROM todos
             WHERE list_id = ? AND is_deleted = 0
-            ORDER BY position
+            ORDER BY done_at, position
           ''', [listId])
           .then((l) => l.map(ToDo.fromMap).toList())
           // Join list data and items together
