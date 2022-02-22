@@ -307,6 +307,8 @@ class _ToDoListViewState extends State<ToDoListView> {
           items: uncheckedItems,
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
+          insertDuration: const Duration(milliseconds: 300),
+          removeDuration: const Duration(milliseconds: 300),
           reorderDuration: const Duration(milliseconds: 200),
           areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
           onReorderFinished: (_, from, to, __) {
