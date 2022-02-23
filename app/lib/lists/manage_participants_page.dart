@@ -38,7 +38,7 @@ class ManageParticipantsPage extends StatelessWidget {
               curve: Curves.easeInOut,
               animation: itemAnimation,
               child: ListTile(
-                leading: Avatar(),
+                leading: const Avatar(),
                 title: Text(user.nameOr(context)),
                 subtitle: user.isCurrentUser ? Text(t.you) : null,
                 trailing: user.isCurrentUser
