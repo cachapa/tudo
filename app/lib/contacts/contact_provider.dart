@@ -30,16 +30,6 @@ class ContactProvider {
 
   Stream<User> getUser(String id) =>
       _contacts.map((m) => m[id] ?? User(userId, id, null));
-
-  Stream<List<User>> getListParticipants(String listId) => _crdt.query(
-        '''
-          SELECT user_id, name FROM user_lists
-            LEFT JOIN users ON user_id = id
-          WHERE list_id = ?1
-            AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
-        ''',
-        [listId],
-      ).map((l) => l.map((m) => User.fromMap(userId, m)).toList());
 }
 
 class User {

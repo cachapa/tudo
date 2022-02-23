@@ -130,7 +130,7 @@ class ToDoListPage extends StatelessWidget {
   }
 
   void editParticipants(BuildContext context) =>
-      context.push(() => ManageParticipantsPage(list: list));
+      context.push(() => ManageParticipantsPage(listId: list.id));
 
   Future<void> _addItem(
       BuildContext context, String listID, String name) async {

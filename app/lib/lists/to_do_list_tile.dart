@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/progress.dart';
-import 'package:tudo_app/common/value_builders.dart';
-import 'package:tudo_app/contacts/contact_provider.dart';
 import 'package:tudo_app/extensions.dart';
 
 import 'list_provider.dart';
@@ -57,15 +55,13 @@ class _ListParticipants extends StatelessWidget {
           color: context.theme.textTheme.caption!.color,
         ),
         const SizedBox(width: 4),
-        Expanded(
-          child: ValueStreamBuilder<List<User>>(
-            stream: context.contactProvider.getListParticipants(list.id),
-            builder: (_, users) => Text(
-              users.map((e) => e.nameOr(context)).join(' • '),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
+        Text(
+          list.members
+              .where((e) => !e.isCurrentUser)
+              .map((e) => e.nameOr(context))
+              .join(' • '),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ],
     );
