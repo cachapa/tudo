@@ -23,55 +23,59 @@ class _ShareListForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            list.name,
-            style: Theme.of(context)
-                .textTheme
-                .headline6!
-                .copyWith(color: list.color),
-          ),
-          const SizedBox(height: 20),
-          QrImage(
-            data: shareUrl,
-            version: QrVersions.auto,
-            size: 250.0,
-            backgroundColor: ThemeData.light().canvasColor,
-          ),
-          const SizedBox(height: 20),
-          ButtonBar(
-            mainAxisSize: MainAxisSize.max,
-            alignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextButton.icon(
-                style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all(list.color)),
-                icon: const Icon(Icons.copy),
-                label: Text('Copy Link'.toUpperCase()),
-                onPressed: () {
-                  FlutterClipboard.copy(shareUrl);
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(width: 16),
-              TextButton.icon(
-                style: ButtonStyle(
-                    foregroundColor: MaterialStateProperty.all(list.color)),
-                icon: const Icon(Icons.share),
-                label: Text('Share'.toUpperCase()),
-                onPressed: () {
-                  Share.share('Tap to open "${list.name}" in your device:\n'
-                      '$shareUrl');
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-        ],
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding:
+            const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              list.name,
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: list.color),
+            ),
+            const SizedBox(height: 20),
+            QrImage(
+              data: shareUrl,
+              version: QrVersions.auto,
+              size: 250.0,
+              backgroundColor: ThemeData.light().canvasColor,
+            ),
+            const SizedBox(height: 20),
+            ButtonBar(
+              mainAxisSize: MainAxisSize.max,
+              alignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton.icon(
+                  style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all(list.color)),
+                  icon: const Icon(Icons.copy),
+                  label: Text('Copy Link'.toUpperCase()),
+                  onPressed: () {
+                    FlutterClipboard.copy(shareUrl);
+                    Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(width: 16),
+                TextButton.icon(
+                  style: ButtonStyle(
+                      foregroundColor: MaterialStateProperty.all(list.color)),
+                  icon: const Icon(Icons.share),
+                  label: Text('Share'.toUpperCase()),
+                  onPressed: () {
+                    Share.share('Tap to open "${list.name}" in your device:\n'
+                        '$shareUrl');
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
