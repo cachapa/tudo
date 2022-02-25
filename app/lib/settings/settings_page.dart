@@ -131,6 +131,8 @@ class SettingsPage extends StatelessWidget {
         title: context.t.name,
         value: currentName ?? '',
         caption: context.t.nameCaption,
+        hint: context.t.anonymous,
+        showClearButton: true,
         textCapitalization: TextCapitalization.words,
         positiveLabel: context.t.update,
       ),

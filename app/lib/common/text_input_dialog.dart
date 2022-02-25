@@ -4,6 +4,8 @@ import 'package:tudo_app/extensions.dart';
 class TextInputDialog extends StatelessWidget {
   final String? title;
   final String? caption;
+  final String? hint;
+  final bool showClearButton;
   final String positiveLabel;
   final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
@@ -14,6 +16,8 @@ class TextInputDialog extends StatelessWidget {
     Key? key,
     this.title,
     this.caption,
+    this.hint,
+    this.showClearButton = false,
     this.positiveLabel = 'Set',
     required String value,
     this.keyboardType,
@@ -35,8 +39,16 @@ class TextInputDialog extends StatelessWidget {
             maxLines: 1,
             keyboardType: keyboardType,
             textCapitalization: textCapitalization,
-            decoration: InputDecoration(hintText: context.t.anonymous),
-            onSubmitted: (value) => _set(context, value),
+            decoration: InputDecoration(
+              hintText: hint,
+              suffixIcon: showClearButton
+                  ? IconButton(
+                      icon: const Icon(Icons.clear),
+                      onPressed: () => _controller.clear(),
+                    )
+                  : null,
+            ),
+            onSubmitted: (value) => context.pop(_controller.text),
           ),
           const SizedBox(height: 16),
           if (caption != null)
@@ -48,17 +60,15 @@ class TextInputDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: Text('Cancel'.toUpperCase()),
+          onPressed: () => context.pop(),
+          child: Text(context.t.cancel.toUpperCase()),
         ),
         ElevatedButton(
           style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
-          onPressed: () => _set(context, _controller.text),
+          onPressed: () => context.pop(_controller.text),
           child: Text(positiveLabel.toUpperCase()),
         ),
       ],
     );
   }
-
-  void _set(BuildContext context, String value) => context.pop(value);
 }
