@@ -26,8 +26,8 @@ class SettingsPage extends StatelessWidget {
           ValueStreamBuilder<User>(
             stream: context.contactProvider.currentUser,
             builder: (_, user) => ListTile(
-              leading: ValueFutureBuilder<bool>(
-                future: context.contactProvider.isNameSet,
+              leading: ValueStreamBuilder<bool>(
+                stream: context.contactProvider.isNameSet,
                 builder: (_, isNameSet) => Badge(
                   showBadge: !isNameSet,
                   child: const Icon(Icons.badge_outlined),

@@ -206,8 +206,8 @@ class Logo extends StatelessWidget {
                 onPressed: () => _launchQrScanner(context),
               ),
               IconButton(
-                icon: ValueFutureBuilder<bool>(
-                  future: context.contactProvider.isNameSet,
+                icon: ValueStreamBuilder<bool>(
+                  stream: context.contactProvider.isNameSet,
                   builder: (_, isNameSet) => Badge(
                     showBadge: !isNameSet,
                     child: const Icon(Icons.tune_rounded),

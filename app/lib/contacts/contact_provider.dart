@@ -9,8 +9,8 @@ class ContactProvider {
 
   final _contacts = BehaviorSubject<Map<String, User>>();
 
-  Future<bool> get isNameSet async =>
-      (await _crdt.getField('users', userId, 'name')) != null;
+  Stream<bool> get isNameSet => currentUser.asyncMap(
+      (_) async => (await _crdt.getField('users', userId, 'name')) != null);
 
   Stream<User> get currentUser => getUser(userId);
 
