@@ -48,7 +48,7 @@ extension DateTimeX on DateTime {
           return DateFormat.EEEE(languageCode).format(this);
         }
       }
-      return DateFormat.MMMM(languageCode).format(this);
+      return DateFormat.MMMd(languageCode).format(this);
     }
     return DateFormat.y(languageCode).format(this);
   }
