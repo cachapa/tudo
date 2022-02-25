@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:tudo_app/extensions.dart';
 
 class Avatar extends StatelessWidget {
-  const Avatar({Key? key}) : super(key: key);
+  final Color? color;
+
+  const Avatar({Key? key, this.color}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +13,7 @@ class Avatar extends StatelessWidget {
         Icons.person,
         color: context.theme.canvasColor,
       ),
-      backgroundColor: context.theme.primaryColor,
+      backgroundColor: color ?? context.theme.primaryColor,
     );
   }
 }

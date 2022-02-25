@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tudo_app/common/drag_handler.dart';
+import 'package:tudo_app/common/icon_label.dart';
 import 'package:tudo_app/common/progress.dart';
 import 'package:tudo_app/extensions.dart';
 
@@ -32,38 +33,18 @@ class ToDoListTile extends StatelessWidget {
           style: context.theme.textTheme.headline6,
         ),
       ),
-      subtitle: list.isShared ? _ListParticipants(list) : null,
+      subtitle: list.isShared
+          ? IconLabel(
+              Icons.supervised_user_circle,
+              list.members
+                  .where((e) => !e.isCurrentUser)
+                  .map((e) => e.nameOr(context))
+                  .join(' • '),
+            )
+          : null,
       trailing: const DragHandle(),
       onTap: onTap,
       onLongPress: onLongPress,
-    );
-  }
-}
-
-class _ListParticipants extends StatelessWidget {
-  final ToDoList list;
-
-  const _ListParticipants(this.list, {Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(
-          Icons.supervised_user_circle,
-          size: 14,
-          color: context.theme.textTheme.caption!.color,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          list.members
-              .where((e) => !e.isCurrentUser)
-              .map((e) => e.nameOr(context))
-              .join(' • '),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-      ],
     );
   }
 }

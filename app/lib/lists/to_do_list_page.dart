@@ -17,7 +17,7 @@ import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
 
 import 'list_provider.dart';
-import 'manage_participants_page.dart';
+import 'manage_participants.dart';
 
 const blurSigma = 14.0;
 
@@ -130,7 +130,7 @@ class ToDoListPage extends StatelessWidget {
   }
 
   void editParticipants(BuildContext context) =>
-      context.push(() => ManageParticipantsPage(listId: list.id));
+      manageParticipants(context, list.id);
 
   Future<void> _addItem(
       BuildContext context, String listID, String name) async {

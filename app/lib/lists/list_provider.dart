@@ -174,15 +174,15 @@ class ListProvider {
     await _crdt.commit(batch);
   }
 
-  Future<List<User>> _getMembers(String listId) => _crdt.queryAsync(
+  Future<List<Member>> _getMembers(String listId) => _crdt.queryAsync(
         '''
-          SELECT user_id, name FROM user_lists
+          SELECT user_id, name, user_lists.created_at AS joined_at FROM user_lists
             LEFT JOIN users ON user_id = id
           WHERE list_id = ?1
             AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
         ''',
         [listId],
-      ).then((l) => l.map((m) => User.fromMap(userId, m)).toList());
+      ).then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
 
   Future<List<ToDo>> _getToDos(String listId) => _crdt.queryAsync('''
     SELECT * FROM todos
@@ -199,7 +199,7 @@ class ToDoListWithItems extends ToDoList {
             list.position, list.itemCount, list.doneCount, list.members);
 
   ToDoListWithItems.fromMap(
-      Map<String, dynamic> map, List<User> members, this.items)
+      Map<String, dynamic> map, List<Member> members, this.items)
       : super.fromMap(map, members);
 }
 
@@ -212,7 +212,7 @@ class ToDoList {
   final int position;
   final int itemCount;
   final int doneCount;
-  final List<User> members;
+  final List<Member> members;
 
   int get shareCount => members.length;
 
@@ -223,7 +223,7 @@ class ToDoList {
   const ToDoList(this.id, this.name, this.color, this.creatorId, this.createdAt,
       this.position, this.itemCount, this.doneCount, this.members);
 
-  ToDoList.fromMap(Map<String, dynamic> map, List<User> members)
+  ToDoList.fromMap(Map<String, dynamic> map, List<Member> members)
       : this(
           map['id'],
           map['name'],
@@ -276,4 +276,12 @@ class ToDo {
 
   @override
   String toString() => '$name ${done ? '🗹' : '☐'}';
+}
+
+class Member extends User {
+  final DateTime? joinedAt;
+
+  Member.fromMap(String userId, Map<String, dynamic> map)
+      : joinedAt = (map['joined_at'] as String?)?.asDateTime.toLocal(),
+        super.fromMap(userId, map);
 }
