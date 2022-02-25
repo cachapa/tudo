@@ -7,7 +7,7 @@ import 'color_selector.dart';
 Future<bool?> editToDoList(BuildContext context, [ToDoList? list]) {
   return showModalBottomSheet<bool>(
     shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
     isScrollControlled: true,
     context: context,
     builder: (context) => _EditListForm(
@@ -53,7 +53,7 @@ class _EditListFormState extends State<_EditListForm> {
           left: 24,
           right: 24,
           top: 24,
-          bottom: context.padding.bottom + keyboardInset + 24),
+          bottom: context.padding.bottom + keyboardInset + 8),
       child: Theme(
         data: context.theme.copyWith(
           colorScheme: context.theme.colorScheme.copyWith(primary: color),
@@ -69,18 +69,18 @@ class _EditListFormState extends State<_EditListForm> {
                 style: context.theme.textTheme.headline6,
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 20),
               TextField(
                 controller: _textController,
                 textCapitalization: TextCapitalization.sentences,
                 autofocus: !editMode,
                 decoration: InputDecoration(
-                  labelText: t.name,
-                  labelStyle: TextStyle(color: context.theme.primaryColor),
+                  hintText: t.name,
                 ),
                 onChanged: (_) => setState(() {}),
                 onSubmitted: (_) => _create(context),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               ColorSelector(
                 controller: _colorController,
                 onColorSelected: (_) => setState(() {}),

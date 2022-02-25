@@ -92,12 +92,30 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
           primarySwatch: Colors.blue,
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: context.theme.dividerColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
         ),
         darkTheme: ThemeData(
           primarySwatch: Colors.blue,
           primaryColor: Colors.blue,
           canvasColor: Colors.grey[900],
           brightness: Brightness.dark,
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: context.theme.dividerColor,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
         ),
         themeMode: theme,
         home: const ListManagerPage(),
