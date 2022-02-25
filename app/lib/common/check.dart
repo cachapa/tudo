@@ -14,7 +14,7 @@ class Check extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 8, right: 8, top: 4),
+      padding: const EdgeInsets.only(left: 8, right: 8, top: 2),
       child: SizedBox(
         width: _size,
         height: _size,
