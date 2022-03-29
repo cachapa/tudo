@@ -1,4 +1,4 @@
-![tudo](tudo.svg)
+![tudo](../tudo.svg)
 
 tudo is an experiment on simple, private, synchronized to-do lists.
 

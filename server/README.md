@@ -1,4 +1,4 @@
-![tudo](tudo.svg)
+![tudo](../tudo.svg)
 
 an experiment in simple connected to-do lists.
 
