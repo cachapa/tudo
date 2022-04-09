@@ -66,7 +66,7 @@ class _AnimatedCounterState extends State<AnimatedCounter> {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 200),
       transitionBuilder: (child, animation) {
-        final d = (child.key as ValueKey<int>).value == widget.value ? -1 : 1;
+        final d = (child.key as ValueKey<int>).value == widget.value ? 1 : -1;
         final offsetAnimation = Tween<Offset>(
                 begin: Offset(0.0, direction * d * 0.5), end: Offset.zero)
             .animate(animation);
