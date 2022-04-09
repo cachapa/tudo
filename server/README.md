@@ -1,4 +1,4 @@
-![tudo](../tudo.svg)
+<img src="../tudo.svg" width="240">
 
 an experiment in simple connected to-do lists.
 
@@ -14,7 +14,7 @@ $ dart bin/main.dart --port 8080
 Serving at http://localhost:8080
 ```
 
-However, you might prefer to pre-compile the program into native code, making it much more efficient:
+However, you might prefer to precompile the program into native code, making it much more efficient:
 
 ``` shell
 $ pub get
@@ -35,3 +35,4 @@ While this project can be hosted from any internet-accessible device, keep in mi
 ## How to contribute
 
 Please file feature requests and bugs at the [issue tracker](https://github.com/cachapa/tudo/issues).
+
