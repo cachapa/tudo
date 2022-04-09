@@ -2,10 +2,7 @@
 
 tudo is an experiment on simple, private, synchronized to-do lists.
 
-<img src="../screenshots/a.jpg" width="140">
-<img src="../screenshots/b.jpg" width="140">
-<img src="../screenshots/c.jpg" width="140">
-<img src="../screenshots/d.jpg" width="140">
+<img src="../screenshots/a.jpg" width="140"> <img src="../screenshots/b.jpg" width="140"> <img src="../screenshots/c.jpg" width="140"> <img src="../screenshots/d.jpg" width="140">
 
 ## Try it out
 
