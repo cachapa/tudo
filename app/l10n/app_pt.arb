@@ -37,5 +37,7 @@
   "removeConfirmation": "Remover utilizador da lista",
   "remove": "Remover",
   "userRemoved": "{name} foi removido/a",
-  "nameCaption": "Visível nas listas partilhadas"
+  "nameCaption": "Visível nas listas partilhadas",
+  "copyLink": "Copiar ligação",
+  "listShareMessage": "Abre a a lista \"{listName}\" no teu aparelho\n:{shareUrl}"
 }

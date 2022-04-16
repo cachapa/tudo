@@ -2,6 +2,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/lists/list_provider.dart';
 
 void shareToDoList(BuildContext context, ToDoList list) {
@@ -23,6 +24,8 @@ class _ShareListForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
+
     return SafeArea(
       top: false,
       child: Padding(
@@ -54,7 +57,7 @@ class _ShareListForm extends StatelessWidget {
                   style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all(list.color)),
                   icon: const Icon(Icons.copy),
-                  label: Text('Copy Link'.toUpperCase()),
+                  label: Text(t.copyLink.toUpperCase()),
                   onPressed: () {
                     FlutterClipboard.copy(shareUrl);
                     Navigator.pop(context);
@@ -64,11 +67,10 @@ class _ShareListForm extends StatelessWidget {
                 TextButton.icon(
                   style: ButtonStyle(
                       foregroundColor: MaterialStateProperty.all(list.color)),
-                  icon: const Icon(Icons.share),
-                  label: Text('Share'.toUpperCase()),
+                  icon: Icon(Icons.adaptive.share),
+                  label: Text(context.t.share.toUpperCase()),
                   onPressed: () {
-                    Share.share('Tap to open "${list.name}" in your device:\n'
-                        '$shareUrl');
+                    Share.share(t.listShareMessage(t.name, shareUrl));
                     Navigator.pop(context);
                   },
                 ),

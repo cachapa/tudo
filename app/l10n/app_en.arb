@@ -71,5 +71,17 @@
     }
   },
   "today": "Today",
-  "yesterday": "Yesterday"
+  "yesterday": "Yesterday",
+  "copyLink": "Copy link",
+  "listShareMessage": "Tap to open \"{listName}\" in your device:\n{shareUrl}",
+  "@listShareMessage": {
+    "placeholders": {
+      "listName": {
+        "type": "String"
+      },
+      "shareUrl": {
+        "type": "String"
+      }
+    }
+  }
 }

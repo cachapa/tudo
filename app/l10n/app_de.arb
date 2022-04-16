@@ -29,7 +29,7 @@
   "share": "Teilen",
   "delete": "Löschen",
   "create": "Erstellen",
-  "participants" : "Teilnehmer",
+  "participants": "Teilnehmer",
   "you": "Du",
   "leaveList": "Liste verlassen",
   "listUnavailable": "Liste nicht verfügbar",
@@ -37,5 +37,7 @@
   "removeConfirmation": "Benutzer entfernen",
   "remove": "Entfernen",
   "userRemoved": "{name} entfernt",
-  "nameCaption": "In geteilten Listen sichtbar"
+  "nameCaption": "In geteilten Listen sichtbar",
+  "copyLink": "Link kopieren",
+  "listShareMessage": "Die Liste \"{ListName}\" in dein Gerät öffnen:\n{shareUrl}"
 }
