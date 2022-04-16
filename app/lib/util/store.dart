@@ -5,16 +5,10 @@ class StoreProvider {
 
   StoreProvider._(this._box);
 
-  // TODO Remove when tudo v2 has been out for a while
-  List<String>? get legacyListIds => _box.get('list_id_keys');
-
   static Future<StoreProvider> open() async =>
       StoreProvider._(await Hive.openBox('store'));
 
   Store getStore(String namespace) => Store(_box, namespace);
-
-  // TODO Remove when tudo v2 has been out for a while
-  void purgeLegacyListIds() => _box.delete('list_id_keys');
 }
 
 class Store {
