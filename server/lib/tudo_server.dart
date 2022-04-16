@@ -144,7 +144,7 @@ class TudoServer {
         if (apiSecret == suppliedSecret) {
           return innerHandler(request);
         } else {
-          return _forbidden('Invalid secret: $suppliedSecret');
+          return _forbidden('Invalid API secret: $suppliedSecret');
         }
       };
 
@@ -157,36 +157,36 @@ class TudoServer {
           return _forbidden('Invalid user id: $userId');
         }
 
-        if (token != null) {
-          // Validate token length
-          if (token.length != 128) {
-            return _forbidden('Invalid token size: $token');
-          }
+        // Validate token length
+        if (token == null || token.length != 128) {
+          return _forbidden('Invalid token: $token');
+        }
 
-          final knownUserId = await _getUserId(token);
-          // Associate token with user id, if it doesn't exist yet
-          if (knownUserId == null) {
-            await _crdt.setFields(
-              'auth',
-              [token],
-              {
-                'user_id': userId,
-                'created_at': DateTime.now(),
-              },
-            );
-          } else if (userId != knownUserId) {
-            return _forbidden(
-                'Invalid token for supplied user id:\n  token: $token\n  user_id: $userId');
-          }
+        final knownToken = await _getTokenForUser(userId);
+        // Associate token with user id, if it doesn't exist yet
+        if (knownToken == null) {
+          await _crdt.setFields(
+            'auth',
+            [token],
+            {
+              'user_id': userId,
+              'created_at': DateTime.now(),
+            },
+          );
+        }
+        // Verify that user id and token match
+        else if (token != knownToken) {
+          return _forbidden(
+              'Invalid token for supplied user id: $userId\n$token');
         }
 
         return innerHandler(request);
       };
 
-  Future<String?> _getUserId(String token) async {
+  Future<String?> _getTokenForUser(String userId) async {
     final result = await _crdt
-        .queryAsync('SELECT user_id FROM auth WHERE token = ?1', [token]);
-    return result.isEmpty ? null : result.first['user_id'];
+        .queryAsync('SELECT token FROM auth WHERE user_id = ?1', [userId]);
+    return result.isEmpty ? null : result.first['token'];
   }
 
   Future<List<Map<String, dynamic>>> _listChangeset(String listId) =>
