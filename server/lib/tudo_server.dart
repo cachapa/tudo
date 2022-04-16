@@ -19,6 +19,7 @@ class TudoServer {
     await _crdt.init('store', 'tudo');
 
     var router = Router()
+      ..get('/auth', _auth)
       ..get('/ws', _wsHandler)
       // Return 404 for everything else
       ..all('/<ignored|.*>', _notFoundHandler);
@@ -32,6 +33,9 @@ class TudoServer {
     var server = await io.serve(handler, '0.0.0.0', port);
     print('Serving at http://${server.address.host}:${server.port}');
   }
+
+  /// By the time we arrive here, both the secret and credentials have been validated
+  Response _auth(Request request) => Response.ok('👍');
 
   Future<Response> _wsHandler(Request request) async {
     final userId = request.headers['user_id']!;
