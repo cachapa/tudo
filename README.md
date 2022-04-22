@@ -2,6 +2,8 @@
 
 tudo is an experiment on simple, private, synchronized to-do lists.
 
+It is a useful demonstration of the realtime, offline-first capabilities powering the [StoryArk app](https://storyark.eu). 
+
 <img src="screenshots/a.jpg" width="140"> <img src="screenshots/b.jpg" width="140"> <img src="screenshots/c.jpg" width="140"> <img src="screenshots/d.jpg" width="140">
 
 ## Try it out
