@@ -2,7 +2,7 @@
 
 an experiment in simple connected to-do lists.
 
-This project is the server counterpart to the [tudo app](https://github.com/cachapa/tudo/app).
+This project is the server counterpart to the [tudo app](../app).
 
 ## Usage
 
