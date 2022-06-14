@@ -35,7 +35,7 @@ class ValueFutureBuilder<T> extends StatelessWidget {
           // TODO Replace with Container() after Navigator migration
           return emptyWidget ?? const Material();
         }
-        return builder(context, snapshot.data!);
+        return builder(context, snapshot.data as T);
       },
     );
   }
@@ -77,7 +77,7 @@ class ValueStreamBuilder<T> extends StatelessWidget {
           // TODO Replace with Container() after Navigator migration
           return emptyWidget ?? const Material();
         }
-        return builder(context, snapshot.data!);
+        return builder(context, snapshot.data as T);
       },
     );
   }

@@ -9,7 +9,7 @@ import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/contacts/contact_provider.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/util/build_info.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -59,18 +59,20 @@ class SettingsPage extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.mail_outline),
             title: Text(t.sendFeedback),
-            onTap: () =>
-                launch('mailto:cachapa@gmail.com?subject=tudo%20feedback'),
+            onTap: () => launchUrlString(
+                'mailto:cachapa@gmail.com?subject=tudo%20feedback'),
           ),
           ListTile(
             leading: const Icon(Icons.bug_report_outlined),
             title: Text(t.reportIssues),
-            onTap: () => launch('https://github.com/cachapa/tudo/issues'),
+            onTap: () =>
+                launchUrlString('https://github.com/cachapa/tudo/issues'),
           ),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(t.privacyPolicy),
-            onTap: () => launch('https://tudo.cachapa.net/privacy.html'),
+            onTap: () =>
+                launchUrlString('https://tudo.cachapa.net/privacy.html'),
           ),
           ListTile(
             leading: const Icon(Icons.info_outline),
@@ -82,7 +84,7 @@ class SettingsPage extends StatelessWidget {
                 height: 60,
               ),
               applicationVersion: BuildInfo.version,
-              applicationLegalese: "© Daniel Cachapa",
+              applicationLegalese: '© Daniel Cachapa',
             ),
           ),
           Header(t.otherApps),
@@ -93,7 +95,7 @@ class SettingsPage extends StatelessWidget {
             ),
             title: const Text('StoryArk'),
             subtitle: Text(t.storyArkDescription),
-            onTap: () => launch(Platform.isIOS
+            onTap: () => launchUrlString(Platform.isIOS
                 ? 'https://apps.apple.com/US/app/id1558910365'
                 : 'https://play.google.com/store/apps/details?id=de.storyark.app'),
           ),
@@ -105,7 +107,7 @@ class SettingsPage extends StatelessWidget {
               ),
               title: const Text('Libra'),
               subtitle: Text(t.libraDescription),
-              onTap: () => launch(
+              onTap: () => launchUrlString(
                   'https://play.google.com/store/apps/details?id=net.cachapa.libra'),
             ),
           const Spacer(),

@@ -44,7 +44,7 @@ class AnimatedCounter extends StatefulWidget {
       : super(key: key);
 
   @override
-  _AnimatedCounterState createState() => _AnimatedCounterState();
+  State<AnimatedCounter> createState() => _AnimatedCounterState();
 }
 
 class _AnimatedCounterState extends State<AnimatedCounter> {

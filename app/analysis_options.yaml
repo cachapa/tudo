@@ -3,3 +3,8 @@ include: package:flutter_lints/flutter.yaml
 analyzer:
 #  errors:
 #    import_of_legacy_library_into_null_safe: ignore
+
+linter:
+  rules:
+    prefer_single_quotes: true
+    use_build_context_synchronously: false

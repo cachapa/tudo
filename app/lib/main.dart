@@ -55,19 +55,19 @@ void main() async {
             create: (c) =>
                 SyncProvider(c.authProvider, c.storeProvider, c.listProvider)),
       ],
-      child: const MyApp(),
+      child: const TudoApp(),
     ),
   );
 }
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class TudoApp extends StatefulWidget {
+  const TudoApp({Key? key}) : super(key: key);
 
   @override
-  _MyAppState createState() => _MyAppState();
+  State<TudoApp> createState() => _TudoAppState();
 }
 
-class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();

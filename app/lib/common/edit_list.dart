@@ -86,6 +86,7 @@ class _EditListFormState extends State<_EditListForm> {
               ),
               const SizedBox(height: 16),
               TextButton(
+                onPressed: name.isEmpty ? null : () => _create(context),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Text(
@@ -93,7 +94,6 @@ class _EditListFormState extends State<_EditListForm> {
                     style: const TextStyle(fontSize: 14),
                   ),
                 ),
-                onPressed: name.isEmpty ? null : () => _create(context),
               ),
             ],
           ),

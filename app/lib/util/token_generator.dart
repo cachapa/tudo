@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:math';
 
 // Lazy instantiation
-late final _random = Random.secure();
+final _random = Random.secure();
 
 /// Generates a (pseudo) random token by creating a byte array and encoding it
 /// as a base64 string of the requested [length].

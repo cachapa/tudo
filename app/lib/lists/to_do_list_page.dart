@@ -223,7 +223,7 @@ class InputBar extends StatefulWidget {
   const InputBar({Key? key, required this.onSubmitted}) : super(key: key);
 
   @override
-  _InputBarState createState() => _InputBarState();
+  State<InputBar> createState() => _InputBarState();
 }
 
 class _InputBarState extends State<InputBar> {

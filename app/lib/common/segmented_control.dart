@@ -23,7 +23,7 @@ class SegmentedControl<V, T> extends StatelessWidget {
       groupValue: value,
       children: items
           .map((key, value) => MapEntry(key, segmentBuilder(context, value))),
-      onValueChanged: (value) => onChanged(value!),
+      onValueChanged: (value) => onChanged(value as V),
     );
   }
 }

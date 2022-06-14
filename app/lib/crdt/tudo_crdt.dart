@@ -52,10 +52,10 @@ class TudoCrdt extends SqfliteCrdt {
   @override
   Future<void> onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
-      await db.execute("ALTER TABLE todos ADD done_at TEXT");
+      await db.execute('ALTER TABLE todos ADD done_at TEXT');
     }
     if (oldVersion < 3) {
-      await db.execute("ALTER TABLE todos ADD done_by TEXT");
+      await db.execute('ALTER TABLE todos ADD done_by TEXT');
     }
   }
 
