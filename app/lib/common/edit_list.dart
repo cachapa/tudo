@@ -18,9 +18,8 @@ Future<bool?> editToDoList(BuildContext context, [ToDoList? list]) {
 
 class _EditListForm extends StatefulWidget {
   final ToDoList? list;
-  final Function()? onDelete;
 
-  const _EditListForm({Key? key, this.list, this.onDelete}) : super(key: key);
+  const _EditListForm({Key? key, this.list}) : super(key: key);
 
   @override
   State<_EditListForm> createState() => _EditListFormState();

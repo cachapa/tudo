@@ -32,7 +32,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance!.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       _offlineIndicator = OfflineIndicator(context);
     });
     _monitorDeeplinks();

@@ -20,14 +20,7 @@ class ListProvider {
       _queryLists().asyncMap((l) => Future.wait(l.map(
           (map) async => ToDoList.fromMap(map, await _getMembers(map['id'])))));
 
-  ListProvider(this.userId, this._crdt, StoreProvider storeProvider) {
-    final legacyLists = storeProvider.legacyListIds;
-    if (legacyLists != null) {
-      // Upgrading from tudo v1
-      Future.wait(legacyLists.map(import))
-          .then((_) => storeProvider.purgeLegacyListIds());
-    }
-  }
+  ListProvider(this.userId, this._crdt, StoreProvider storeProvider);
 
   Future<void> createList(String name, Color color) async {
     final listId = uuid();
