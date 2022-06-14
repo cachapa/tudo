@@ -208,6 +208,7 @@ class Logo extends StatelessWidget {
               IconButton(
                 icon: ValueStreamBuilder<bool>(
                   stream: context.contactProvider.isNameSet,
+                  initialData: true,
                   builder: (_, isNameSet) => Badge(
                     showBadge: !isNameSet,
                     child: const Icon(Icons.tune_rounded),
