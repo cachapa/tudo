@@ -9,6 +9,7 @@ import 'package:tudo_app/common/check.dart';
 import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/empty_page.dart';
+import 'package:tudo_app/common/icon_label.dart';
 import 'package:tudo_app/common/popup_menu.dart';
 import 'package:tudo_app/common/progress.dart';
 import 'package:tudo_app/common/share_list.dart';
@@ -190,12 +191,21 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
               ],
             ),
           ),
-          title: Hero(
-            tag: 'name_${list.id}',
-            child: Text(
-              list.name,
-              style: context.theme.textTheme.headline6,
-            ),
+          title: Column(
+            children: [
+              Hero(
+                tag: 'name_${list.id}',
+                child: Text(
+                  list.name,
+                  style: context.theme.textTheme.headline6,
+                ),
+              ),
+              if (list.isShared)
+                IconLabel(
+                  Icons.supervised_user_circle,
+                  list.memberNames(context),
+                ),
+            ],
           ),
           actions: actions,
         ),

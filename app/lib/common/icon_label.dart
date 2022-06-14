@@ -9,17 +9,21 @@ class IconLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final color = context.theme.textTheme.caption!.color;
+
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         Icon(
           icon,
           size: 14,
-          color: context.theme.textTheme.caption!.color,
+          color: color,
         ),
         const SizedBox(width: 4),
         Text(
           label,
-          maxLines: 1,
+          style: context.theme.textTheme.bodyMedium!.copyWith(color: color),
+          softWrap: false,
           overflow: TextOverflow.ellipsis,
         ),
       ],
