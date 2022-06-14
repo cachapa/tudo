@@ -113,7 +113,7 @@ class ToDoListPage extends StatelessWidget {
                 ? EmptyPage(text: t.toDoListEmptyMessage)
                 : ToDoListView(
                     key: _listKey,
-                    items: list.items,
+                    list: list,
                     checkedListKey: _uncheckedListKey,
                     controller: _controller,
                   ),
@@ -144,7 +144,7 @@ class ToDoListPage extends StatelessWidget {
 }
 
 class TitleBar extends StatelessWidget implements PreferredSizeWidget {
-  final ToDoList list;
+  final ToDoListWithItems list;
   final List<Widget> actions;
 
   const TitleBar({Key? key, required this.list, required this.actions})
@@ -280,13 +280,13 @@ class _InputBarState extends State<InputBar> {
 }
 
 class ToDoListView extends StatefulWidget {
-  final List<ToDo> items;
+  final ToDoListWithItems list;
   final Key checkedListKey;
   final ScrollController controller;
 
   const ToDoListView({
     Key? key,
-    required this.items,
+    required this.list,
     required this.checkedListKey,
     required this.controller,
   }) : super(key: key);
@@ -301,10 +301,12 @@ class _ToDoListViewState extends State<ToDoListView> {
   // Temporarily remember deleted items to fix an edge case in the removal anim
   String? _lastDeletedItemId;
 
+  List<ToDo> get items => widget.list.items;
+
   @override
   Widget build(BuildContext context) {
-    final uncheckedItems = widget.items.where((item) => !item.done).toList();
-    final checkedItems = widget.items.where((item) => item.done).toList();
+    final uncheckedItems = items.where((item) => !item.done).toList();
+    final checkedItems = items.where((item) => item.done).toList();
     _itemKeys.clear();
 
     return ListView(
@@ -338,6 +340,7 @@ class _ToDoListViewState extends State<ToDoListView> {
                 onEdit: () => _editItem(item),
                 onDelete: () => _deleteItem(item),
                 isDeleted: item.id == _lastDeletedItemId,
+                isShared: widget.list.isShared,
               ),
             ),
           ),
@@ -365,6 +368,7 @@ class _ToDoListViewState extends State<ToDoListView> {
                     onEdit: () => _editItem(item),
                     onDelete: () => _deleteItem(item),
                     isDeleted: item.id == _lastDeletedItemId,
+                    isShared: widget.list.isShared,
                   ),
           ),
         ),
@@ -416,7 +420,7 @@ class _ToDoListViewState extends State<ToDoListView> {
   }
 
   Future<void> _clearCompleted() async {
-    var checked = widget.items.where((item) => item.done).toList();
+    var checked = items.where((item) => item.done).toList();
     if (checked.isEmpty) return;
 
     var indexes =
@@ -439,11 +443,11 @@ class _ToDoListViewState extends State<ToDoListView> {
   }
 
   void _swap(ToDo from, ToDo to) {
-    final fromIndex = widget.items.indexOf(from);
-    final toIndex = widget.items.indexOf(to);
+    final fromIndex = items.indexOf(from);
+    final toIndex = items.indexOf(to);
 
     // Copy list
-    final itemsCopy = widget.items.toList();
+    final itemsCopy = items.toList();
     final item = itemsCopy.removeAt(fromIndex);
     itemsCopy.insert(toIndex, item);
     context.listProvider.setItemOrder(itemsCopy);
@@ -456,6 +460,7 @@ class _ListTile extends StatelessWidget {
   final Function() onEdit;
   final Function() onDelete;
   final bool isDeleted;
+  final bool isShared;
 
   const _ListTile({
     Key? key,
@@ -464,6 +469,7 @@ class _ListTile extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     required this.isDeleted,
+    required this.isShared,
   }) : super(key: key);
 
   @override
@@ -504,6 +510,10 @@ class _ListTile extends StatelessWidget {
             onChanged: onToggle,
           ),
           title: Text(item.name),
+          subtitle: isShared && item.done
+              ? IconLabel(
+                  Icons.account_circle, item.doneBy ?? context.t.anonymous)
+              : null,
           trailing: item.done
               ? item.doneAt != null
                   ? Text(

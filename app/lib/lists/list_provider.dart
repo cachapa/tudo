@@ -178,9 +178,24 @@ class ListProvider {
       ).then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
 
   Future<List<ToDo>> _getToDos(String listId) => _crdt.queryAsync('''
-    SELECT * FROM todos
-    WHERE list_id = ? AND is_deleted = 0
-    ORDER BY done_at, position
+    SELECT
+      todos.id,
+      todos.name,
+      todos.done,
+      todos.done_at,
+      users.name AS done_by,
+      todos.position,
+      todos.creator_id,
+      todos.created_at
+    FROM
+      todos
+    LEFT JOIN
+      users ON done_by = users.id
+    WHERE
+      list_id = ?
+      AND todos.is_deleted = 0
+    ORDER BY
+      done_at, position
   ''', [listId]).then((l) => l.map(ToDo.fromMap).toList());
 }
 
@@ -229,10 +244,8 @@ class ToDoList {
           members,
         );
 
-  String memberNames(BuildContext context) => [
-        ...members.where((e) => !e.isCurrentUser).map((e) => e.nameOr(context)),
-        context.t.you,
-      ].join(' • ');
+  String memberNames(BuildContext context) =>
+      members.map((e) => e.nameOr(context)).join(' • ');
 
   @override
   String toString() => '$name [$doneCount/$itemCount]';
