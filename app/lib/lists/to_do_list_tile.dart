@@ -36,10 +36,7 @@ class ToDoListTile extends StatelessWidget {
       subtitle: list.isShared
           ? IconLabel(
               Icons.supervised_user_circle,
-              list.members
-                  .where((e) => !e.isCurrentUser)
-                  .map((e) => e.nameOr(context))
-                  .join(' • '),
+              list.memberNames(context),
             )
           : null,
       trailing: const DragHandle(),

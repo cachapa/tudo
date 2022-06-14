@@ -229,6 +229,11 @@ class ToDoList {
           members,
         );
 
+  String memberNames(BuildContext context) => [
+        ...members.where((e) => !e.isCurrentUser).map((e) => e.nameOr(context)),
+        context.t.you,
+      ].join(' • ');
+
   @override
   String toString() => '$name [$doneCount/$itemCount]';
 }
