@@ -201,9 +201,12 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ),
               if (list.isShared)
-                IconLabel(
-                  Icons.supervised_user_circle,
-                  list.memberNames(context),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: IconLabel(
+                    Icons.supervised_user_circle,
+                    list.memberNames(context),
+                  ),
                 ),
             ],
           ),
