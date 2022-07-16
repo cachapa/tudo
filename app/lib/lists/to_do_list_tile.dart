@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tudo_app/common/drag_handler.dart';
-import 'package:tudo_app/common/icon_label.dart';
 import 'package:tudo_app/common/progress.dart';
 import 'package:tudo_app/extensions.dart';
 
@@ -34,9 +33,10 @@ class ToDoListTile extends StatelessWidget {
         ),
       ),
       subtitle: list.isShared
-          ? IconLabel(
-              Icons.supervised_user_circle,
+          ? Text(
               list.memberNames(context),
+              softWrap: false,
+              overflow: TextOverflow.fade,
             )
           : null,
       trailing: const DragHandle(),

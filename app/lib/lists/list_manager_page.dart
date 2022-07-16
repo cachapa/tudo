@@ -205,17 +205,17 @@ class Logo extends StatelessWidget {
                 tooltip: t.scanQrCode,
                 onPressed: () => _launchQrScanner(context),
               ),
-              IconButton(
-                icon: ValueStreamBuilder<bool>(
-                  stream: context.contactProvider.isNameSet,
-                  initialData: true,
-                  builder: (_, isNameSet) => Badge(
+              ValueStreamBuilder<bool>(
+                stream: context.contactProvider.isNameSet,
+                initialData: true,
+                builder: (_, isNameSet) => IconButton(
+                  icon: Badge(
                     showBadge: !isNameSet,
                     child: const Icon(Icons.tune_rounded),
                   ),
+                  tooltip: t.settings,
+                  onPressed: () => context.push(() => const SettingsPage()),
                 ),
-                tooltip: t.settings,
-                onPressed: () => context.push(() => const SettingsPage()),
               ),
             ],
           ),
