@@ -36,10 +36,9 @@ jobs:
           path: /opt/hostedtoolcache/flutter
           key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}
 
-      - uses: subosito/flutter-action@v1
+      - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.0.1'
-          channel: 'stable'
+          channel: 'master'
 
       - name: Retrieve build name from tag
         id: get_version
@@ -51,7 +50,7 @@ jobs:
       - name: Build app
         env:
           BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}
-        run: flutter build ipa --export-options-plist=../.github/provisioning/ExportOptions.plist --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME --bundle-sksl-path flutter_01.sksl.json
+        run: flutter build ipa --export-options-plist=../.github/provisioning/ExportOptions.plist --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
       - name: Upload app to App Store Connect
         env:
