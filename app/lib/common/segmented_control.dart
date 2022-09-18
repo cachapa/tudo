@@ -18,8 +18,6 @@ class SegmentedControl<V, T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CupertinoSlidingSegmentedControl<V>(
-      thumbColor: context.theme.dialogBackgroundColor,
-      backgroundColor: context.theme.dividerColor,
       groupValue: value,
       children: items
           .map((key, value) => MapEntry(key, segmentBuilder(context, value))),
