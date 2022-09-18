@@ -193,23 +193,17 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
           ),
           title: Column(
             children: [
-              Hero(
-                tag: 'name_${list.id}',
-                child: Text(
-                  list.name,
-                  style: context.theme.textTheme.headline6,
-                ),
+              Text(
+                list.name,
+                style: context.theme.textTheme.titleLarge,
               ),
               if (list.isShared)
-                Padding(
-                  padding: const EdgeInsets.only(top: 4),
-                  child: Text(
-                    list.memberNames(context),
-                    softWrap: false,
-                    overflow: TextOverflow.fade,
-                    style: context.theme.textTheme.bodyMedium!.copyWith(
-                        color: context.theme.textTheme.caption!.color),
-                  ),
+                Text(
+                  list.memberNames(context),
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  style: context.theme.textTheme.bodyMedium!
+                      .copyWith(color: context.theme.textTheme.caption!.color),
                 ),
             ],
           ),

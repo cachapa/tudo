@@ -91,6 +91,7 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: ThemeData(
+          useMaterial3: true,
           primarySwatch: Colors.blue,
           inputDecorationTheme: InputDecorationTheme(
             filled: true,
@@ -101,8 +102,12 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
               borderSide: BorderSide.none,
             ),
           ),
+          appBarTheme: const AppBarTheme(
+            scrolledUnderElevation: 0,
+          ),
         ),
         darkTheme: ThemeData(
+          useMaterial3: true,
           primarySwatch: Colors.blue,
           primaryColor: Colors.blue,
           canvasColor: Colors.grey[900],
@@ -115,6 +120,11 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide.none,
             ),
+          ),
+          appBarTheme: const AppBarTheme(
+            scrolledUnderElevation: 0,
+            foregroundColor: Colors.red,
+            color: Colors.red,
           ),
         ),
         themeMode: theme,

@@ -25,12 +25,9 @@ class ToDoListTile extends StatelessWidget {
           total: list.itemCount,
         ),
       ),
-      title: Hero(
-        tag: 'name_${list.id}',
-        child: Text(
-          list.name,
-          style: context.theme.textTheme.headline6,
-        ),
+      title: Text(
+        list.name,
+        style: context.theme.textTheme.titleLarge,
       ),
       subtitle: list.isShared
           ? Text(
