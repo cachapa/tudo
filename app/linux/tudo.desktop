@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=tudo
+Icon=tudo
+Exec=/bin/sh -c "$HOME/.local/share/tudo/tudo"
+Comment=To-do lists
+Categories=Utility;
+Terminal=false
+
