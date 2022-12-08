@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:sqlite_crdt/sqlite_crdt.dart';
 import 'package:tudo_app/config.dart';
 import 'package:tudo_app/contacts/contact_provider.dart';
-import 'package:tudo_app/crdt/hlc.dart';
-import 'package:tudo_app/crdt/sqflite_crdt.dart';
-import 'package:tudo_app/crdt/tudo_crdt.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/util/store.dart';
 import 'package:tudo_app/util/uuid.dart';
@@ -12,34 +11,29 @@ const listIdsKey = 'list_id_keys';
 
 class ListProvider {
   final String userId;
-  final TudoCrdt _crdt;
+  final SqliteCrdt _crdt;
 
-  Stream get allChanges => _crdt.allChanges;
-
-  Stream<List<ToDoList>> get lists =>
-      _queryLists().asyncMap((l) => Future.wait(l.map(
-          (map) async => ToDoList.fromMap(map, await _getMembers(map['id'])))));
+  Stream<List<ToDoList>> get lists => _queryLists()
+      .asyncMap((l) => Future.wait(l.map(
+          (map) async => ToDoList.fromMap(map, await _getMembers(map['id'])))))
+      .doOnError((p0, p1) => print('$p0\n$p1'));
 
   ListProvider(this.userId, this._crdt, StoreProvider storeProvider);
 
   Future<void> createList(String name, Color color) async {
     final listId = uuid();
 
-    final batch = _crdt.newBatch();
-    batch.setFields('lists', [
-      listId
-    ], {
-      'name': name,
-      'color': color.hexValue,
-      'creator_id': userId,
-      'created_at': DateTime.now(),
+    await _crdt.transaction((txn) async {
+      await txn.execute('''
+        INSERT INTO lists (id, name, color, creator_id, created_at)
+        VALUES (?1, ?2, ?3, ?4, ?5)
+      ''', [listId, name, color.hexValue, userId, DateTime.now()]);
+      await _setListReference(txn, listId);
     });
-    await _setListReference(batch, listId);
-    await _crdt.commit(batch);
   }
 
   Future<void> import(String listId) async {
-    final exists = await _crdt.queryAsync('''
+    final exists = await _crdt.query('''
       SELECT EXISTS (
         SELECT * FROM user_lists WHERE user_id = ? AND list_id = ? AND is_deleted = 0
       ) AS e
@@ -50,24 +44,22 @@ class ListProvider {
     }
 
     'Importing $listId'.log;
-    final batch = _crdt.newBatch();
-    await _setListReference(batch, listId);
-    await _crdt.commit(batch);
+    await _setListReference(_crdt, listId);
   }
 
-  Future<void> _setListReference(CrdtBatch batch, String listId) async {
-    final maxPosition = (await _crdt.queryAsync('''
-        SELECT max(position) as max_position FROM user_lists
-        WHERE is_deleted = 0
-      ''')).first['max_position'] ?? -1;
-    batch
-      ..setField('user_lists', [userId, listId], 'created_at', DateTime.now())
-      ..setDeleted('user_lists', [userId, listId], false)
-      ..setField('user_lists', [userId, listId], 'position', maxPosition + 1);
+  Future<void> _setListReference(TimestampedCrdt crdt, String listId) async {
+    final maxPosition = (await crdt.query('''
+      SELECT max(position) as max_position FROM user_lists
+      WHERE is_deleted = 0
+    ''')).first['max_position'] as int? ?? -1;
+    await crdt.execute('''
+      INSERT INTO user_lists (user_id, list_id, created_at, position)
+      VALUES (?1, ?2, ?3, ?4)
+    ''', [userId, listId, DateTime.now(), maxPosition + 1]);
   }
 
   Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
-      _crdt.query('''
+      _crdt.watch('''
         SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count FROM user_lists
         LEFT JOIN lists ON user_lists.user_id = ? AND user_lists.list_id = id
         LEFT JOIN (
@@ -76,7 +68,7 @@ class ListProvider {
         ) ON item_count_list_id = id
         WHERE id IS NOT NULL AND user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
         ORDER BY position
-      ''', [userId, if (listId != null) listId]);
+      ''', () => [userId, if (listId != null) listId]);
 
   Stream<ToDoListWithItems> getList(String listId) => _queryLists(listId)
       .map((e) => e.first)
@@ -90,94 +82,102 @@ class ListProvider {
   /// Does not actually delete the list, since it could be used by others
   Future<void> removeList(String listId) => removeUser(userId, listId);
 
-  Future<void> removeUser(String userId, String listId) =>
-      _crdt.setDeleted('user_lists', [userId, listId]);
+  Future<void> removeUser(String userId, String listId) => _crdt.execute('''
+    UPDATE user_lists SET is_deleted = ?1
+    WHERE user_id = ?2 AND list_id = ?3
+  ''', [true, userId, listId]);
 
   Future<void> undoRemoveList(String listId) => undoRemoveUser(userId, listId);
 
-  Future<void> undoRemoveUser(String userId, String listId) =>
-      _crdt.setDeleted('user_lists', [userId, listId], false);
+  Future<void> undoRemoveUser(String userId, String listId) => _crdt.execute('''
+    UPDATE lists SET is_deleted = ?1
+    WHERE user_id = ?2 AND list_id = ?3
+  ''', [false, userId, listId]);
 
-  Future<void> deleteItem(String id) => _crdt.setDeleted('todos', [id]);
+  Future<void> deleteItem(String id) => _crdt.execute('''
+    UPDATE todos SET is_deleted = ?1
+    WHERE id = ?2
+  ''', [true, id]);
 
-  Future<void> undeleteItem(String id) =>
-      _crdt.setDeleted('todos', [id], false);
+  Future<void> undeleteItem(String id) => _crdt.execute('''
+    UPDATE todos SET is_deleted = ?1
+    WHERE id = ?2
+  ''', [false, id]);
 
-  Future<void> setDone(String itemId, bool isDone) => _crdt.setFields('todos', [
-        itemId
-      ], {
-        'done': isDone,
-        'done_at': isDone ? DateTime.now() : null,
-        'done_by': isDone ? userId : null,
-      });
+  Future<void> setDone(String itemId, bool isDone) => _crdt.execute('''
+    UPDATE todos SET
+      done = ?1,
+      done_at = ?2,
+      done_by = ?3
+    WHERE id = ?4
+  ''',
+      [isDone, isDone ? DateTime.now() : null, isDone ? userId : null, itemId]);
 
-  Future<void> setItemName(String itemId, String name) =>
-      _crdt.setField('todos', [itemId], 'name', name);
+  Future<void> setItemName(String itemId, String name) => _crdt.execute('''
+    UPDATE todos SET name = ?1
+    WHERE id = ?2
+  ''', [name, itemId]);
 
-  Future<Hlc> merge(List<Map<String, dynamic>> changeset) =>
-      _crdt.merge(changeset);
+  void setName(String listId, String name) => _crdt.execute('''
+    UPDATE lists SET name = ?1
+    WHERE id = ?2
+  ''', [name, listId]);
 
-  Future<CrdtChangeset> changeset(Hlc? lastSync) =>
-      _crdt.getChangeset(modifiedSince: lastSync, onlyModifiedHere: true);
-
-  void setName(String listId, String name) =>
-      _crdt.setField('lists', [listId], 'name', name);
-
-  void setColor(String listId, Color color) =>
-      _crdt.setField('lists', [listId], 'color', color.hexValue);
+  void setColor(String listId, Color color) => _crdt.execute('''
+    UPDATE lists SET color = ?1
+    WHERE id = ?2
+  ''', [color.hexValue, listId]);
 
   Future<String> createItem(String listId, String name) async {
     final id = uuid();
-    final maxPosition = (await _crdt.queryAsync('''
-        SELECT max(position) AS max_position FROM todos
-        WHERE list_id = ? AND is_deleted = 0
-      ''', [listId])).first['max_position'] ?? -1;
-    await _crdt.setFields('todos', [
-      id
-    ], {
-      'list_id': listId,
-      'name': name,
-      'done': false,
-      'position': maxPosition + 1,
-      'creator_id': userId,
-      'created_at': DateTime.now(),
-    });
+    final maxPosition = (await _crdt.query('''
+      SELECT max(position) AS max_position FROM todos
+      WHERE list_id = ? AND is_deleted = 0
+    ''', [listId])).first['max_position'] as int? ?? -1;
+    await _crdt.execute('''
+      INSERT INTO todos (id, list_id, name, done, position, creator_id, created_at)
+      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
+    ''', [id, listId, name, false, maxPosition + 1, userId, DateTime.now()]);
     return id;
   }
 
   Future<void> setListOrder(List<ToDoList> lists) async {
-    final batch = _crdt.newBatch();
-    for (int i = 0; i < lists.length; i++) {
-      final list = lists[i];
-      if (list.position != i) {
-        batch.setField('user_lists', [userId, list.id], 'position', i);
+    await _crdt.transaction((txn) async {
+      for (int i = 0; i < lists.length; i++) {
+        final list = lists[i];
+        if (list.position != i) {
+          await txn.execute('''
+            UPDATE user_lists SET position = ?1
+            WHERE user_id = ?2 AND list_id = ?3
+          ''', [i, userId, list.id]);
+        }
       }
-    }
-    await _crdt.commit(batch);
+    });
   }
 
   Future<void> setItemOrder(List<ToDo> items) async {
-    final batch = _crdt.newBatch();
-    for (int i = 0; i < items.length; i++) {
-      final item = items[i];
-      if (item.position != i) {
-        batch.setField('todos', [item.id], 'position', i);
+    await _crdt.transaction((txn) async {
+      for (int i = 0; i < items.length; i++) {
+        final item = items[i];
+        if (item.position != i) {
+          await txn.execute('''
+            UPDATE todos SET position = ?1
+            WHERE id = ?2
+          ''', [i, item.id]);
+        }
       }
-    }
-    await _crdt.commit(batch);
+    });
   }
 
-  Future<List<Member>> _getMembers(String listId) => _crdt.queryAsync(
-        '''
+  Future<List<Member>> _getMembers(String listId) => _crdt.query('''
           SELECT user_id, name, user_lists.created_at AS joined_at FROM user_lists
             LEFT JOIN users ON user_id = id
           WHERE list_id = ?1
             AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
         ''',
-        [listId],
-      ).then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
+      [listId]).then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
 
-  Future<List<ToDo>> _getToDos(String listId) => _crdt.queryAsync('''
+  Future<List<ToDo>> _getToDos(String listId) => _crdt.query('''
     SELECT
       todos.id,
       todos.name,
@@ -283,7 +283,7 @@ class ToDo {
       other.done == done;
 
   @override
-  int get hashCode => hashValues(id, name, done);
+  int get hashCode => Object.hash(id, name, done);
 
   @override
   String toString() => '$name ${done ? '🗹' : '☐'}';

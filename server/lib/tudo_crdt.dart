@@ -1,9 +1,8 @@
 import 'dart:async';
 
 import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:tudo_app/extensions.dart';
 
-const _version = 4;
+final _version = 5;
 
 /// Convenience class to handle database creation and upgrades
 class TudoCrdt {
@@ -18,7 +17,14 @@ class TudoCrdt {
       );
 
   static FutureOr<void> _onCreate(BaseCrdt crdt, int version) async {
-    'Creating database…'.log;
+    await crdt.execute('''
+      CREATE TABLE auth (
+        token TEXT NOT NULL,
+        user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        PRIMARY KEY (token)
+      )
+    ''');
     await crdt.execute('''
       CREATE TABLE users (
         id TEXT NOT NULL,
@@ -30,7 +36,7 @@ class TudoCrdt {
       CREATE TABLE user_lists (
         user_id TEXT NOT NULL,
         list_id TEXT NOT NULL,
-        position INTEGER,
+        position INTEGER AUTO INCREMENT,
         created_at TEXT NOT NULL,
         PRIMARY KEY (user_id, list_id)
       )
@@ -53,7 +59,7 @@ class TudoCrdt {
         done INTEGER DEFAULT 0,
         done_at TEXT,
         done_by TEXT,
-        position INTEGER,
+        position INTEGER AUTO INCREMENT,
         creator_id TEXT NOT NULL,
         created_at TEXT NOT NULL,
         PRIMARY KEY (id)
@@ -63,8 +69,28 @@ class TudoCrdt {
 
   static FutureOr<void> _onUpgrade(
       BaseCrdt crdt, int oldVersion, int newVersion) async {
-    'Upgrading database from $oldVersion to $newVersion…'.log;
-    if (oldVersion < 4) {
+    'Upgrading database from $oldVersion to $newVersion…';
+    if (oldVersion < 5) {
+      // Recreate auth table with token as primary key
+      // Sqlite doesn't allow changing table structures on the fly, so we have
+      // to recreate it and copy the data over
+      await _upgradeFromCrdt(crdt, 'auth', ['user_id']);
+      await crdt.execute('''
+        CREATE TABLE auth2 (
+          token TEXT NOT NULL,
+          user_id TEXT NOT NULL,
+          created_at TEXT NOT NULL,
+          PRIMARY KEY (token)
+        )
+      ''');
+      await crdt.execute('''
+        INSERT INTO auth2 (token, user_id, created_at, is_deleted, hlc, modified)
+        SELECT token, user_id, created_at, is_deleted, hlc, modified FROM auth
+          WHERE token IS NOT null
+      ''');
+      await crdt.execute('DROP TABLE auth');
+      await crdt.execute('ALTER TABLE auth2 RENAME TO auth');
+
       await _upgradeFromCrdt(crdt, 'users', ['id']);
       await _upgradeFromCrdt(crdt, 'user_lists', ['user_id', 'list_id']);
       await _upgradeFromCrdt(crdt, 'lists', ['id']);

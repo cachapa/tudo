@@ -1,30 +1,37 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:rxdart/transformers.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_web_socket/shelf_web_socket.dart';
-import 'package:tudo_server/crdt/tudo_crdt.dart';
+import 'package:sqlite_crdt/sqlite_crdt.dart';
 import 'package:tudo_server/extensions.dart';
+import 'package:tudo_server/tudo_crdt.dart';
+import 'package:version/version.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'config.dart';
 
 class TudoServer {
-  late final TudoCrdt _crdt;
+  late final SqliteCrdt _crdt;
+
+  var userCount = 0;
 
   Future<void> serve(int port) async {
-    _crdt = TudoCrdt();
-    await _crdt.init('store', 'tudo');
+    _crdt = await TudoCrdt.open('store', 'tudo');
 
     final router = Router()
-      ..head('/check_version', _checkVersion)
+      ..head('/check_version', (_) => Response(200))
       ..get('/auth', _auth)
+      ..get('/last_modified', _lastModified)
       ..get('/ws', _wsHandler);
 
     final handler = Pipeline()
         .addMiddleware(logRequests())
+        .addMiddleware(_validateVersion)
         .addMiddleware(_validateSecret)
         .addMiddleware(_validateCredentials)
         .addHandler(router);
@@ -33,123 +40,111 @@ class TudoServer {
     print('Serving at http://${server.address.host}:${server.port}');
   }
 
-  Response _checkVersion(Request request) {
-    // final userAgent = request.headers[HttpHeaders.userAgentHeader]!;
-    // final version = Version.parse(userAgent.substring(
-    //     userAgent.indexOf('/') + 1, userAgent.indexOf(' ')));
-    // final needsUpgrade = version <= Version(1, 9, 0);
-    //
-    // return Response(needsUpgrade ? 426 : 200);
-
-    return Response(200);
-  }
-
   /// By the time we arrive here, both the secret and credentials have been validated
   Response _auth(Request request) => Response.ok('👍');
 
+  Future<Response> _lastModified(Request request) async {
+    final nodeId = request.headers['node_id']!;
+    final latest = await _crdt.lastModified(onlyNodeId: nodeId);
+    return Response.ok(
+        jsonEncode({'last_modified': latest?.apply(nodeId: nodeId)}));
+  }
+
   Future<Response> _wsHandler(Request request) async {
     final userId = request.headers['user_id']!;
-    var lastSend = request.headers['last_receive'];
+    final nodeId = request.headers['node_id']!;
+    var lastSend = request.headers['last_receive']?.toHlc.apply(nodeId: nodeId);
 
-    print('Client connected: $userId');
+    final slug = '${userId.short} (${nodeId.short})';
+    print('$slug: connect [${++userCount}]');
+
     var handler = webSocketHandler((WebSocketChannel webSocket) async {
       StreamSubscription? changesSubscription;
-      String? nodeId;
-
-      // Send changeset on connect
-      _sendChangeset(webSocket, userId, lastSend, nodeId);
 
       // Monitor remote changesets
       webSocket.stream.listen((message) async {
-        final map = jsonDecode(message) as Map;
-        final type = map['type'] ?? '';
+        final changeset = (jsonDecode(message) as Map<String, dynamic>)
+            .map((key, value) => MapEntry(
+                  key,
+                  (value as List).cast<Map<String, dynamic>>(),
+                ));
 
-        switch (type) {
-          case 'hlc':
-            lastSend = map['hlc'];
-            break;
-          case 'changeset':
-            // Read node id
-            nodeId ??= (map['hlc'] as String).asHlc.nodeId;
+        final count = changeset.recordCount;
+        print('RECV $count records');
 
-            // Merge remote changeset
-            final changeset =
-                (map['data'] as List).cast<Map<String, dynamic>>();
-            print('RECV ${changeset.length} records');
-
-            await _crdt.merge(changeset);
-
-            // HACK Recognize if the user added a new list and re-create the record to trigger
-            // the entire list to be sent.
-            // This gets around the problem where the changeset wouldn't contain list data older than lastSend
-            for (final map in changeset) {
-              if (map['collection'] == 'user_lists' &&
-                  map['field'] == 'created_at') {
-                final listId = (map['id'] as String).split(':')[1];
-                await _crdt.setField(
-                    'user_lists', [userId, listId], map['field'], map['value']);
-              }
-            }
-
-            // Notify client
-            webSocket.sink.add(jsonEncode({
-              'type': 'hlc',
-              'hlc': map['hlc'],
-            }));
-            break;
-        }
+        // Merge remote changeset
+        _crdt.merge(changeset);
       }, onDone: () {
         changesSubscription?.cancel();
-        print('Client disconnected from ${request.url.path}');
+        print('$slug: leave [${--userCount}] ');
       }, onError: (e) {
         print(e);
       });
 
       // Monitor local database
-      changesSubscription = _crdt.allChanges
-          .listen((_) => _sendChangeset(webSocket, userId, lastSend, nodeId));
+      changesSubscription = _crdt.watch('''
+        SELECT hlc FROM users UNION ALL
+        SELECT hlc FROM user_lists UNION ALL
+        SELECT hlc FROM lists UNION ALL
+        SELECT hlc FROM todos
+        LIMIT 1
+      ''').debounceTime(Duration(milliseconds: 200)).listen(
+            (_) async {
+              await _sendChangeset(webSocket, userId, nodeId, lastSend);
+              lastSend = _crdt.canonicalTime;
+            },
+          );
     });
 
     return await handler(request);
   }
 
   Future<void> _sendChangeset(WebSocketChannel webSocket, String userId,
-      String? lastSend, String? nodeId) async {
-    var changeset = await _crdt.queryAsync('''
-          SELECT collection, id, field, value, hlc, modified FROM user_lists
-            JOIN crdt
-              ON (collection = 'user_lists' AND id LIKE '%' || list_id)
-              OR (collection = 'lists' AND id = list_id)
-            WHERE user_id = ?1 AND modified > ?2 AND hlc NOT LIKE '%' || ?3
-          UNION ALL
-          SELECT collection, crdt.id, field, value, hlc, modified FROM user_lists
-            JOIN todos ON user_lists.list_id = todos.list_id
-            JOIN crdt ON todos.id = crdt.id
-            WHERE user_id = ?1 AND modified > ?2 AND hlc NOT LIKE '%' || ?3
-          UNION ALL
-          SELECT DISTINCT collection, id, field, value, hlc, modified FROM user_lists 
-            JOIN (SELECT list_id FROM user_lists WHERE user_id = ?1 AND is_deleted = 0) AS l ON l.list_id = user_lists.list_id
-            JOIN crdt ON (collection = 'users' AND id = user_id)
-            WHERE is_deleted = 0
-          ''', [userId, lastSend ?? '', nodeId ?? '---']);
-    if (changeset.isEmpty) return;
+      String nodeId, Hlc? modifiedSince) async {
+    modifiedSince ??= Hlc.zero(nodeId);
+    final changeset = <String, Iterable<Map<String, Object?>>>{
+      'users': await _crdt.query('''
+        SELECT id, name, is_deleted, hlc FROM users
+        WHERE id = ?1
+          AND hlc NOT LIKE '%' || ?2
+          AND modified > ?3
+      ''', [userId, nodeId, modifiedSince]),
+      'user_lists': await _crdt.query('''
+        SELECT * FROM user_lists
+        WHERE user_id = ?1
+          AND hlc NOT LIKE '%' || ?2
+          AND modified > ?3
+      ''', [userId, nodeId, modifiedSince]),
+      'lists': await _crdt.query('''
+        SELECT lists.id, lists.name, lists.color, lists.creator_id,
+          lists.created_at, lists.is_deleted, lists.hlc FROM user_lists
+        JOIN lists ON list_id = lists.id AND user_id = ?1 AND user_lists.is_deleted = 0
+        WHERE lists.hlc NOT LIKE '%' || ?2
+          AND lists.modified > CASE WHEN user_lists.created_at >= ?2 THEN '' ELSE ?3 END
+      ''', [userId, nodeId, modifiedSince]),
+      'todos': await _crdt.query('''
+        SELECT todos.id, todos.list_id, todos.name, todos.done, todos.position,
+          todos.creator_id, todos.created_at, todos.done_at, todos.done_by,
+          todos.is_deleted, todos.hlc FROM user_lists
+        JOIN todos ON user_lists.list_id = todos.list_id AND user_id = ?1 AND user_lists.is_deleted = 0
+        WHERE todos.hlc NOT LIKE '%' || ?2
+          AND todos.modified > CASE WHEN user_lists.created_at >= ?2 THEN '' ELSE ?3 END
+      ''', [userId, nodeId, modifiedSince]),
+    }..removeWhere((_, value) => value.isEmpty);
 
-    // Detect if this user joined a new list and send all its data.
-    for (final map in changeset) {
-      if (map['collection'] == 'user_lists' && map['field'] == 'created_at') {
-        final listId = (map['id'] as String).split(':')[1];
-        final listChangeset = await _listChangeset(listId);
-        changeset = [...changeset, ...listChangeset];
-      }
-    }
+    if (changeset.recordCount == 0) return;
 
-    'SEND ${changeset.length} records'.log;
-    webSocket.sink.add(jsonEncode({
-      'type': 'changeset',
-      'data': changeset,
-      'hlc': changeset.first['modified'],
-    }));
+    print('SEND ${changeset.recordCount} records');
+    webSocket.sink.add(jsonEncode(changeset));
   }
+
+  Handler _validateVersion(Handler innerHandler) => (request) async {
+        final userAgent = request.headers[HttpHeaders.userAgentHeader]!;
+        final version = Version.parse(userAgent.substring(
+            userAgent.indexOf('/') + 1, userAgent.indexOf(' ')));
+        final needsUpgrade = version < Version(2, 0, 0);
+        return needsUpgrade ? Response(426) : innerHandler(request);
+      };
 
   Handler _validateSecret(Handler innerHandler) => (request) async {
         // Do not validate for public paths
@@ -161,13 +156,13 @@ class TudoServer {
         if (apiSecret == suppliedSecret) {
           return innerHandler(request);
         } else {
-          return _forbidden('Invalid API secret: $suppliedSecret');
+          return Response.forbidden('Invalid API secret: $suppliedSecret');
         }
       };
 
   Handler _validateCredentials(Handler innerHandler) => (request) async {
-        // Do not validate for public paths
-        if (['check_version'].contains(request.url.path)) {
+        // Only validate for WS connection
+        if (request.url.path != 'ws') {
           return innerHandler(request);
         }
 
@@ -176,29 +171,25 @@ class TudoServer {
 
         // Validate user id length
         if (userId == null || userId.length != 36) {
-          return _forbidden('Invalid user id: $userId');
+          return Response.forbidden('Invalid user id: $userId');
         }
 
         // Validate token length
         if (token == null || token.length != 128) {
-          return _forbidden('Invalid token: $token');
+          return Response.forbidden('Invalid token: $token');
         }
 
         final knownToken = await _getTokenForUser(userId);
         // Associate token with user id, if it doesn't exist yet
         if (knownToken == null) {
-          await _crdt.setFields(
-            'auth',
-            [token],
-            {
-              'user_id': userId,
-              'created_at': DateTime.now(),
-            },
-          );
+          await _crdt.execute('''
+            INSERT INTO auth (user_id, token, created_at)
+            VALUES (?1, ?2, ?3)
+          ''', [userId, token, DateTime.now()]);
         }
         // Verify that user id and token match
         else if (token != knownToken) {
-          return _forbidden(
+          return Response.forbidden(
               'Invalid token for supplied user id: $userId\n$token');
         }
 
@@ -207,31 +198,8 @@ class TudoServer {
 
   Future<String?> _getTokenForUser(String userId) async {
     final result = await _crdt
-        .queryAsync('SELECT token FROM auth WHERE user_id = ?1', [userId]);
-    return result.isEmpty ? null : result.first['token'];
-  }
-
-  Future<List<Map<String, dynamic>>> _listChangeset(String listId) =>
-      _crdt.queryAsync('''
-        SELECT collection, id, field, value, hlc, modified FROM crdt
-          WHERE collection = 'user_lists' AND id LIKE '%:' || ?1
-        UNION ALL
-        SELECT collection, id, field, value, hlc, modified FROM crdt
-          WHERE collection = 'lists' AND id = ?1
-        UNION ALL
-        SELECT collection, crdt.id, field, value, hlc, modified FROM todos
-          JOIN crdt ON todos.id = crdt.id
-          WHERE list_id = ?1
-        UNION ALL
-        SELECT DISTINCT collection, id, field, value, hlc, modified FROM user_lists 
-          JOIN crdt ON user_lists.user_id = crdt.id
-          WHERE list_id = ?1
-        ORDER BY value
-      ''', [listId]);
-
-  Response _forbidden(String message) {
-    print('403 Forbidden: $message');
-    return Response.forbidden(message);
+        .query('SELECT token FROM auth WHERE user_id = ?1', [userId]);
+    return result.isEmpty ? null : result.first['token'] as String?;
   }
 }
 

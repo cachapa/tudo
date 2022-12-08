@@ -11,7 +11,6 @@ final darkTheme = ThemeData(
   brightness: Brightness.dark,
   primarySwatch: Colors.blue,
   primaryColor: Colors.blue,
-  canvasColor: Colors.grey[900],
   inputDecorationTheme: _inputDecorationTheme,
 );
 

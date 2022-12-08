@@ -28,7 +28,7 @@ void main() async {
 
   WidgetsFlutterBinding.ensureInitialized();
 
-  _setSystemColors();
+  await _setSystemColors();
 
   final dir = PlatformX.isMobile
       ? (await getApplicationDocumentsDirectory()).path
@@ -38,9 +38,8 @@ void main() async {
 
   await BuildInfo.init();
 
-  final crdt = TudoCrdt();
   final storeProvider = await StoreProvider.open();
-  await crdt.init(dir, 'tudo');
+  final crdt = await TudoCrdt.open(dir, 'tudo');
 
   runApp(
     MultiProvider(
@@ -53,8 +52,7 @@ void main() async {
             create: (c) =>
                 ListProvider(c.authProvider.userId, crdt, c.storeProvider)),
         Provider(
-            create: (c) =>
-                SyncProvider(c.authProvider, c.storeProvider, c.listProvider)),
+            create: (c) => SyncProvider(c.authProvider, c.storeProvider, crdt)),
       ],
       child: const TudoApp(),
     ),

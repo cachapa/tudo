@@ -3,70 +3,46 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:rxdart/rxdart.dart';
+import 'package:sqlite_crdt/sqlite_crdt.dart';
 import 'package:tudo_app/auth/auth_provider.dart';
-import 'package:tudo_app/crdt/hlc.dart';
 import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/lists/list_provider.dart';
-import 'package:tudo_app/util/build_info.dart';
 import 'package:tudo_app/util/store.dart';
 
 import '../config.dart';
+import '../util/build_info.dart';
 import 'sync_client.dart';
 
 class SyncProvider {
-  final ListProvider _listProvider;
-  final Store _store;
+  final SqliteCrdt _crdt;
   late final SyncClient _client;
 
   var _online = false;
   Timer? _reconnectTimer;
-
-  set _lastReceive(Hlc? value) => _store.put('last_recv', value);
-
-  Hlc? get _lastReceive => _store.get('last_recv');
-
-  set _lastSend(Hlc? value) => _store.put('last_send', value);
-
-  Hlc? get _lastSend => _store.get('last_send');
+  Hlc? _lastSend;
+  StreamSubscription? _sendSubscription;
 
   Stream<bool> get connectionState => _client.connectionState;
 
-  SyncProvider(AuthProvider authProvider, StoreProvider storeProvider,
-      this._listProvider)
-      : _store = storeProvider.getStore('sync') {
-    _client = SyncClient(authProvider.token, authProvider.userId)
+  SyncProvider(
+      AuthProvider authProvider, StoreProvider storeProvider, this._crdt) {
+    _client = SyncClient(authProvider.token, authProvider.userId, _crdt.nodeId)
       ..messages.listen((message) async {
-        final map = jsonDecode(message) as Map;
-        final type = map['type'];
-
-        switch (type) {
-          case 'hlc':
-            _lastSend = (map['hlc'] as String).asHlc;
-            break;
-          case 'changeset':
-            // Merge remote changeset
-            final changeset =
-                (map['data'] as List).cast<Map<String, dynamic>>();
-            'RECV ${changeset.length} records'.log;
-
-            // Store last receive time
-            final canonicalTime = await _listProvider.merge(changeset);
-            _lastReceive = canonicalTime;
-
-            // Notify remote
-            _client.send(jsonEncode({
-              'type': 'hlc',
-              'hlc': map['hlc'],
-            }));
-            break;
-        }
+        final changeset = (jsonDecode(message) as Map<String, dynamic>)
+            .map((key, value) => MapEntry(
+                  key,
+                  (value as List).cast<Map<String, dynamic>>(),
+                ));
+        await _crdt.merge(changeset);
       });
 
     _client.connectionState.listen((isConnected) {
       if (isConnected) {
         // Sync whenever connection is established
-        _sync();
+        _sendChangeset();
       } else {
+        _lastSend = null;
+        _sendSubscription?.cancel();
         // Trigger reconnect
         if (_online) {
           _reconnectTimer = Timer(const Duration(seconds: 10), () => connect());
@@ -74,17 +50,14 @@ class SyncProvider {
       }
     });
 
-    // Sync on changes
-    _listProvider.allChanges.listen((_) => _sync());
-
     // Make sure all sockets are connected
     connect();
   }
 
-  void connect() {
+  Future<void> connect() async {
     _reconnectTimer?.cancel();
     _online = true;
-    _client.connect(_lastReceive);
+    _client.connect(await _crdt.peerLastModified);
   }
 
   void disconnect() {
@@ -94,18 +67,23 @@ class SyncProvider {
     _client.disconnect();
   }
 
-  Future<void> _sync() async {
-    if (!_client.isConnected) return;
+  Future<void> _sendChangeset() async {
+    _lastSend ??= await _client.getRemoteLastModified();
+    _sendSubscription = _crdt
+        .watchChangeset(
+          onlyModifiedHere: true,
+          modifiedSince: () => _lastSend,
+        )
+        .debounceTime(const Duration(milliseconds: 200))
+        .listen((changeset) {
+      _lastSend = _crdt.canonicalTime;
 
-    final changeset = await _listProvider.changeset(_lastSend);
-    if (changeset.records.isEmpty) return;
-
-    'SEND ${changeset.records.length} records'.log;
-    _client.send(jsonEncode({
-      'type': 'changeset',
-      'data': changeset.records,
-      'hlc': changeset.canonicalTime,
-    }));
+      final count = changeset.recordCount;
+      if (count > 0) {
+        'SEND $count records'.log;
+        _client.send(jsonEncode(changeset));
+      }
+    });
   }
 
   Future<bool> isUpdateRequired() async {

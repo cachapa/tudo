@@ -413,6 +413,7 @@ class ToDoListView extends StatelessWidget {
   }
 
   void _deleteItem(BuildContext context, ToDo toDo) {
+    list.items.remove(toDo);
     final listProvider = context.listProvider;
     listProvider.deleteItem(toDo.id);
 

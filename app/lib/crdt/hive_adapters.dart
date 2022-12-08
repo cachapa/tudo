@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
-
-import 'hlc.dart';
+import 'package:sqlite_crdt/sqlite_crdt.dart';
 
 class HlcAdapter extends TypeAdapter<Hlc> {
   @override

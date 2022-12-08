@@ -192,11 +192,11 @@ class _ListManagerPageState extends State<ListManagerPage> {
         ),
       );
 
-      if (result ?? false) {
+      if (result == true) {
         if (Platform.isAndroid) {
           await InAppUpdate.performImmediateUpdate();
         } else {
-          launchUrlString(
+          await launchUrlString(
               'https://apps.apple.com/us/app/tudo-lists/id1550819275');
         }
       }

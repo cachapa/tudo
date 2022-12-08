@@ -1,32 +1,42 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:tudo_app/crdt/tudo_crdt.dart';
+import 'package:sqlite_crdt/sqlite_crdt.dart';
 import 'package:tudo_app/extensions.dart';
 
 class ContactProvider {
   final String userId;
-  final TudoCrdt _crdt;
+  final SqliteCrdt _crdt;
 
   final _contacts = BehaviorSubject<Map<String, User>>();
 
-  Stream<bool> get isNameSet => currentUser.asyncMap(
-      (_) async => (await _crdt.getField('users', userId, 'name')) != null);
+  Stream<bool> get isNameSet => currentUser.map((e) => e.name.isNotEmpty);
 
   Stream<User> get currentUser => getUser(userId);
 
   ContactProvider(this.userId, this._crdt) {
     _contacts.addStream(_crdt
-        .query('''
-          SELECT user_id, name FROM user_lists
-            LEFT JOIN users ON user_id = id
-          WHERE coalesce(users.is_deleted, 0) = 0
+        .watch('''
+          SELECT * FROM users
+          WHERE is_deleted = 0
         ''')
         .map((l) => l.map((m) => User.fromMap(userId, m)))
         .map((l) => {for (final u in l) u.id: u}));
   }
 
-  Future<void> setName(String value) =>
-      _crdt.setField('users', [userId], 'name', value);
+  Future<void> setName(String name) async {
+    final userExists = (await _contacts.first).containsKey(userId);
+    if (!userExists) {
+      await _crdt.execute('''
+        INSERT INTO users (id, name)
+        VALUES (?1, ?2)
+      ''', [userId, name]);
+    } else {
+      await _crdt.execute('''
+        UPDATE users SET name = ?2
+        WHERE id = ?1
+      ''', [userId, name]);
+    }
+  }
 
   Stream<User> getUser(String id) =>
       _contacts.map((m) => m[id] ?? User(userId, id, null));
@@ -42,7 +52,7 @@ class User {
         isCurrentUser = userId == id;
 
   User.fromMap(String userId, Map<String, dynamic> map)
-      : this(userId, map['user_id'], map['name']);
+      : this(userId, map['id'], map['name']);
 
   String nameOr(BuildContext context) =>
       name.isEmpty ? context.t.anonymous : name;

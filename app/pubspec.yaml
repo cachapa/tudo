@@ -1,6 +1,6 @@
 name: tudo_app
 description: A simple to-do app
-version: 0.0.0
+version: 2.0.0
 homepage: https://github.com/cachapa/tudo
 publish_to: none
 
@@ -20,8 +20,7 @@ dependencies:
 
   provider: ^6.0.5
   rxdart: ^0.27.7
-  sqflite: ^2.2.2
-  sqflite_common_ffi: ^2.2.0+1
+  sqlite_crdt: ^0.0.3
   # Required for Android and iOS because UPSERTs are only supported on very recent OS versions
   sqlite3_flutter_libs: ^0.5.12
 
@@ -32,6 +31,7 @@ dependencies:
     git:
       url: https://github.com/storyark-app/implicitly_animated_reorderable_list.git
       ref: flutter_beta
+
   in_app_update: ^4.0.1
   package_info_plus: ^3.0.2
   path_provider: ^2.0.11

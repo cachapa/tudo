@@ -1,9 +1,6 @@
-import 'crdt/hlc.dart';
-
 extension StringX on String {
-  void get log => print(this);
-
-  DateTime get asDateTime => DateTime.parse(this);
-
-  Hlc get asHlc => Hlc.parse(this);
+  String get short {
+    final i = indexOf('-');
+    return i > 0 ? substring(0, i) : this;
+  }
 }

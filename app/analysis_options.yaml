@@ -7,4 +7,4 @@ analyzer:
 linter:
   rules:
     prefer_single_quotes: true
-    use_build_context_synchronously: false
+    unawaited_futures: true

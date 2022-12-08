@@ -10,7 +10,6 @@ import 'package:tudo_app/util/store.dart';
 
 import 'auth/auth_provider.dart';
 import 'contacts/contact_provider.dart';
-import 'crdt/hlc.dart';
 import 'lists/list_provider.dart';
 import 'settings/settings_provider.dart';
 import 'sync/sync_provider.dart';
@@ -25,8 +24,6 @@ extension StringX on String {
   }
 
   DateTime get asDateTime => DateTime.parse(this);
-
-  Hlc get asHlc => Hlc.parse(this);
 
   Color get asColor =>
       Color(int.parse(replaceFirst('#', ''), radix: 16) + 0xFF000000);
