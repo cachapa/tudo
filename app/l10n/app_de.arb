@@ -39,5 +39,5 @@
   "userRemoved": "{name} entfernt",
   "nameCaption": "In geteilten Listen sichtbar",
   "copyLink": "Link kopieren",
-  "listShareMessage": "Die Liste \"{listName}\" in dein Gerät öffnen:\n{shareUrl}"
+  "listShareMessage": "Die Liste \"{listName}\" aud deinem Gerät öffnen:\n{shareUrl}"
 }

@@ -70,7 +70,7 @@ class _ShareListForm extends StatelessWidget {
                   icon: Icon(Icons.adaptive.share),
                   label: Text(context.t.share.toUpperCase()),
                   onPressed: () {
-                    Share.share(t.listShareMessage(t.name, shareUrl));
+                    Share.share(t.listShareMessage(list.name, shareUrl));
                     Navigator.pop(context);
                   },
                 ),
