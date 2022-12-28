@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:tudo_app/common/appbars.dart';
-import 'package:tudo_app/common/badge.dart';
 import 'package:tudo_app/common/segmented_control.dart';
 import 'package:tudo_app/common/text_input_dialog.dart';
 import 'package:tudo_app/common/value_builders.dart';
@@ -29,7 +28,7 @@ class SettingsPage extends StatelessWidget {
               leading: ValueStreamBuilder<bool>(
                 stream: context.contactProvider.isNameSet,
                 builder: (_, isNameSet) => Badge(
-                  showBadge: !isNameSet,
+                  smallSize: isNameSet ? 0 : null,
                   child: const Icon(Icons.badge_outlined),
                 ),
               ),
