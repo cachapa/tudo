@@ -65,7 +65,7 @@ class _EditListFormState extends State<_EditListForm> {
             children: [
               Text(
                 editMode ? t.editList : t.createList,
-                style: context.theme.textTheme.headline6,
+                style: context.theme.textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),

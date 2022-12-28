@@ -149,11 +149,11 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
 // https://github.com/flutter/flutter/issues/90098
 Future<void> _setSystemColors() async {
   final navigationBarColor = !Platform.isAndroid ||
-          ((await DeviceInfoPlugin().androidInfo).version.sdkInt ?? 0) >= 29
+          ((await DeviceInfoPlugin().androidInfo).version.sdkInt) >= 29
       ? Colors.transparent
       : Colors.black38;
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
     systemNavigationBarColor: navigationBarColor,

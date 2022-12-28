@@ -9,7 +9,7 @@ class IconLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = context.theme.textTheme.caption!.color;
+    final color = context.theme.textTheme.bodySmall!.color;
 
     return Row(
       mainAxisSize: MainAxisSize.min,

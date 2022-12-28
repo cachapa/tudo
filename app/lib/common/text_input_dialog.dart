@@ -54,7 +54,7 @@ class TextInputDialog extends StatelessWidget {
           if (caption != null)
             Text(
               caption!,
-              style: context.theme.textTheme.caption,
+              style: context.theme.textTheme.bodySmall,
             ),
         ],
       ),

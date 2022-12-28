@@ -47,7 +47,7 @@ class _ManageParticipantsPage extends StatelessWidget {
               padding: const EdgeInsets.only(top: 24, bottom: 16),
               child: Text(
                 t.participants,
-                style: context.theme.textTheme.headline6,
+                style: context.theme.textTheme.titleLarge,
               ),
             ),
             Expanded(
@@ -77,7 +77,7 @@ class _ManageParticipantsPage extends StatelessWidget {
                           )
                         : IconButton(
                             icon: const Icon(Icons.close),
-                            color: context.theme.errorColor,
+                            color: context.theme.colorScheme.error,
                             onPressed: () => _removeUser(context, user),
                           ),
                   ),
@@ -106,7 +106,7 @@ class _ManageParticipantsPage extends StatelessWidget {
           TextButton(
             child: Text(
               t.remove.toUpperCase(),
-              style: TextStyle(color: context.theme.errorColor),
+              style: TextStyle(color: context.theme.colorScheme.error),
             ),
             onPressed: () => context.pop(true),
           ),
@@ -114,14 +114,16 @@ class _ManageParticipantsPage extends StatelessWidget {
       ),
     );
 
-    if (result ?? false) {
+    if (context.mounted && (result ?? false)) {
       final listProvider = context.listProvider;
       await listProvider.removeUser(user.id, listId);
 
-      context.showSnackBar(
-        context.t.userRemoved(user.name),
-        () => listProvider.undoRemoveUser(user.id, listId),
-      );
+      if (context.mounted) {
+        context.showSnackBar(
+          context.t.userRemoved(user.name),
+          () => listProvider.undoRemoveUser(user.id, listId),
+        );
+      }
     }
   }
 }

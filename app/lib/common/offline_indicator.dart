@@ -22,7 +22,7 @@ class OfflineIndicator {
         ),
       ),
     );
-    Overlay.of(context)!.insert(_overlay);
+    Overlay.of(context).insert(_overlay);
   }
 
   void dispose() {

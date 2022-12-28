@@ -115,7 +115,7 @@ class SettingsPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 t.version(BuildInfo.version),
-                style: context.theme.textTheme.caption,
+                style: context.theme.textTheme.bodySmall,
                 textAlign: TextAlign.center,
               ),
             ),
@@ -138,8 +138,8 @@ class SettingsPage extends StatelessWidget {
         positiveLabel: context.t.update,
       ),
     );
-    if (name != null) {
-      context.contactProvider.setName(name);
+    if (context.mounted && name != null) {
+      await context.contactProvider.setName(name);
     }
   }
 }
@@ -155,7 +155,7 @@ class Header extends StatelessWidget {
       padding: const EdgeInsets.only(top: 16, bottom: 8, left: 16, right: 16),
       child: Text(
         title,
-        style: TextStyle(color: context.theme.textTheme.caption!.color),
+        style: TextStyle(color: context.theme.textTheme.bodySmall!.color),
       ),
     );
   }

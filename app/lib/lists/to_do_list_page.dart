@@ -50,7 +50,7 @@ class ToDoListPage extends StatelessWidget {
             children: [
               Text(
                 t.listUnavailable,
-                style: context.theme.textTheme.headline6,
+                style: context.theme.textTheme.titleLarge,
               ),
               const SizedBox(height: 16),
               MaterialButton(
@@ -66,13 +66,58 @@ class ToDoListPage extends StatelessWidget {
                 context.theme.colorScheme.copyWith(primary: list.color),
             primaryColor: list.color,
             primaryTextTheme:
-                TextTheme(headline6: TextStyle(color: list.color)),
+                TextTheme(titleLarge: TextStyle(color: list.color)),
             primaryIconTheme: IconThemeData(color: list.color),
             iconTheme: IconThemeData(color: list.color),
-            toggleableActiveColor: list.color,
             textSelectionTheme: TextSelectionThemeData(
               selectionHandleColor: list.color,
               cursorColor: list.color,
+            ),
+            checkboxTheme: CheckboxThemeData(
+              fillColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return null;
+                }
+                if (states.contains(MaterialState.selected)) {
+                  return list.color;
+                }
+                return null;
+              }),
+            ),
+            radioTheme: RadioThemeData(
+              fillColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return null;
+                }
+                if (states.contains(MaterialState.selected)) {
+                  return list.color;
+                }
+                return null;
+              }),
+            ),
+            switchTheme: SwitchThemeData(
+              thumbColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return null;
+                }
+                if (states.contains(MaterialState.selected)) {
+                  return list.color;
+                }
+                return null;
+              }),
+              trackColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                if (states.contains(MaterialState.disabled)) {
+                  return null;
+                }
+                if (states.contains(MaterialState.selected)) {
+                  return list.color;
+                }
+                return null;
+              }),
             ),
           ),
           child: Scaffold(
@@ -103,7 +148,7 @@ class ToDoListPage extends StatelessWidget {
                       Icons.exit_to_app,
                       t.leaveList,
                       () => context.pop(ListAction.delete),
-                      context.theme.errorColor,
+                      context.theme.colorScheme.error,
                     ),
                   ],
                 ),
@@ -202,8 +247,8 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
                   list.memberNames(context),
                   softWrap: false,
                   overflow: TextOverflow.fade,
-                  style: context.theme.textTheme.bodyMedium!
-                      .copyWith(color: context.theme.textTheme.caption!.color),
+                  style: context.theme.textTheme.bodyMedium!.copyWith(
+                      color: context.theme.textTheme.bodySmall!.color),
                 ),
             ],
           ),
@@ -245,7 +290,7 @@ class _InputBarState extends State<InputBar> {
             focusNode: _focusNode,
             textCapitalization: TextCapitalization.sentences,
             cursorColor: primaryColor,
-            style: context.theme.textTheme.subtitle1!
+            style: context.theme.textTheme.titleMedium!
                 .copyWith(color: primaryColor),
             decoration: InputDecoration(
               filled: true,
@@ -398,8 +443,8 @@ class _ToDoListViewState extends State<ToDoListView> {
         positiveLabel: context.t.update,
       ),
     );
-    if (title != null) {
-      context.listProvider.setItemName(toDo.id, title);
+    if (context.mounted && title != null) {
+      await context.listProvider.setItemName(toDo.id, title);
     }
   }
 
@@ -518,7 +563,7 @@ class _ListTile extends StatelessWidget {
               ? item.doneAt != null
                   ? Text(
                       item.doneAt!.toRelativeString(context),
-                      style: context.theme.textTheme.caption,
+                      style: context.theme.textTheme.bodySmall,
                     )
                   : null
               : const DragHandle(),
@@ -554,7 +599,7 @@ class _CompletedHeader extends StatelessWidget {
           Expanded(
             child: Text(
               context.t.completed,
-              style: context.theme.textTheme.subtitle2!.copyWith(color: color),
+              style: context.theme.textTheme.titleSmall!.copyWith(color: color),
             ),
           ),
           IconButton(

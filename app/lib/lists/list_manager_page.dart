@@ -124,10 +124,12 @@ class _ListManagerPageState extends State<ListManagerPage> {
   Future<void> _deleteList(BuildContext context, ToDoList list) async {
     final listManager = context.read<ListProvider>();
     await listManager.removeList(list.id);
-    context.showSnackBar(
-      context.t.listDeleted(list.name),
-      () => listManager.undoRemoveList(list.id),
-    );
+    if (context.mounted) {
+      context.showSnackBar(
+        context.t.listDeleted(list.name),
+        () => listManager.undoRemoveList(list.id),
+      );
+    }
   }
 
   void _scrollToLastItem() {
@@ -176,7 +178,7 @@ class Logo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.t;
-    final color = context.theme.textTheme.bodyText1!.color;
+    final color = context.theme.textTheme.bodyLarge!.color;
 
     return SafeArea(
       bottom: false,
@@ -233,6 +235,8 @@ class Logo extends StatelessWidget {
     if (code == '-1') return;
     'Read QR: $code'.log;
     final uri = Uri.parse(code);
-    await context.read<ListProvider>().import(uri.pathSegments.last);
+    if (context.mounted) {
+      await context.read<ListProvider>().import(uri.pathSegments.last);
+    }
   }
 }

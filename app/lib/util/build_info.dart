@@ -27,8 +27,8 @@ class BuildInfo {
     // Mobile
     if (Platform.isAndroid) {
       final info = await DeviceInfoPlugin().androidInfo;
-      deviceModel = info.model!;
-      platformVersion = info.version.release!;
+      deviceModel = info.model;
+      platformVersion = info.version.release;
     } else if (Platform.isIOS) {
       final info = await DeviceInfoPlugin().iosInfo;
       deviceModel = info.model!;

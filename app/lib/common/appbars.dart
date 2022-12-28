@@ -19,7 +19,7 @@ class DiscreteAppBar extends StatelessWidget with PreferredSizeWidget {
           ? SystemUiOverlayStyle.dark
           : SystemUiOverlayStyle.light,
       elevation: 0,
-      foregroundColor: context.theme.textTheme.headline6!.color,
+      foregroundColor: context.theme.textTheme.titleLarge!.color,
       backgroundColor: context.theme.canvasColor,
       centerTitle: true,
       title: Column(
@@ -28,7 +28,7 @@ class DiscreteAppBar extends StatelessWidget with PreferredSizeWidget {
           if (subtitle != null)
             Text(
               subtitle!,
-              style: context.theme.textTheme.caption!
+              style: context.theme.textTheme.bodySmall!
                   .copyWith(color: context.theme.primaryColor),
             ),
         ],

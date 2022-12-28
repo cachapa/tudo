@@ -83,7 +83,7 @@ class _AnimatedCounterState extends State<AnimatedCounter> {
         key: ValueKey(widget.value),
         style: Theme.of(context)
             .primaryTextTheme
-            .bodyText2!
+            .bodyMedium!
             .copyWith(fontSize: widget.size),
       ),
     );

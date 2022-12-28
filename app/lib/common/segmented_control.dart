@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tudo_app/extensions.dart';
 
 class SegmentedControl<V, T> extends StatelessWidget {
   final V value;

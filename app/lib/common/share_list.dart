@@ -38,7 +38,7 @@ class _ShareListForm extends StatelessWidget {
               list.name,
               style: Theme.of(context)
                   .textTheme
-                  .headline6!
+                  .titleLarge!
                   .copyWith(color: list.color),
             ),
             const SizedBox(height: 20),
