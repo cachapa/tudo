@@ -19,6 +19,9 @@ class BuildInfo {
 
   static bool get isDebug => kDebugMode;
 
+  static String get userAgent =>
+      'tudo/$version $platform/$platformVersion ($deviceModel)';
+
   BuildInfo._();
 
   static Future<void> init() async {

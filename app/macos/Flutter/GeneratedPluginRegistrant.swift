@@ -5,10 +5,10 @@
 import FlutterMacOS
 import Foundation
 
-import device_info_plus_macos
-import package_info_plus_macos
+import device_info_plus
+import package_info_plus
 import path_provider_macos
-import share_plus_macos
+import share_plus
 import sqflite
 import sqlite3_flutter_libs
 import url_launcher_macos

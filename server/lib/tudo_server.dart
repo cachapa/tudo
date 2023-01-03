@@ -18,13 +18,12 @@ class TudoServer {
     _crdt = TudoCrdt();
     await _crdt.init('store', 'tudo');
 
-    var router = Router()
+    final router = Router()
+      ..head('/check_version', _checkVersion)
       ..get('/auth', _auth)
-      ..get('/ws', _wsHandler)
-      // Return 404 for everything else
-      ..all('/<ignored|.*>', _notFoundHandler);
+      ..get('/ws', _wsHandler);
 
-    var handler = const Pipeline()
+    final handler = Pipeline()
         .addMiddleware(logRequests())
         .addMiddleware(_validateSecret)
         .addMiddleware(_validateCredentials)
@@ -32,6 +31,17 @@ class TudoServer {
 
     var server = await io.serve(handler, '0.0.0.0', port);
     print('Serving at http://${server.address.host}:${server.port}');
+  }
+
+  Response _checkVersion(Request request) {
+    // final userAgent = request.headers[HttpHeaders.userAgentHeader]!;
+    // final version = Version.parse(userAgent.substring(
+    //     userAgent.indexOf('/') + 1, userAgent.indexOf(' ')));
+    // final needsUpgrade = version <= Version(1, 9, 0);
+    //
+    // return Response(needsUpgrade ? 426 : 200);
+
+    return Response(200);
   }
 
   /// By the time we arrive here, both the secret and credentials have been validated
@@ -141,9 +151,12 @@ class TudoServer {
     }));
   }
 
-  Response _notFoundHandler(Request request) => Response.notFound('Not found');
-
   Handler _validateSecret(Handler innerHandler) => (request) async {
+        // Do not validate for public paths
+        if (['check_version'].contains(request.url.path)) {
+          return innerHandler(request);
+        }
+
         final suppliedSecret = request.headers['api_secret'];
         if (apiSecret == suppliedSecret) {
           return innerHandler(request);
@@ -153,6 +166,11 @@ class TudoServer {
       };
 
   Handler _validateCredentials(Handler innerHandler) => (request) async {
+        // Do not validate for public paths
+        if (['check_version'].contains(request.url.path)) {
+          return innerHandler(request);
+        }
+
         final userId = request.headers['user_id'];
         final token = request.headers['token'];
 

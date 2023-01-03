@@ -1,15 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:in_app_update/in_app_update.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/offline_indicator.dart';
 import 'package:tudo_app/common/value_builders.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/settings/settings_page.dart';
 import 'package:uni_links/uni_links.dart';
+import 'package:url_launcher/url_launcher_string.dart';
 
 import 'list_provider.dart';
 import 'to_do_list_page.dart';
@@ -35,6 +39,8 @@ class _ListManagerPageState extends State<ListManagerPage> {
       _offlineIndicator = OfflineIndicator(context);
     });
     _monitorDeeplinks();
+
+    _checkForUpdates();
   }
 
   @override
@@ -168,6 +174,38 @@ class _ListManagerPageState extends State<ListManagerPage> {
       }
     } catch (e) {
       e.toString().log;
+    }
+  }
+
+  Future<void> _checkForUpdates() async {
+    if (await context.syncProvider.isUpdateRequired()) {
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(context.t.updateRequired),
+          content: Text(context.t.updateRequiredMessage),
+          actions: [
+            TextButton(
+              child: Text(context.t.close),
+              onPressed: () => context.pop(false),
+            ),
+            if (PlatformX.isMobile)
+              TextButton(
+                child: Text(context.t.update),
+                onPressed: () => context.pop(true),
+              ),
+          ],
+        ),
+      );
+
+      if (result ?? false) {
+        if (Platform.isAndroid) {
+          await InAppUpdate.performImmediateUpdate();
+        } else {
+          launchUrlString(
+              'https://apps.apple.com/us/app/tudo-lists/id1550819275');
+        }
+      }
     }
   }
 }

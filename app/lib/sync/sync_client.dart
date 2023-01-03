@@ -27,10 +27,9 @@ class SyncClient {
     if (isConnected) return;
 
     // Dart's WebSocket uses a global static client, so the user agent needs to be set like so:
-    WebSocket.userAgent =
-        'tudo/${BuildInfo.version} ${BuildInfo.platform}/${BuildInfo.platformVersion} (${BuildInfo.deviceModel})';
+    WebSocket.userAgent = BuildInfo.userAgent;
 
-    const endpoint = '$serverAddress/ws';
+    final endpoint = '${serverAddress.replaceFirst('http', 'ws')}/ws';
     channel = IOWebSocketChannel.connect(Uri.parse(endpoint), headers: {
       'api_secret': apiSecret,
       'token': token,

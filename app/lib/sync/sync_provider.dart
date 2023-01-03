@@ -1,12 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:http/http.dart';
 import 'package:tudo_app/auth/auth_provider.dart';
 import 'package:tudo_app/crdt/hlc.dart';
 import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/lists/list_provider.dart';
+import 'package:tudo_app/util/build_info.dart';
 import 'package:tudo_app/util/store.dart';
 
+import '../config.dart';
 import 'sync_client.dart';
 
 class SyncProvider {
@@ -102,5 +106,15 @@ class SyncProvider {
       'data': changeset.records,
       'hlc': changeset.canonicalTime,
     }));
+  }
+
+  Future<bool> isUpdateRequired() async {
+    final result = await head(
+      Uri.parse('$serverAddress/check_version'),
+      headers: {HttpHeaders.userAgentHeader: BuildInfo.userAgent},
+    );
+    // There's actually a status code for this:
+    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/426
+    return result.statusCode == 426;
   }
 }
