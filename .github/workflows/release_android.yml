@@ -33,7 +33,7 @@ jobs:
 
       - name: Retrieve build name from tag
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF#refs/tags/}
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Load secrets
         working-directory: app/android
