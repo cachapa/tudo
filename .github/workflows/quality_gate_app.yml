@@ -19,20 +19,25 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+
       - name: Cache Flutter dependencies
         uses: actions/cache@v1
         with:
           path: /opt/hostedtoolcache/flutter
           key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}
+
       - uses: subosito/flutter-action@v1
         with:
-          channel: 'stable'
+          channel: 'beta'
 
       - name: Verify code formatting
         run: dart format --output none --set-exit-if-changed .
+
       - name: Load config
         run: echo "${{ secrets.CONFIG }}" > lib/config.dart
+
       - name: Static code analysis
         run: flutter analyze
+
 #      - name: Run tests
 #        run: flutter test
