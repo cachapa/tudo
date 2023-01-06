@@ -3,10 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
-import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:tudo_app/common/check.dart';
-import 'package:tudo_app/common/drag_handler.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/empty_page.dart';
 import 'package:tudo_app/common/icon_label.dart';
@@ -26,11 +23,9 @@ enum ListAction { delete }
 
 class ToDoListPage extends StatelessWidget {
   final ToDoList list;
-  final _listKey = GlobalKey<_ToDoListViewState>();
-  final _uncheckedListKey = GlobalKey();
-  final _controller = ScrollController();
+  final _bottomOfList = GlobalKey();
 
-  ToDoListPage({Key? key, required this.list}) : super(key: key);
+  ToDoListPage({super.key, required this.list});
 
   @override
   Widget build(BuildContext context) {
@@ -127,12 +122,19 @@ class ToDoListPage extends StatelessWidget {
               list: list,
               actions: [
                 IconButton(
-                  tooltip: t.share,
-                  icon: Icon(Icons.adaptive.share),
-                  onPressed: () => shareToDoList(context, list),
+                  tooltip: t.clearCompleted,
+                  icon: const Icon(Icons.delete_sweep_outlined),
+                  onPressed: list.doneCount == 0
+                      ? null
+                      : () => _clearCompleted(context, list.items),
                 ),
                 PopupMenu(
                   entries: [
+                    PopupEntry(
+                      Icons.share,
+                      t.share,
+                      () => shareToDoList(context, list),
+                    ),
                     PopupEntry(
                       Icons.edit,
                       t.editList,
@@ -156,12 +158,7 @@ class ToDoListPage extends StatelessWidget {
             ),
             body: list.items.isEmpty
                 ? EmptyPage(text: t.toDoListEmptyMessage)
-                : ToDoListView(
-                    key: _listKey,
-                    list: list,
-                    checkedListKey: _uncheckedListKey,
-                    controller: _controller,
-                  ),
+                : ToDoListView(list: list, bottomOfListKey: _bottomOfList),
             bottomNavigationBar: Padding(
               padding: EdgeInsets.only(bottom: bottom),
               child: InputBar(
@@ -182,9 +179,39 @@ class ToDoListPage extends StatelessWidget {
       BuildContext context, String listID, String name) async {
     final itemId = await context.listProvider.createItem(list.id, name);
 
-    // Wait for item insertion animation to complete
-    await Future.delayed(const Duration(milliseconds: 400));
-    _listKey.currentState?.scrollToItem(itemId);
+    // Scroll to bottom of list
+    await Future.delayed(const Duration(milliseconds: 100));
+    final itemContext = _bottomOfList.currentContext;
+    if (itemContext != null) {
+      Scrollable.ensureVisible(
+        itemContext,
+        duration: const Duration(milliseconds: 300),
+        alignment: 0.90,
+      );
+    }
+  }
+
+  Future<void> _clearCompleted(BuildContext context, List<ToDo> items) async {
+    var checked = items.where((item) => item.done).toList();
+    if (checked.isEmpty) return;
+
+    var indexes =
+        checked.map((e) => context.listProvider.deleteItem(e.id)).toList();
+
+    // Insert in reverse order when undoing so the old indexes match
+    checked = checked.reversed.toList();
+    indexes = indexes.reversed.toList();
+    final count = checked.length;
+
+    context.showSnackBar(
+      context.t.itemsCleared(count),
+      () {
+        for (var i = 0; i < checked.length; i++) {
+          final item = checked[i];
+          context.listProvider.undeleteItem(item.id);
+        }
+      },
+    );
   }
 }
 
@@ -324,117 +351,55 @@ class _InputBarState extends State<InputBar> {
   }
 }
 
-class ToDoListView extends StatefulWidget {
+class ToDoListView extends StatelessWidget {
   final ToDoListWithItems list;
-  final Key checkedListKey;
-  final ScrollController controller;
+  final GlobalKey bottomOfListKey;
 
-  const ToDoListView({
-    Key? key,
-    required this.list,
-    required this.checkedListKey,
-    required this.controller,
-  }) : super(key: key);
+  const ToDoListView(
+      {super.key, required this.list, required this.bottomOfListKey});
 
-  @override
-  State<ToDoListView> createState() => _ToDoListViewState();
-}
-
-class _ToDoListViewState extends State<ToDoListView> {
-  final _itemKeys = <String, GlobalKey>{};
-
-  // Temporarily remember deleted items to fix an edge case in the removal anim
-  String? _lastDeletedItemId;
-
-  List<ToDo> get items => widget.list.items;
+  List<ToDo> get items => list.items;
 
   @override
   Widget build(BuildContext context) {
-    final uncheckedItems = items.where((item) => !item.done).toList();
-    final checkedItems = items.where((item) => item.done).toList();
-    _itemKeys.clear();
-
-    return ListView(
-      controller: widget.controller,
-      clipBehavior: Clip.none,
+    return CustomScrollView(
+      // padding: context.padding,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      children: [
-        ImplicitlyAnimatedReorderableList<ToDo>(
-          key: widget.checkedListKey,
-          items: uncheckedItems,
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          insertDuration: const Duration(milliseconds: 300),
-          removeDuration: const Duration(milliseconds: 300),
-          reorderDuration: const Duration(milliseconds: 200),
-          areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-          onReorderFinished: (_, from, to, __) {
+      slivers: [
+        const SliverSafeArea(
+          bottom: false,
+          sliver: SliverToBoxAdapter(),
+        ),
+        SliverReorderableList(
+          itemCount: items.length,
+          onReorder: (from, to) {
+            // Fix buggy swap indexes
+            if (from < to) to--;
             if (from == to) return;
-            _swap(uncheckedItems[from], uncheckedItems[to]);
+            _swap(context, from, to);
           },
-          itemBuilder: (_, itemAnimation, item, __) => Reorderable(
-            key: Key(item.id),
-            builder: (context, animation, inDrag) => SizeFadeTransition(
-              sizeFraction: 0.7,
-              curve: Curves.easeInOut,
-              animation: itemAnimation,
-              child: _ListTile(
-                key: _itemKeys[item.id] ??= GlobalKey(),
-                item: item,
-                onToggle: () => _toggle(item),
-                onEdit: () => _editItem(item),
-                onDelete: () => _deleteItem(item),
-                isDeleted: item.id == _lastDeletedItemId,
-                isShared: widget.list.isShared,
-              ),
-            ),
+          itemBuilder: (context, i) => _ListTile(
+            key: ValueKey(items[i].id),
+            index: i,
+            item: items[i],
+            onToggle: () => _toggle(context, items[i]),
+            onEdit: () => _editItem(context, items[i]),
+            onDelete: () => _deleteItem(context, items[i]),
+            isShared: list.isShared,
           ),
         ),
-        ImplicitlyAnimatedList<ToDo>(
-          items: [
-            if (checkedItems.isNotEmpty)
-              ToDo('header', '', false, null, '', 0, null, null),
-            ...checkedItems,
-          ],
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          areItemsTheSame: (oldItem, newItem) => oldItem == newItem,
-          itemBuilder: (context, itemAnimation, item, i) => SizeFadeTransition(
-            sizeFraction: 0.7,
-            curve: Curves.easeInOut,
-            animation: itemAnimation,
-            child: item.id == 'header'
-                ? _CompletedHeader(
-                    onClear: _clearCompleted,
-                  )
-                : _ListTile(
-                    item: item,
-                    onToggle: () => _toggle(item),
-                    onEdit: () => _editItem(item),
-                    onDelete: () => _deleteItem(item),
-                    isDeleted: item.id == _lastDeletedItemId,
-                    isShared: widget.list.isShared,
-                  ),
-          ),
+        SliverSafeArea(
+          top: false,
+          sliver: SliverToBoxAdapter(key: bottomOfListKey),
         ),
       ],
     );
   }
 
-  void scrollToItem(String id) {
-    final itemContext = _itemKeys[id]?.currentContext;
-    if (itemContext != null) {
-      Scrollable.ensureVisible(
-        itemContext,
-        duration: const Duration(milliseconds: 300),
-        alignment: 0.90,
-      );
-    }
-  }
+  void _toggle(BuildContext context, ToDo toDo) =>
+      context.listProvider.setDone(toDo.id, !toDo.done);
 
-  void _toggle(ToDo toDo) => context.listProvider.setDone(toDo.id, !toDo.done);
-
-  Future<void> _editItem(ToDo toDo) async {
+  Future<void> _editItem(BuildContext context, ToDo toDo) async {
     final title = await showDialog<String>(
       context: context,
       builder: (context) => TextInputDialog(
@@ -448,107 +413,63 @@ class _ToDoListViewState extends State<ToDoListView> {
     }
   }
 
-  void _deleteItem(ToDo toDo) {
-    // Used to hide the item during its removal animation
-    _lastDeletedItemId = toDo.id;
-
+  void _deleteItem(BuildContext context, ToDo toDo) {
     final listProvider = context.listProvider;
     listProvider.deleteItem(toDo.id);
 
     context.showSnackBar(
       context.t.itemDeleted(toDo.name),
-      () {
-        _lastDeletedItemId = null;
-        listProvider.undeleteItem(toDo.id);
-      },
+      () => listProvider.undeleteItem(toDo.id),
     );
   }
 
-  Future<void> _clearCompleted() async {
-    var checked = items.where((item) => item.done).toList();
-    if (checked.isEmpty) return;
-
-    var indexes =
-        checked.map((e) => context.listProvider.deleteItem(e.id)).toList();
-
-    // Insert in reverse order when undoing so the old indexes match
-    checked = checked.reversed.toList();
-    indexes = indexes.reversed.toList();
-    final count = checked.length;
-
-    context.showSnackBar(
-      context.t.itemsCleared(count),
-      () {
-        for (var i = 0; i < checked.length; i++) {
-          final item = checked[i];
-          context.listProvider.undeleteItem(item.id);
-        }
-      },
-    );
-  }
-
-  void _swap(ToDo from, ToDo to) {
-    final fromIndex = items.indexOf(from);
-    final toIndex = items.indexOf(to);
-
-    // Copy list
-    final itemsCopy = items.toList();
-    final item = itemsCopy.removeAt(fromIndex);
-    itemsCopy.insert(toIndex, item);
-    context.listProvider.setItemOrder(itemsCopy);
+  void _swap(BuildContext context, int from, int to) {
+    final item = items.removeAt(from);
+    items.insert(to, item);
+    context.listProvider.setItemOrder(items);
   }
 }
 
 class _ListTile extends StatelessWidget {
+  final int index;
   final ToDo item;
   final Function() onToggle;
   final Function() onEdit;
   final Function() onDelete;
-  final bool isDeleted;
   final bool isShared;
 
   const _ListTile({
-    Key? key,
+    super.key,
+    required this.index,
     required this.item,
     required this.onToggle,
     required this.onEdit,
     required this.onDelete,
-    required this.isDeleted,
     required this.isShared,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: isDeleted ? 0 : 1,
-      child: Dismissible(
-        key: Key(item.id),
-        background: Container(
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: const Icon(
-            Icons.delete,
-            color: Colors.red,
-          ),
+    return Dismissible(
+      key: Key(item.id),
+      background: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(
+          Icons.delete,
+          color: Colors.red,
         ),
-        secondaryBackground: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: const Icon(
-            Icons.delete,
-            color: Colors.red,
-          ),
+      ),
+      secondaryBackground: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: const Icon(
+          Icons.delete,
+          color: Colors.red,
         ),
-        onDismissed: (_) {
-          // Do nothing - deletions happen in confirmDismiss
-        },
-        confirmDismiss: (_) async {
-          // Avoid conflicts between Dismissible and list animations
-          // This removes the item and returns true so this widget remains in the
-          // tree to be removed by the list animation rather than itself.
-          onDelete();
-          return false;
-        },
+      ),
+      onDismissed: (_) => onDelete(),
+      child: Material(
         child: ListTile(
           leading: Check(
             checked: item.done,
@@ -559,54 +480,13 @@ class _ListTile extends StatelessWidget {
               ? IconLabel(
                   Icons.account_circle, item.doneBy ?? context.t.anonymous)
               : null,
-          trailing: item.done
-              ? item.doneAt != null
-                  ? Text(
-                      item.doneAt!.toRelativeString(context),
-                      style: context.theme.textTheme.bodySmall,
-                    )
-                  : null
-              : const DragHandle(),
+          trailing: ReorderableDragStartListener(
+            index: index,
+            child: const Icon(Icons.drag_indicator),
+          ),
           onTap: () => onToggle(),
           onLongPress: onEdit,
         ),
-      ),
-    );
-  }
-}
-
-class _CompletedHeader extends StatelessWidget {
-  final Function() onClear;
-
-  const _CompletedHeader({Key? key, required this.onClear}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final color = context.theme.primaryColor;
-
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: color.withOpacity(0.4),
-            width: 2,
-          ),
-        ),
-      ),
-      padding: const EdgeInsets.only(left: 16, top: 8, right: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              context.t.completed,
-              style: context.theme.textTheme.titleSmall!.copyWith(color: color),
-            ),
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_sweep_outlined),
-            onPressed: onClear,
-          ),
-        ],
       ),
     );
   }

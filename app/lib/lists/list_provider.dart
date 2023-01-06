@@ -195,7 +195,7 @@ class ListProvider {
       list_id = ?
       AND todos.is_deleted = 0
     ORDER BY
-      done_at, position
+      position
   ''', [listId]).then((l) => l.map(ToDo.fromMap).toList());
 }
 

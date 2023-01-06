@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
-import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
-import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:tudo_app/common/edit_list.dart';
 import 'package:tudo_app/common/offline_indicator.dart';
@@ -19,8 +17,6 @@ import 'list_provider.dart';
 import 'to_do_list_page.dart';
 import 'to_do_list_tile.dart';
 
-final _controller = ScrollController();
-
 class ListManagerPage extends StatefulWidget {
   const ListManagerPage({Key? key}) : super(key: key);
 
@@ -30,7 +26,7 @@ class ListManagerPage extends StatefulWidget {
 
 class _ListManagerPageState extends State<ListManagerPage> {
   late final OfflineIndicator _offlineIndicator;
-  final _itemKeys = <String, GlobalKey>{};
+  final _bottomOfList = GlobalKey();
 
   @override
   void initState() {
@@ -51,8 +47,6 @@ class _ListManagerPageState extends State<ListManagerPage> {
 
   @override
   Widget build(BuildContext context) {
-    _itemKeys.clear();
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.theme.brightness.invert,
@@ -60,28 +54,30 @@ class _ListManagerPageState extends State<ListManagerPage> {
       child: Scaffold(
         body: ValueStreamBuilder<List<ToDoList>>(
           stream: context.listProvider.lists,
-          builder: (_, lists) => ImplicitlyAnimatedReorderableList<ToDoList>(
-            controller: _controller,
-            padding: EdgeInsets.only(bottom: context.padding.bottom + 88),
-            items: lists,
-            shrinkWrap: true,
-            areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
-            onReorderFinished: (_, from, to, __) => _swap(lists, from, to),
-            header: const Logo(),
-            itemBuilder: (_, itemAnimation, item, __) => Reorderable(
-              key: ValueKey(item.id),
-              builder: (_, __, ___) => SizeFadeTransition(
-                sizeFraction: 0.7,
-                curve: Curves.easeInOut,
-                animation: itemAnimation,
-                child: ToDoListTile(
-                  key: _itemKeys[item.id] ??= GlobalKey(),
-                  list: item,
-                  onTap: () => _openList(context, item),
-                  onLongPress: () => _editList(context, item),
+          builder: (_, lists) => CustomScrollView(
+            slivers: [
+              const SliverToBoxAdapter(child: Logo()),
+              SliverReorderableList(
+                itemCount: lists.length,
+                onReorder: (from, to) {
+                  // Fix buggy swap indexes
+                  if (from < to) to--;
+                  if (from == to) return;
+                  _swap(lists, from, to);
+                },
+                itemBuilder: (context, i) => ToDoListTile(
+                  key: ValueKey(lists[i].id),
+                  list: lists[i],
+                  onTap: () => _openList(context, lists[i]),
+                  onLongPress: () => _editList(context, lists[i]),
+                  index: i,
                 ),
               ),
-            ),
+              SliverPadding(
+                key: _bottomOfList,
+                padding: EdgeInsets.only(bottom: context.padding.bottom + 88),
+              ),
+            ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
@@ -108,7 +104,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
     final result = await editToDoList(context);
     if (result ?? false) {
       // Scroll to the new item
-      await Future.delayed(const Duration(milliseconds: 400));
+      await Future.delayed(const Duration(milliseconds: 100));
       _scrollToLastItem();
     }
   }
@@ -139,8 +135,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
   }
 
   void _scrollToLastItem() {
-    if (_itemKeys.isEmpty) return;
-    final itemContext = _itemKeys.values.last.currentContext;
+    final itemContext = _bottomOfList.currentContext;
     if (itemContext != null) {
       Scrollable.ensureVisible(
         itemContext,
@@ -150,7 +145,6 @@ class _ListManagerPageState extends State<ListManagerPage> {
   }
 
   void _swap(List<ToDoList> lists, int from, int to) {
-    lists = lists.toList();
     final item = lists.removeAt(from);
     lists.insert(to, item);
     context.listProvider.setListOrder(lists);

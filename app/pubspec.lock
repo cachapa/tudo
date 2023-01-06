@@ -338,7 +338,7 @@ packages:
     description:
       path: "."
       ref: flutter_beta
-      resolved-ref: "5b184e7f95f947799fb52c94fea59811fd025ff2"
+      resolved-ref: "720b1d4d6a67b0c03c9dd57569f401cd647a526f"
       url: "https://github.com/storyark-app/implicitly_animated_reorderable_list.git"
     source: git
     version: "0.4.2"
