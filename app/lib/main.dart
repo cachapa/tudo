@@ -11,6 +11,7 @@ import 'package:tudo_app/extensions.dart';
 import 'package:tudo_app/settings/settings_provider.dart';
 import 'package:tudo_app/util/build_info.dart';
 import 'package:tudo_app/util/store.dart';
+import 'package:tudo_app/util/themes.dart';
 
 import 'common/value_builders.dart';
 import 'contacts/contact_provider.dart';
@@ -89,44 +90,12 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
         debugShowCheckedModeBanner: false,
         title: 'tudo',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        theme: ThemeData(
-          useMaterial3: true,
-          primarySwatch: Colors.blue,
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: context.theme.dividerColor,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-          ),
-          appBarTheme: const AppBarTheme(
-            scrolledUnderElevation: 0,
-          ),
-        ),
-        darkTheme: ThemeData(
-          useMaterial3: true,
-          primarySwatch: Colors.blue,
-          primaryColor: Colors.blue,
-          canvasColor: Colors.grey[900],
-          brightness: Brightness.dark,
-          inputDecorationTheme: InputDecorationTheme(
-            filled: true,
-            fillColor: context.theme.dividerColor,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-          ),
-          appBarTheme: const AppBarTheme(
-            scrolledUnderElevation: 0,
-            foregroundColor: Colors.red,
-            color: Colors.red,
-          ),
-        ),
+        supportedLocales: const [
+          Locale('en'),
+          ...AppLocalizations.supportedLocales,
+        ],
+        theme: lightTheme,
+        darkTheme: darkTheme,
         themeMode: theme,
         home: const ListManagerPage(),
       ),

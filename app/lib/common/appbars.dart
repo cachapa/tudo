@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:tudo_app/extensions.dart';
 
 class DiscreteAppBar extends StatelessWidget with PreferredSizeWidget {
@@ -15,9 +14,6 @@ class DiscreteAppBar extends StatelessWidget with PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      systemOverlayStyle: context.theme.brightness == Brightness.light
-          ? SystemUiOverlayStyle.dark
-          : SystemUiOverlayStyle.light,
       elevation: 0,
       foregroundColor: context.theme.textTheme.titleLarge!.color,
       backgroundColor: context.theme.canvasColor,
