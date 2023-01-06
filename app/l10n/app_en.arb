@@ -85,5 +85,6 @@
     }
   },
   "updateRequired": "Update required",
-  "updateRequiredMessage": "Please update tudo to resume synchronization."
+  "updateRequiredMessage": "Please update tudo to resume synchronization.",
+  "clearCompleted": "Clear completed"
 }

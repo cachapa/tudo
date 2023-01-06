@@ -26,7 +26,7 @@
   "libraDescription": "Gestor de peso com gráficos dinâmicos",
   "today": "Hoje",
   "yesterday": "Ontem",
-  "share":  "Partilhar",
+  "share": "Partilhar",
   "delete": "Eliminar",
   "create": "Criar",
   "participants": "Membros",
@@ -39,5 +39,8 @@
   "userRemoved": "{name} foi removido/a",
   "nameCaption": "Visível nas listas partilhadas",
   "copyLink": "Copiar ligação",
-  "listShareMessage": "Abre a a lista \"{listName}\" no teu aparelho\n:{shareUrl}"
+  "listShareMessage": "Abre a a lista \"{listName}\" no teu aparelho\n:{shareUrl}",
+  "updateRequired": "Atualização necessária",
+  "updateRequiredMessage": "Por favor actualiza a aplicação para continuar a sincronizar.",
+  "clearCompleted": "Eliminar completos"
 }
