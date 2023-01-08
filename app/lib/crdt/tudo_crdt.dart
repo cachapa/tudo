@@ -74,11 +74,10 @@ class TudoCrdt {
   }
 
   static Future<void> _upgradeFromCrdt(
-          BaseCrdt crdt, String table, List<String> ids) =>
-      crdt.execute('''
-        ALTER TABLE $table ADD COLUMN hlc TEXT NOT NULL DEFAULT '';
-        ALTER TABLE $table ADD COLUMN modified TEXT NOT NULL DEFAULT '';
-        
+      BaseCrdt crdt, String table, List<String> ids) async {
+    await crdt.execute('ALTER TABLE $table ADD COLUMN hlc TEXT');
+    await crdt.execute('ALTER TABLE $table ADD COLUMN modified TEXT');
+    await crdt.execute('''        
         UPDATE $table SET
           hlc = c.hlc,
           modified = c.modified
@@ -88,4 +87,5 @@ class TudoCrdt {
             GROUP BY id) AS c
         WHERE ${ids.map((e) => '$table.$e').join(" || ':' || ")} = c.id;
       ''');
+  }
 }

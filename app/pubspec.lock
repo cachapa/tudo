@@ -695,10 +695,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite_crdt
-      sha256: "8eb3261c7d106a753b21fafbe0831cae8a8e4cdd8554e8f32e678551c39e23c8"
+      sha256: "40146c69ea3e7b5f8155bdbc08cbab0d1a58c1b236dab4a17e74d64e75be7097"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.3"
+    version: "0.0.4"
   sqlparser:
     dependency: transitive
     description:

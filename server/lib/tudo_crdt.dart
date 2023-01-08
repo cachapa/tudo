@@ -71,10 +71,13 @@ class TudoCrdt {
       BaseCrdt crdt, int oldVersion, int newVersion) async {
     'Upgrading database from $oldVersion to $newVersion…';
     if (oldVersion < 5) {
+      await _upgradeFromCrdt(crdt, 'auth', ['user_id']);
+      await _upgradeFromCrdt(crdt, 'login', ['login_token']);
+      await _upgradeFromCrdt(crdt, 'tokens', ['token']);
+
       // Recreate auth table with token as primary key
       // Sqlite doesn't allow changing table structures on the fly, so we have
       // to recreate it and copy the data over
-      await _upgradeFromCrdt(crdt, 'auth', ['user_id']);
       await crdt.execute('''
         CREATE TABLE auth2 (
           token TEXT NOT NULL,
@@ -95,16 +98,16 @@ class TudoCrdt {
       await _upgradeFromCrdt(crdt, 'user_lists', ['user_id', 'list_id']);
       await _upgradeFromCrdt(crdt, 'lists', ['id']);
       await _upgradeFromCrdt(crdt, 'todos', ['id']);
+
       await crdt.execute('DROP TABLE crdt');
     }
   }
 
   static Future<void> _upgradeFromCrdt(
-          BaseCrdt crdt, String table, List<String> ids) =>
-      crdt.execute('''
-        ALTER TABLE $table ADD COLUMN hlc TEXT NOT NULL DEFAULT '';
-        ALTER TABLE $table ADD COLUMN modified TEXT NOT NULL DEFAULT '';
-        
+      BaseCrdt crdt, String table, List<String> ids) async {
+    await crdt.execute('ALTER TABLE $table ADD COLUMN hlc TEXT');
+    await crdt.execute('ALTER TABLE $table ADD COLUMN modified TEXT');
+    await crdt.execute('''        
         UPDATE $table SET
           hlc = c.hlc,
           modified = c.modified
@@ -114,4 +117,5 @@ class TudoCrdt {
             GROUP BY id) AS c
         WHERE ${ids.map((e) => '$table.$e').join(" || ':' || ")} = c.id;
       ''');
+  }
 }
