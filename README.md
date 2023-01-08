@@ -2,7 +2,7 @@
 
 tudo is an experiment on simple, private, synchronized to-do lists.
 
-It is a useful demonstration of the realtime, offline-first capabilities powering the [StoryArk app](https://storyark.eu). 
+It uses [sqlite_crdt](https://github.com/cachapa/sqlite_crdt) and is a useful demonstration of the realtime, offline-first capabilities powering [Libra](https://libra-app.eu) and [StoryArk app](https://storyark.eu). 
 
 <img src="screenshots/a.jpg" width="140"> <img src="screenshots/b.jpg" width="140"> <img src="screenshots/c.jpg" width="140"> <img src="screenshots/d.jpg" width="140">
 
@@ -38,7 +38,7 @@ Look at how it's built. Modify it. Host it yourself. Maybe help me improve it?
 
 ## How it works
 
-To do lists are stored on the device as [CRDTs](https://github.com/cachapa/crdt) which enable conflictless synchronization with an essentially unlimited number of devices. Every device maintains a local copy of the entire database.
+To do lists are stored on the device as [CRDTs](https://github.com/cachapa/sqlite_crdt) which enable conflictless synchronization with an essentially unlimited number of devices. Every device maintains a local copy of the entire database.
 
 A live websocket connection to the server is kept open whenever the app is active and network is available. Local changes are immediately pushed to the network, and remote changes are pulled in real-time. This promotes rapid consistency of the database between all active devices in the network, and allows users to immediately see those changes in the interface.
 
