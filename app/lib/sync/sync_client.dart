@@ -27,18 +27,22 @@ class SyncClient {
   bool get isConnected => connectionState.value;
 
   Future<Hlc?> getRemoteLastModified() async {
-    final result =
-        await get(Uri.parse('$serverAddress/last_modified'), headers: {
-      HttpHeaders.userAgentHeader: BuildInfo.userAgent,
-      'api_secret': apiSecret,
-      'token': token,
-      'user_id': userId,
-      'node_id': nodeId,
-    });
-    if (result.statusCode ~/ 100 != 2) {
-      throw '${result.statusCode}: ${result.reasonPhrase}\n${result.body}';
+    try {
+      final result =
+          await get(Uri.parse('$serverAddress/last_modified'), headers: {
+        HttpHeaders.userAgentHeader: BuildInfo.userAgent,
+        'api_secret': apiSecret,
+        'token': token,
+        'user_id': userId,
+        'node_id': nodeId,
+      });
+      if (result.statusCode ~/ 100 != 2) {
+        throw '${result.statusCode}: ${result.reasonPhrase}\n${result.body}';
+      }
+      return (jsonDecode(result.body)['last_modified'] as String?)?.toHlc;
+    } catch (_) {
+      return null;
     }
-    return (jsonDecode(result.body)['last_modified'] as String?)?.toHlc;
   }
 
   void connect(Hlc? lastReceive) {
@@ -70,7 +74,7 @@ class SyncClient {
     );
   }
 
-  void send(dynamic message) => channel!.sink.add(message);
+  void send(dynamic message) => channel?.sink.add(message);
 
   void disconnect() {
     _disconnect();
@@ -81,6 +85,8 @@ class SyncClient {
     connectionState.add(false);
     subscription?.cancel();
     subscription = null;
+    channel?.sink.close();
+    channel = null;
   }
 
   void destroy() {

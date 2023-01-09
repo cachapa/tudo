@@ -36,7 +36,7 @@ class TudoCrdt {
       CREATE TABLE user_lists (
         user_id TEXT NOT NULL,
         list_id TEXT NOT NULL,
-        position INTEGER AUTO INCREMENT,
+        position INTEGER,
         created_at TEXT NOT NULL,
         PRIMARY KEY (user_id, list_id)
       )
@@ -59,7 +59,7 @@ class TudoCrdt {
         done INTEGER DEFAULT 0,
         done_at TEXT,
         done_by TEXT,
-        position INTEGER AUTO INCREMENT,
+        position INTEGER,
         creator_id TEXT NOT NULL,
         created_at TEXT NOT NULL,
         PRIMARY KEY (id)

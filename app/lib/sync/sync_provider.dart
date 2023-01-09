@@ -19,7 +19,6 @@ class SyncProvider {
 
   var _online = false;
   Timer? _reconnectTimer;
-  Hlc? _lastSend;
   StreamSubscription? _sendSubscription;
 
   Stream<bool> get connectionState => _client.connectionState;
@@ -41,7 +40,6 @@ class SyncProvider {
         // Sync whenever connection is established
         _sendChangeset();
       } else {
-        _lastSend = null;
         _sendSubscription?.cancel();
         // Trigger reconnect
         if (_online) {
@@ -63,36 +61,41 @@ class SyncProvider {
   void disconnect() {
     _reconnectTimer?.cancel();
     _online = false;
-
     _client.disconnect();
   }
 
   Future<void> _sendChangeset() async {
-    _lastSend ??= await _client.getRemoteLastModified();
+    var lastSend = await _client.getRemoteLastModified();
     _sendSubscription = _crdt
         .watchChangeset(
           onlyModifiedHere: true,
-          modifiedSince: () => _lastSend,
+          modifiedSince: () => lastSend,
         )
         .debounceTime(const Duration(milliseconds: 200))
-        .listen((changeset) {
-      _lastSend = _crdt.canonicalTime;
+        .listen(
+      (changeset) {
+        lastSend = _crdt.canonicalTime;
 
-      final count = changeset.recordCount;
-      if (count > 0) {
-        'SEND $count records'.log;
-        _client.send(jsonEncode(changeset));
-      }
-    });
+        final count = changeset.recordCount;
+        if (count > 0) {
+          'SEND $count records'.log;
+          _client.send(jsonEncode(changeset));
+        }
+      },
+    );
   }
 
   Future<bool> isUpdateRequired() async {
-    final result = await head(
-      Uri.parse('$serverAddress/check_version'),
-      headers: {HttpHeaders.userAgentHeader: BuildInfo.userAgent},
-    );
-    // There's actually a status code for this:
-    // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/426
-    return result.statusCode == 426;
+    try {
+      final result = await head(
+        Uri.parse('$serverAddress/check_version'),
+        headers: {HttpHeaders.userAgentHeader: BuildInfo.userAgent},
+      );
+      // There's actually a status code for this:
+      // https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/426
+      return result.statusCode == 426;
+    } catch (_) {
+      return false;
+    }
   }
 }

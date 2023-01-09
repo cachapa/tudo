@@ -170,11 +170,11 @@ class ListProvider {
   }
 
   Future<List<Member>> _getMembers(String listId) => _crdt.query('''
-          SELECT user_id AS id, name, user_lists.created_at AS joined_at FROM user_lists
-            LEFT JOIN users ON user_id = id
-          WHERE list_id = ?1
-            AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
-        ''',
+        SELECT user_id AS id, name, user_lists.created_at AS joined_at FROM user_lists
+          LEFT JOIN users ON user_id = id
+        WHERE list_id = ?1
+          AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
+      ''',
       [listId]).then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
 
   Future<List<ToDo>> _getToDos(String listId) => _crdt.query('''

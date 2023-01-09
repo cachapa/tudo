@@ -104,23 +104,29 @@ class TudoServer {
     modifiedSince ??= Hlc.zero(nodeId);
     final changeset = <String, Iterable<Map<String, Object?>>>{
       'users': await _crdt.query('''
-        SELECT id, name, is_deleted, hlc FROM users
-        WHERE id = ?1
-          AND hlc NOT LIKE '%' || ?2
-          AND modified > ?3
+        SELECT users.id, users.name, users.is_deleted, users.hlc FROM
+          (SELECT user_id, max(created_at) AS created_at FROM
+            (SELECT list_id FROM user_lists WHERE user_id = '3cfd55f8-a4cb-46fa-9064-48a9d9c5e8a6' AND is_deleted = 0) AS list_ids
+            JOIN user_lists ON user_lists.list_id = list_ids.list_id
+            GROUP BY user_lists.user_id
+          ) AS user_ids
+        JOIN users ON users.id = user_ids.user_id
+        WHERE hlc NOT LIKE '%' || ?2
+          AND modified > CASE WHEN user_ids.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'user_lists': await _crdt.query('''
-        SELECT * FROM user_lists
-        WHERE user_id = ?1
-          AND hlc NOT LIKE '%' || ?2
-          AND modified > ?3
+        SELECT user_lists.list_id, user_id, position, created_at, is_deleted, hlc FROM
+          (SELECT list_id FROM user_lists WHERE user_id = ?1) AS list_ids
+        JOIN user_lists ON list_ids.list_id = user_lists.list_id
+        WHERE hlc NOT LIKE '%' || ?2
+          AND modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'lists': await _crdt.query('''
         SELECT lists.id, lists.name, lists.color, lists.creator_id,
           lists.created_at, lists.is_deleted, lists.hlc FROM user_lists
         JOIN lists ON list_id = lists.id AND user_id = ?1 AND user_lists.is_deleted = 0
         WHERE lists.hlc NOT LIKE '%' || ?2
-          AND lists.modified > CASE WHEN user_lists.created_at >= ?2 THEN '' ELSE ?3 END
+          AND lists.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'todos': await _crdt.query('''
         SELECT todos.id, todos.list_id, todos.name, todos.done, todos.position,
@@ -128,7 +134,7 @@ class TudoServer {
           todos.is_deleted, todos.hlc FROM user_lists
         JOIN todos ON user_lists.list_id = todos.list_id AND user_id = ?1 AND user_lists.is_deleted = 0
         WHERE todos.hlc NOT LIKE '%' || ?2
-          AND todos.modified > CASE WHEN user_lists.created_at >= ?2 THEN '' ELSE ?3 END
+          AND todos.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
     }..removeWhere((_, value) => value.isEmpty);
 
