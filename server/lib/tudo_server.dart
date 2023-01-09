@@ -106,7 +106,7 @@ class TudoServer {
       'users': await _crdt.query('''
         SELECT users.id, users.name, users.is_deleted, users.hlc FROM
           (SELECT user_id, max(created_at) AS created_at FROM
-            (SELECT list_id FROM user_lists WHERE user_id = '3cfd55f8-a4cb-46fa-9064-48a9d9c5e8a6' AND is_deleted = 0) AS list_ids
+            (SELECT list_id FROM user_lists WHERE user_id = ?1 AND is_deleted = 0) AS list_ids
             JOIN user_lists ON user_lists.list_id = list_ids.list_id
             GROUP BY user_lists.user_id
           ) AS user_ids
