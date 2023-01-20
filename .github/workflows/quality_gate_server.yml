@@ -24,7 +24,7 @@ jobs:
         run: dart format --output none --set-exit-if-changed .
 
       - name: Get dependencies
-        run: pub get
+        run: dart pub get
 
       - name: Static code analysis
         run: dart analyze --fatal-infos

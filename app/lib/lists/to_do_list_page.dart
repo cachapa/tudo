@@ -177,13 +177,13 @@ class ToDoListPage extends StatelessWidget {
 
   Future<void> _addItem(
       BuildContext context, String listID, String name) async {
-    final itemId = await context.listProvider.createItem(list.id, name);
+    await context.listProvider.createItem(list.id, name);
 
     // Scroll to bottom of list
     await Future.delayed(const Duration(milliseconds: 100));
     final itemContext = _bottomOfList.currentContext;
-    if (itemContext != null) {
-      Scrollable.ensureVisible(
+    if (itemContext != null && itemContext.mounted) {
+      await Scrollable.ensureVisible(
         itemContext,
         duration: const Duration(milliseconds: 300),
         alignment: 0.90,

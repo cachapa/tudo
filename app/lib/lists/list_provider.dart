@@ -16,7 +16,7 @@ class ListProvider {
   Stream<List<ToDoList>> get lists => _queryLists()
       .asyncMap((l) => Future.wait(l.map(
           (map) async => ToDoList.fromMap(map, await _getMembers(map['id'])))))
-      .doOnError((p0, p1) => print('$p0\n$p1'));
+      .doOnError((p0, p1) => '$p0\n$p1'.log);
 
   ListProvider(this.userId, this._crdt, StoreProvider storeProvider);
 
