@@ -20,7 +20,7 @@ dependencies:
 
   provider: ^6.0.5
   rxdart: ^0.27.7
-  sqlite_crdt: ^0.0.4
+  sqlite_crdt: ^0.0.6
   # Required for Android and iOS because UPSERTs are only supported on very recent OS versions
   sqlite3_flutter_libs: ^0.5.12
 

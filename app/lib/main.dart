@@ -39,7 +39,7 @@ void main() async {
   await BuildInfo.init();
 
   final storeProvider = await StoreProvider.open();
-  final crdt = await TudoCrdt.open(dir, 'tudo');
+  final crdt = await TudoCrdt.open('$dir/tudo.db');
 
   runApp(
     MultiProvider(

@@ -8,9 +8,8 @@ final _version = 5;
 class TudoCrdt {
   TudoCrdt._();
 
-  static Future<SqliteCrdt> open(String dir, String name) => SqliteCrdt.open(
-        dir,
-        name,
+  static Future<SqliteCrdt> open(String path) => SqliteCrdt.open(
+        path,
         version: _version,
         onCreate: _onCreate,
         onUpgrade: _onUpgrade,

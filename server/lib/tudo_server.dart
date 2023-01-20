@@ -21,7 +21,7 @@ class TudoServer {
   var userCount = 0;
 
   Future<void> serve(int port) async {
-    _crdt = await TudoCrdt.open('store', 'tudo');
+    _crdt = await TudoCrdt.open('store/tudo.db');
 
     final router = Router()
       ..head('/check_version', (_) => Response(200))
