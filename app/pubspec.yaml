@@ -16,11 +16,11 @@ dependencies:
 
   hive: ^2.2.3
   http: ^0.13.5
-  web_socket_channel: ^2.2.0
+  web_socket_channel: ^2.3.0
 
   provider: ^6.0.5
   rxdart: ^0.27.7
-  sqlite_crdt: ^0.0.6
+  sqlite_crdt: ^0.0.7
   # Required for Android and iOS because UPSERTs are only supported on very recent OS versions
   sqlite3_flutter_libs: ^0.5.12
 
@@ -34,12 +34,12 @@ dependencies:
 
   in_app_update: ^4.0.1
   package_info_plus: ^3.0.2
-  path_provider: ^2.0.11
+  path_provider: ^2.0.12
   qr_flutter: ^4.0.0
   share_plus: ^6.3.0
   uni_links: ^0.5.1
   uuid: ^3.0.7
-  url_launcher: ^6.1.7
+  url_launcher: ^6.1.8
 
 dev_dependencies:
   flutter_test:

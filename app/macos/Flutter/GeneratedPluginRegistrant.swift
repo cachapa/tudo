@@ -7,7 +7,7 @@ import Foundation
 
 import device_info_plus
 import package_info_plus
-import path_provider_macos
+import path_provider_foundation
 import share_plus
 import sqlite3_flutter_libs
 import url_launcher_macos

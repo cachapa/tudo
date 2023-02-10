@@ -9,7 +9,7 @@ const _version = 4;
 class TudoCrdt {
   TudoCrdt._();
 
-  static Future<SqliteCrdt> open(String path) => SqliteCrdt.open(
+  static Future<SqlCrdt> open(String path) => SqliteCrdt.open(
         path,
         version: _version,
         onCreate: _onCreate,
@@ -77,14 +77,14 @@ class TudoCrdt {
     await crdt.execute('ALTER TABLE $table ADD COLUMN hlc TEXT');
     await crdt.execute('ALTER TABLE $table ADD COLUMN modified TEXT');
     await crdt.execute('''        
-        UPDATE $table SET
-          hlc = c.hlc,
-          modified = c.modified
-        FROM
-          (SELECT id, max(hlc) AS hlc, max(modified) AS modified FROM crdt
-            WHERE collection = '$table'
-            GROUP BY id) AS c
-        WHERE ${ids.map((e) => '$table.$e').join(" || ':' || ")} = c.id;
-      ''');
+      UPDATE $table SET
+        hlc = c.hlc,
+        modified = c.modified
+      FROM
+        (SELECT id, max(hlc) AS hlc, max(modified) AS modified FROM crdt
+          WHERE collection = '$table'
+          GROUP BY id) AS c
+      WHERE ${ids.map((e) => '$table.$e').join(" || ':' || ")} = c.id;
+    ''');
   }
 }
