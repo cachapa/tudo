@@ -2,26 +2,25 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:postgres_crdt/postgres_crdt.dart';
 import 'package:rxdart/transformers.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
 import 'package:shelf_web_socket/shelf_web_socket.dart';
-import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:tudo_server/extensions.dart';
-import 'package:tudo_server/tudo_crdt.dart';
 import 'package:version/version.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'config.dart';
+import 'extensions.dart';
 
 class TudoServer {
-  late final SqliteCrdt _crdt;
+  late final SqlCrdt _crdt;
 
   var userCount = 0;
 
   Future<void> serve(int port) async {
-    _crdt = await TudoCrdt.open('store/tudo.db');
+    _crdt = await PostgresCrdt.open('tudo', username: 'cachapa');
 
     final router = Router()
       ..head('/check_version', (_) => Response(200))
@@ -73,7 +72,7 @@ class TudoServer {
         print('RECV $count records');
 
         // Merge remote changeset
-        _crdt.merge(changeset);
+        await _crdt.merge(changeset);
       }, onDone: () {
         changesSubscription?.cancel();
         print('$slug: leave [${--userCount}] ');
