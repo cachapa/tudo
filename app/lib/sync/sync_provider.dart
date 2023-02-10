@@ -5,12 +5,12 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:tudo_app/auth/auth_provider.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/util/store.dart';
 
+import '../auth/auth_provider.dart';
 import '../config.dart';
+import '../extensions.dart';
 import '../util/build_info.dart';
+import '../util/store.dart';
 import 'sync_client.dart';
 
 class SyncProvider {

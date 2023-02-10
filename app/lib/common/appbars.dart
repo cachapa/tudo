@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tudo_app/extensions.dart';
+
+import '../extensions.dart';
 
 class DiscreteAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;

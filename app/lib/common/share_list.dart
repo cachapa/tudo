@@ -2,8 +2,9 @@ import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/lists/list_provider.dart';
+
+import '../extensions.dart';
+import '../lists/list_provider.dart';
 
 void shareToDoList(BuildContext context, ToDoList list) {
   showModalBottomSheet<String>(

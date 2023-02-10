@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:tudo_app/extensions.dart';
+
+import '../extensions.dart';
 
 class ContactProvider {
   final String userId;

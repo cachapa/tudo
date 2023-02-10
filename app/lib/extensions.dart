@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:tudo_app/util/store.dart';
 
 import 'auth/auth_provider.dart';
 import 'contacts/contact_provider.dart';
 import 'lists/list_provider.dart';
 import 'settings/settings_provider.dart';
 import 'sync/sync_provider.dart';
+import 'util/store.dart';
 
 export 'package:flutter_gen/gen_l10n/app_localizations.dart';
 export 'package:provider/provider.dart';

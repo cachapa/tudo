@@ -1,7 +1,8 @@
 import 'dart:async';
 
 import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:tudo_app/extensions.dart';
+
+import '../extensions.dart';
 
 const _version = 4;
 

@@ -1,14 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:tudo_app/common/appbars.dart';
-import 'package:tudo_app/common/segmented_control.dart';
-import 'package:tudo_app/common/text_input_dialog.dart';
-import 'package:tudo_app/common/value_builders.dart';
-import 'package:tudo_app/contacts/contact_provider.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/util/build_info.dart';
 import 'package:url_launcher/url_launcher_string.dart';
+
+import '../common/appbars.dart';
+import '../common/segmented_control.dart';
+import '../common/text_input_dialog.dart';
+import '../common/value_builders.dart';
+import '../contacts/contact_provider.dart';
+import '../extensions.dart';
+import '../util/build_info.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);

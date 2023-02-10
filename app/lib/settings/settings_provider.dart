@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:tudo_app/util/store.dart';
+
+import '../util/store.dart';
 
 class SettingsProvider {
   final Store _store;

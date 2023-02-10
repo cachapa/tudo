@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tudo_app/extensions.dart';
+
+import '../extensions.dart';
 
 class IconLabel extends StatelessWidget {
   final IconData icon;

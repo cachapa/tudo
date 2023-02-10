@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tudo_app/common/shape_borders.dart';
-import 'package:tudo_app/extensions.dart';
+
+import '../extensions.dart';
+import 'shape_borders.dart';
 
 const _size = 18.0;
 

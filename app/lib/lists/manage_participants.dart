@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
-import 'package:tudo_app/common/avatar.dart';
-import 'package:tudo_app/common/icon_label.dart';
-import 'package:tudo_app/common/value_builders.dart';
-import 'package:tudo_app/contacts/contact_provider.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/lists/list_provider.dart';
+
+import '../common/avatar.dart';
+import '../common/icon_label.dart';
+import '../common/value_builders.dart';
+import '../contacts/contact_provider.dart';
+import '../extensions.dart';
+import 'list_provider.dart';
 
 Future<bool?> manageParticipants(BuildContext context, String listId) {
   return showModalBottomSheet(

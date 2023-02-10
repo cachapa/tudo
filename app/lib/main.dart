@@ -6,20 +6,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:tudo_app/auth/auth_provider.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/settings/settings_provider.dart';
-import 'package:tudo_app/util/build_info.dart';
-import 'package:tudo_app/util/store.dart';
-import 'package:tudo_app/util/themes.dart';
 
+import 'auth/auth_provider.dart';
 import 'common/value_builders.dart';
 import 'contacts/contact_provider.dart';
 import 'crdt/hive_adapters.dart';
 import 'crdt/tudo_crdt.dart';
+import 'extensions.dart';
 import 'lists/list_manager_page.dart';
 import 'lists/list_provider.dart';
+import 'settings/settings_provider.dart';
 import 'sync/sync_provider.dart';
+import 'util/build_info.dart';
+import 'util/store.dart';
+import 'util/themes.dart';
 
 void main() async {
   // Emulate platform

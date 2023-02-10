@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:tudo_app/extensions.dart';
+
+import '../extensions.dart';
 
 class ValueFutureBuilder<T> extends StatelessWidget {
   final Future<T> future;

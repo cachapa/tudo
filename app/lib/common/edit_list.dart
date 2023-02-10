@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/lists/list_provider.dart';
 
+import '../extensions.dart';
+import '../lists/list_provider.dart';
 import 'color_selector.dart';
 
 Future<bool?> editToDoList(BuildContext context, [ToDoList? list]) {

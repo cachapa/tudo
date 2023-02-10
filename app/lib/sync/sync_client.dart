@@ -5,11 +5,12 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:tudo_app/config.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/util/build_info.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+import '../config.dart';
+import '../extensions.dart';
+import '../util/build_info.dart';
 
 class SyncClient {
   final String token;

@@ -1,6 +1,6 @@
-import 'package:tudo_app/util/store.dart';
-import 'package:tudo_app/util/token_generator.dart';
-import 'package:tudo_app/util/uuid.dart';
+import '../util/store.dart';
+import '../util/token_generator.dart';
+import '../util/uuid.dart';
 
 class AuthProvider {
   final Store _store;

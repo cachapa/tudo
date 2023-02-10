@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:tudo_app/extensions.dart';
 
+import '../extensions.dart';
 import 'value_builders.dart';
 
 class OfflineIndicator {

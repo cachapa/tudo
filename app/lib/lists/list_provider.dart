@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:tudo_app/config.dart';
-import 'package:tudo_app/contacts/contact_provider.dart';
-import 'package:tudo_app/extensions.dart';
-import 'package:tudo_app/util/store.dart';
-import 'package:tudo_app/util/uuid.dart';
+
+import '../config.dart';
+import '../contacts/contact_provider.dart';
+import '../extensions.dart';
+import '../util/store.dart';
+import '../util/uuid.dart';
 
 const listIdsKey = 'list_id_keys';
 

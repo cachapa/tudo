@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tudo_app/common/progress.dart';
-import 'package:tudo_app/extensions.dart';
 
+import '../common/progress.dart';
+import '../extensions.dart';
 import 'list_provider.dart';
 
 class ToDoListTile extends StatelessWidget {
