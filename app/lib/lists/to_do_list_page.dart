@@ -38,8 +38,8 @@ class ToDoListPage extends StatelessWidget {
       onTap: () => FocusScope.of(context).unfocus(),
       child: ValueStreamBuilder<ToDoListWithItems>(
         stream: context.listProvider.getList(list.id),
-        initialData: ToDoListWithItems.fromList(list, []),
-        errorWidget: Material(
+        initialValue: ToDoListWithItems.fromList(list, []),
+        errorBuilder: (context, error) => Material(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

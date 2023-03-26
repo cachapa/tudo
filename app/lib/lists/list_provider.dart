@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
-import '../config.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
 import '../util/store.dart';
@@ -28,7 +27,13 @@ class ListProvider {
       await txn.execute('''
         INSERT INTO lists (id, name, color, creator_id, created_at)
         VALUES (?1, ?2, ?3, ?4, ?5)
-      ''', [listId, name, color.hexValue, userId, DateTime.now()]);
+      ''', [
+        listId,
+        name,
+        color.hexValue,
+        userId,
+        DateTime.now().toIso8601String()
+      ]);
       await _setListReference(txn, listId);
     });
   }
@@ -56,7 +61,7 @@ class ListProvider {
     await crdt.execute('''
       INSERT INTO user_lists (user_id, list_id, created_at, position)
       VALUES (?1, ?2, ?3, ?4)
-    ''', [userId, listId, DateTime.now(), maxPosition + 1]);
+    ''', [userId, listId, DateTime.now().toIso8601String(), maxPosition + 1]);
   }
 
   Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
@@ -111,8 +116,12 @@ class ListProvider {
       done_at = ?2,
       done_by = ?3
     WHERE id = ?4
-  ''',
-      [isDone, isDone ? DateTime.now() : null, isDone ? userId : null, itemId]);
+  ''', [
+        isDone.toInt,
+        isDone ? DateTime.now().toIso8601String() : null,
+        isDone ? userId : null,
+        itemId
+      ]);
 
   Future<void> setItemName(String itemId, String name) => _crdt.execute('''
     UPDATE todos SET name = ?1
@@ -138,7 +147,15 @@ class ListProvider {
     await _crdt.execute('''
       INSERT INTO todos (id, list_id, name, done, position, creator_id, created_at)
       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-    ''', [id, listId, name, false, maxPosition + 1, userId, DateTime.now()]);
+    ''', [
+      id,
+      listId,
+      name,
+      0,
+      maxPosition + 1,
+      userId,
+      DateTime.now().toIso8601String()
+    ]);
     return id;
   }
 
@@ -225,7 +242,7 @@ class ToDoList {
 
   int get shareCount => members.length;
 
-  bool get isShared => ignoreShares.contains(id) ? false : shareCount > 1;
+  bool get isShared => shareCount > 1;
 
   bool get isEmpty => itemCount == 0;
 

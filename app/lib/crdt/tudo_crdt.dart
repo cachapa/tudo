@@ -4,7 +4,7 @@ import 'package:sqlite_crdt/sqlite_crdt.dart';
 
 import '../extensions.dart';
 
-const _version = 4;
+const _version = 5;
 
 /// Convenience class to handle database creation and upgrades
 class TudoCrdt {
@@ -70,6 +70,14 @@ class TudoCrdt {
       await _upgradeFromCrdt(crdt, 'lists', ['id']);
       await _upgradeFromCrdt(crdt, 'todos', ['id']);
       await crdt.execute('DROP TABLE crdt');
+    }
+
+    if (oldVersion < 5) {
+      // Extract node id into a separate column
+      for (final table in ['lists', 'todos', 'user_lists', 'users']) {
+        await crdt.execute('ALTER TABLE $table ADD node_id TEXT');
+        await crdt.execute('UPDATE $table SET node_id = SUBSTR(hlc, -36)');
+      }
     }
   }
 

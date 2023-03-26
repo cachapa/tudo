@@ -242,7 +242,7 @@ class Logo extends StatelessWidget {
               ),
               ValueStreamBuilder<bool>(
                 stream: context.contactProvider.isNameSet,
-                initialData: true,
+                initialValue: true,
                 builder: (_, isNameSet) => IconButton(
                   icon: Badge(
                     smallSize: isNameSet ? 0 : null,

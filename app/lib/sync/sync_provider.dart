@@ -32,6 +32,7 @@ class SyncProvider {
                   key,
                   (value as List).cast<Map<String, dynamic>>(),
                 ));
+        'RECV ${changeset.recordCount} records'.log;
         await _crdt.merge(changeset);
       });
 

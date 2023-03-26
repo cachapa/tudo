@@ -45,14 +45,14 @@ class TudoServer {
   Future<Response> _lastModified(Request request) async {
     final nodeId = request.headers['node_id']!;
     final latest = await _crdt.lastModified(onlyNodeId: nodeId);
-    return Response.ok(
-        jsonEncode({'last_modified': latest?.apply(nodeId: nodeId)}));
+    return Response.ok(jsonEncode({'last_modified': latest}));
   }
 
   Future<Response> _wsHandler(Request request) async {
     final userId = request.headers['user_id']!;
     final nodeId = request.headers['node_id']!;
-    var lastSend = request.headers['last_receive']?.toHlc.apply(nodeId: nodeId);
+    var lastSend =
+        request.headers['last_receive']?.toHlc.apply(nodeId: _crdt.nodeId);
 
     final slug = '${userId.short} (${nodeId.short})';
     print('$slug: connect [${++userCount}]');
@@ -67,6 +67,8 @@ class TudoServer {
                   key,
                   (value as List).cast<Map<String, dynamic>>(),
                 ));
+
+        // print(JsonEncoder.withIndent('  ').convert(changeset));
 
         final count = changeset.recordCount;
         print('RECV $count records');
@@ -110,21 +112,21 @@ class TudoServer {
             GROUP BY user_lists.user_id
           ) AS user_ids
         JOIN users ON users.id = user_ids.user_id
-        WHERE hlc NOT LIKE '%' || ?2
+        WHERE node_id != ?2
           AND modified > CASE WHEN user_ids.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'user_lists': await _crdt.query('''
         SELECT user_lists.list_id, user_id, position, created_at, is_deleted, hlc FROM
           (SELECT list_id FROM user_lists WHERE user_id = ?1) AS list_ids
         JOIN user_lists ON list_ids.list_id = user_lists.list_id
-        WHERE hlc NOT LIKE '%' || ?2
+        WHERE node_id != ?2
           AND modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'lists': await _crdt.query('''
         SELECT lists.id, lists.name, lists.color, lists.creator_id,
           lists.created_at, lists.is_deleted, lists.hlc FROM user_lists
         JOIN lists ON list_id = lists.id AND user_id = ?1 AND user_lists.is_deleted = 0
-        WHERE lists.hlc NOT LIKE '%' || ?2
+        WHERE lists.node_id != ?2
           AND lists.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'todos': await _crdt.query('''
@@ -132,7 +134,7 @@ class TudoServer {
           todos.creator_id, todos.created_at, todos.done_at, todos.done_by,
           todos.is_deleted, todos.hlc FROM user_lists
         JOIN todos ON user_lists.list_id = todos.list_id AND user_id = ?1 AND user_lists.is_deleted = 0
-        WHERE todos.hlc NOT LIKE '%' || ?2
+        WHERE todos.node_id != ?2
           AND todos.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
     }..removeWhere((_, value) => value.isEmpty);
@@ -140,6 +142,7 @@ class TudoServer {
     if (changeset.recordCount == 0) return;
 
     print('SEND ${changeset.recordCount} records');
+    // print(JsonEncoder.withIndent('  ').convert(changeset));
     webSocket.sink.add(jsonEncode(changeset));
   }
 

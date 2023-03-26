@@ -17,6 +17,10 @@ import 'util/store.dart';
 export 'package:flutter_gen/gen_l10n/app_localizations.dart';
 export 'package:provider/provider.dart';
 
+extension BoolX on bool {
+  int get toInt => this ? 1 : 0;
+}
+
 extension StringX on String {
   void get log {
     // ignore: avoid_print
