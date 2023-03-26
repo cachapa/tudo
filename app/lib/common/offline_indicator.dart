@@ -15,7 +15,7 @@ class OfflineIndicator {
       opaque: false,
       builder: (_) => ValueStreamBuilder<bool>(
         stream: context.syncProvider.connectionState,
-        initialData: true,
+        initialValue: true,
         builder: (_, isConnected) => AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
           child: isConnected ? Container() : const _Indicator(),
