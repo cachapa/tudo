@@ -86,24 +86,24 @@ class ListProvider {
   Future<void> removeUser(String userId, String listId) => _crdt.execute('''
     UPDATE user_lists SET is_deleted = ?1
     WHERE user_id = ?2 AND list_id = ?3
-  ''', [true, userId, listId]);
+  ''', [1, userId, listId]);
 
   Future<void> undoRemoveList(String listId) => undoRemoveUser(userId, listId);
 
   Future<void> undoRemoveUser(String userId, String listId) => _crdt.execute('''
     UPDATE lists SET is_deleted = ?1
     WHERE user_id = ?2 AND list_id = ?3
-  ''', [false, userId, listId]);
+  ''', [0, userId, listId]);
 
   Future<void> deleteItem(String id) => _crdt.execute('''
     UPDATE todos SET is_deleted = ?1
     WHERE id = ?2
-  ''', [true, id]);
+  ''', [1, id]);
 
   Future<void> undeleteItem(String id) => _crdt.execute('''
     UPDATE todos SET is_deleted = ?1
     WHERE id = ?2
-  ''', [false, id]);
+  ''', [0, id]);
 
   Future<void> setDone(String itemId, bool isDone) => _crdt.execute('''
     UPDATE todos SET
