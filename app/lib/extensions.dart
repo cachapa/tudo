@@ -34,6 +34,10 @@ extension StringX on String {
 }
 
 extension DateTimeX on DateTime {
+  String get toUtcString => toUtc().toIso8601String();
+
+  String get toLocalString => toLocal().toIso8601String();
+
   String toTimeString(BuildContext context) =>
       '${hour.toString()}:${minute.toString().padLeft(2, '0')}';
 
