@@ -27,8 +27,7 @@ class ListProvider {
       await txn.execute('''
         INSERT INTO lists (id, name, color, creator_id, created_at)
         VALUES (?1, ?2, ?3, ?4, ?5)
-      ''',
-          [listId, name, color.hexValue, userId, DateTime.now().toLocalString]);
+      ''', [listId, name, color.hexValue, userId, DateTime.now().toUtcString]);
       await _setListReference(txn, listId);
     });
   }
@@ -56,7 +55,7 @@ class ListProvider {
     await crdt.execute('''
       INSERT INTO user_lists (user_id, list_id, created_at, position)
       VALUES (?1, ?2, ?3, ?4)
-    ''', [userId, listId, DateTime.now().toLocalString, maxPosition + 1]);
+    ''', [userId, listId, DateTime.now().toUtcString, maxPosition + 1]);
   }
 
   Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
@@ -113,7 +112,7 @@ class ListProvider {
     WHERE id = ?4
   ''', [
         isDone.toInt,
-        isDone ? DateTime.now().toLocalString : null,
+        isDone ? DateTime.now().toUtcString : null,
         isDone ? userId : null,
         itemId
       ]);
@@ -149,7 +148,7 @@ class ListProvider {
       0,
       maxPosition + 1,
       userId,
-      DateTime.now().toLocalString,
+      DateTime.now().toUtcString,
     ]);
     return id;
   }
