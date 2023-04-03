@@ -1,3 +1,2 @@
 const apiSecret = 'secret';
-const serverAddress = 'ws://localhost:8080';
-const ignoreShares = <String>{};
+final serverUri = Uri.parse('ws://localhost:8080');
