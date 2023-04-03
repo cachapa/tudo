@@ -1,5 +1,4 @@
 import '../util/store.dart';
-import '../util/token_generator.dart';
 import '../util/uuid.dart';
 
 class AuthProvider {
@@ -12,7 +11,7 @@ class AuthProvider {
   AuthProvider(StoreProvider storeProvider)
       : _store = storeProvider.getStore('auth') {
     if (!_store.contains('token')) {
-      _store.put('token', generateToken());
+      _store.put('token', uuid().replaceAll('-', ''));
     }
     if (!_store.contains('user_id')) {
       _store.put('user_id', uuid());

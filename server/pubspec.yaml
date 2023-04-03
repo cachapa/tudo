@@ -9,7 +9,7 @@ environment:
 dependencies:
   args: ^2.4.0
   http: ^0.13.5
-  postgres_crdt: ^0.0.8+1
+  postgres_crdt: ^0.0.9
   rxdart: ^0.27.7
   shelf: ^1.4.0
   shelf_router: ^1.1.3

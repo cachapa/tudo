@@ -89,7 +89,7 @@ class SyncProvider {
   Future<bool> isUpdateRequired() async {
     try {
       final result = await head(
-        Uri.parse('$serverAddress/check_version'),
+        serverUri.apply('check_version'),
         headers: {HttpHeaders.userAgentHeader: BuildInfo.userAgent},
       );
       // There's actually a status code for this:

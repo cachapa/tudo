@@ -89,10 +89,11 @@ class TudoCrdt {
       UPDATE $table SET
         hlc = c.hlc,
         modified = c.modified
-      FROM
-        (SELECT id, max(hlc) AS hlc, max(modified) AS modified FROM crdt
+      FROM (
+        SELECT id, max(hlc) AS hlc, max(modified) AS modified FROM crdt
           WHERE collection = '$table'
-          GROUP BY id) AS c
+          GROUP BY id
+      ) AS c
       WHERE ${ids.map((e) => '$table.$e').join(" || ':' || ")} = c.id;
     ''');
   }

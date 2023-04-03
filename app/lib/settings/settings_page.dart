@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
@@ -95,11 +94,11 @@ class SettingsPage extends StatelessWidget {
             ),
             title: const Text('StoryArk'),
             subtitle: Text(t.storyArkDescription),
-            onTap: () => launchUrlString(Platform.isIOS
+            onTap: () => launchUrlString(platform.isIOS
                 ? 'https://apps.apple.com/US/app/id1558910365'
                 : 'https://play.google.com/store/apps/details?id=de.storyark.app'),
           ),
-          if (!Platform.isIOS)
+          if (!platform.isIOS)
             ListTile(
               leading: Image.asset(
                 'assets/images/libra_icon.png',

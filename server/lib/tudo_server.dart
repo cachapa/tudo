@@ -24,9 +24,13 @@ class TudoServer {
 
     final router = Router()
       ..head('/check_version', (_) => Response(200))
+      ..get('/auth/<userId>', _auth)
+      ..get('/last_modified/<userId>', _lastModified)
+      ..get('/ws/<userId>', _wsHandler)
+      // TODO Compat request without user id in request path
       ..get('/auth', _auth)
-      ..get('/last_modified', _lastModified)
-      ..get('/ws', _wsHandler);
+      ..get('/last_modified', _lastModifiedCompat)
+      ..get('/ws', _wsHandlerCompat);
 
     final handler = Pipeline()
         .addMiddleware(logRequests())
@@ -42,17 +46,22 @@ class TudoServer {
   /// By the time we arrive here, both the secret and credentials have been validated
   Response _auth(Request request) => Response.ok('👍');
 
-  Future<Response> _lastModified(Request request) async {
-    final nodeId = request.headers['node_id']!;
+  Future<Response> _lastModifiedCompat(Request request) =>
+      _lastModified(request, request.headers['user_id'] ?? '');
+
+  Future<Response> _lastModified(Request request, String userId) async {
+    final nodeId = request.compatParams('node_id')!;
     final latest = await _crdt.lastModified(onlyNodeId: nodeId);
     return Response.ok(jsonEncode({'last_modified': latest}));
   }
 
-  Future<Response> _wsHandler(Request request) async {
-    final userId = request.headers['user_id']!;
-    final nodeId = request.headers['node_id']!;
+  Future<Response> _wsHandlerCompat(Request request) =>
+      _wsHandler(request, request.headers['user_id'] ?? '');
+
+  Future<Response> _wsHandler(Request request, String userId) async {
+    final nodeId = request.compatParams('node_id')!;
     var lastSend =
-        request.headers['last_receive']?.toHlc.apply(nodeId: _crdt.nodeId);
+        request.compatParams('last_receive')?.toHlc.apply(nodeId: _crdt.nodeId);
 
     final slug = '${userId.short} (${nodeId.short})';
     print('$slug: connect [${++userCount}]');
@@ -102,7 +111,7 @@ class TudoServer {
 
   Future<void> _sendChangeset(WebSocketChannel webSocket, String userId,
       String nodeId, Hlc? modifiedSince) async {
-    modifiedSince ??= Hlc.zero(nodeId);
+    modifiedSince ??= Hlc.zero(_crdt.nodeId);
     final changeset = <String, Iterable<Map<String, Object?>>>{
       'users': await _crdt.query('''
         SELECT users.id, users.name, users.is_deleted, users.hlc FROM
@@ -142,7 +151,7 @@ class TudoServer {
     if (changeset.recordCount == 0) return;
 
     print('SEND ${changeset.recordCount} records');
-    // print(JsonEncoder.withIndent('  ').convert(changeset));
+    print(JsonEncoder.withIndent('  ').convert(changeset));
     webSocket.sink.add(jsonEncode(changeset));
   }
 
@@ -160,8 +169,9 @@ class TudoServer {
           return innerHandler(request);
         }
 
-        final suppliedSecret = request.headers['api_secret'];
-        if (apiSecret == suppliedSecret) {
+        final suppliedSecret = request.compatParams('api_secret') ?? '';
+        // TODO Compat secret length was reduced to 14
+        if (suppliedSecret.startsWith(apiSecret)) {
           return innerHandler(request);
         } else {
           return Response.forbidden('Invalid API secret: $suppliedSecret');
@@ -169,46 +179,52 @@ class TudoServer {
       };
 
   Handler _validateCredentials(Handler innerHandler) => (request) async {
-        // Only validate for WS connection
-        if (request.url.path != 'ws') {
+        // Do not validate for public paths
+        if (['check_version'].contains(request.url.path)) {
           return innerHandler(request);
         }
 
-        final userId = request.headers['user_id'];
-        final token = request.headers['token'];
+        final userId =
+            request.headers['user_id'] ?? request.url.pathSegments.last;
+        final token = request.compatParams('token');
 
         // Validate user id length
-        if (userId == null || userId.length != 36) {
+        if (userId.length != 36) {
           return Response.forbidden('Invalid user id: $userId');
         }
 
         // Validate token length
-        if (token == null || token.length != 128) {
+        // print(token!.length);
+        if (token == null || token.length < 32 || token.length > 128) {
           return Response.forbidden('Invalid token: $token');
         }
 
-        final knownToken = await _getTokenForUser(userId);
         // Associate token with user id, if it doesn't exist yet
-        if (knownToken == null) {
-          await _crdt.execute('''
-            INSERT INTO auth (user_id, token, created_at)
-            VALUES (?1, ?2, ?3)
-          ''', [userId, token, DateTime.now()]);
-        }
+        String? knownToken;
+        await _crdt.transaction((txn) async {
+          // Check if there's a token in the db
+          // This is done in a transaction to make sure the check and creation
+          // happen atomically
+          final result = await txn
+              .query('SELECT token FROM auth WHERE user_id = ?1', [userId]);
+          knownToken = result.isEmpty ? null : result.first['token'] as String?;
+
+          // Associate new token with user id
+          if (knownToken == null) {
+            await txn.execute('''
+              INSERT INTO auth (user_id, token, created_at)
+              VALUES (?1, ?2, ?3)
+            ''', [userId, token, DateTime.now()]);
+            knownToken = token;
+          }
+        });
+
         // Verify that user id and token match
-        else if (token != knownToken) {
-          return Response.forbidden(
-              'Invalid token for supplied user id: $userId\n$token');
-        }
-
-        return innerHandler(request);
+        return token == knownToken
+            ? innerHandler(request)
+            : Response.forbidden(
+                'Invalid token for supplied user id: $userId\n$token');
       };
-
-  Future<String?> _getTokenForUser(String userId) async {
-    final result = await _crdt
-        .query('SELECT token FROM auth WHERE user_id = ?1', [userId]);
-    return result.isEmpty ? null : result.first['token'] as String?;
-  }
 }
 
 class CrdtStream {
@@ -219,4 +235,10 @@ class CrdtStream {
   void add(String event) => _controller.add(event);
 
   void close() => _controller.close();
+}
+
+// TODO Compat fall back to header parameters
+extension on Request {
+  String? compatParams(String key) =>
+      requestedUri.queryParameters[key] ?? headers[key];
 }

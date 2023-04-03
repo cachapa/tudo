@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:platform_info/platform_info.dart';
 
 import 'auth/auth_provider.dart';
 import 'common/value_builders.dart';
@@ -30,7 +30,7 @@ void main() async {
 
   await _setSystemColors();
 
-  final dir = PlatformX.isMobile
+  final dir = platform.isAndroid || platform.isIOS
       ? (await getApplicationDocumentsDirectory()).path
       : 'store';
   Hive.init(dir);
@@ -115,7 +115,7 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
 // Hack around a bug on earlier Android versions
 // https://github.com/flutter/flutter/issues/90098
 Future<void> _setSystemColors() async {
-  final navigationBarColor = !Platform.isAndroid ||
+  final navigationBarColor = !PlatformX.isAndroid ||
           ((await DeviceInfoPlugin().androidInfo).version.sdkInt) >= 29
       ? Colors.transparent
       : Colors.black38;

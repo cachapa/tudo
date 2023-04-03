@@ -5,7 +5,6 @@ import 'dart:io';
 import 'package:http/http.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../config.dart';
@@ -29,14 +28,18 @@ class SyncClient {
 
   Future<Hlc?> getRemoteLastModified() async {
     try {
-      final result =
-          await get(Uri.parse('$serverAddress/last_modified'), headers: {
-        HttpHeaders.userAgentHeader: BuildInfo.userAgent,
-        'api_secret': apiSecret,
-        'token': token,
-        'user_id': userId,
-        'node_id': nodeId,
-      });
+      final result = await get(
+          serverUri.apply(
+            'last_modified/$userId',
+            queryParameters: {
+              'api_secret': apiSecret,
+              'token': token,
+              'node_id': nodeId,
+            },
+          ),
+          headers: {
+            HttpHeaders.userAgentHeader: BuildInfo.userAgent,
+          });
       if (result.statusCode ~/ 100 != 2) {
         throw '${result.statusCode}: ${result.reasonPhrase}\n${result.body}';
       }
@@ -50,16 +53,16 @@ class SyncClient {
     if (isConnected) return;
 
     // Dart's WebSocket uses a global static client, so the user agent needs to be set like so:
-    WebSocket.userAgent = BuildInfo.userAgent;
-
-    final endpoint = '${serverAddress.replaceFirst('http', 'ws')}/ws';
-    channel = IOWebSocketChannel.connect(Uri.parse(endpoint), headers: {
-      'api_secret': apiSecret,
-      'token': token,
-      'user_id': userId,
-      'node_id': nodeId,
-      if (lastReceive != null) 'last_receive': lastReceive,
-    });
+    // WebSocket.userAgent = BuildInfo.userAgent;
+    final uri = serverUri.apply('ws/$userId',
+        scheme: serverUri.scheme.replaceFirst('http', 'ws'),
+        queryParameters: {
+          'api_secret': apiSecret,
+          'token': token,
+          'node_id': nodeId,
+          if (lastReceive != null) 'last_receive': lastReceive.toString(),
+        });
+    channel = WebSocketChannel.connect(uri);
     'connected'.log;
     connectionState.add(true);
 

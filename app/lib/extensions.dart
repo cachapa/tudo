@@ -1,10 +1,10 @@
-import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:provider/provider.dart';
 
 import 'auth/auth_provider.dart';
@@ -135,11 +135,23 @@ extension ContextExtensions on BuildContext {
   SyncProvider get syncProvider => read<SyncProvider>();
 }
 
-extension PlatformX on Platform {
-  static bool get isMobile => Platform.isAndroid || Platform.isIOS;
+extension UriX on Uri {
+  Uri apply(String path,
+          {String? scheme, Map<String, String>? queryParameters}) =>
+      replace(
+        scheme: scheme,
+        path: '${this.path}/$path',
+        queryParameters: queryParameters,
+      );
+}
+
+class PlatformX {
+  static bool get isAndroid => platform.isAndroid;
+
+  static bool get isMobile => isAndroid || platform.isIOS;
 
   static bool get isDesktop =>
-      Platform.isLinux || Platform.isMacOS || Platform.isWindows;
+      platform.isLinux || platform.isMacOS || platform.isWindows;
 
-  static bool get isApple => Platform.isMacOS || Platform.isIOS;
+  static bool get isApple => platform.isMacOS || platform.isIOS;
 }
