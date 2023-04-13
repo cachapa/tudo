@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../extensions.dart';
@@ -8,7 +6,6 @@ import 'value_builders.dart';
 
 class OfflineIndicator {
   final BuildContext context;
-  late final StreamSubscription<bool> _subscription;
   late final OverlayEntry _overlay;
 
   final connectionState = Registry.syncProvider.connectionState;
@@ -29,8 +26,9 @@ class OfflineIndicator {
   }
 
   void dispose() {
-    _subscription.cancel();
-    _overlay.dispose();
+    _overlay
+      ..remove()
+      ..dispose();
   }
 }
 
