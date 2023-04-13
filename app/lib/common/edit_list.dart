@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../extensions.dart';
 import '../lists/list_provider.dart';
+import '../registry.dart';
 import 'color_selector.dart';
 
 Future<bool?> editToDoList(BuildContext context, [ToDoList? list]) {
@@ -107,13 +108,13 @@ class _EditListFormState extends State<_EditListForm> {
 
     if (editMode) {
       if (widget.list!.name != name) {
-        context.listProvider.setName(widget.list!.id, name);
+        Registry.listProvider.setName(widget.list!.id, name);
       }
       if (widget.list!.color != color) {
-        context.listProvider.setColor(widget.list!.id, color);
+        Registry.listProvider.setColor(widget.list!.id, color);
       }
     } else {
-      context.read<ListProvider>().createList(name, color);
+      Registry.listProvider.createList(name, color);
     }
 
     context.pop(true);

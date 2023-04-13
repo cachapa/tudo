@@ -8,6 +8,7 @@ import '../common/text_input_dialog.dart';
 import '../common/value_builders.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
+import '../registry.dart';
 import '../util/build_info.dart';
 
 class SettingsPage extends StatelessWidget {
@@ -23,10 +24,10 @@ class SettingsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           ValueStreamBuilder<User>(
-            stream: context.contactProvider.currentUser,
+            stream: Registry.contactProvider.currentUser,
             builder: (_, user) => ListTile(
               leading: ValueStreamBuilder<bool>(
-                stream: context.contactProvider.isNameSet,
+                stream: Registry.contactProvider.isNameSet,
                 builder: (_, isNameSet) => Badge(
                   smallSize: isNameSet ? 0 : null,
                   child: const Icon(Icons.badge_outlined),
@@ -41,7 +42,7 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.style_outlined),
             title: Text(t.theme),
             trailing: ValueStreamBuilder<ThemeMode>(
-              stream: context.settingsProvider.theme,
+              stream: Registry.settingsProvider.theme,
               builder: (_, theme) => SegmentedControl<ThemeMode, IconData>(
                 value: theme,
                 items: const {
@@ -50,7 +51,7 @@ class SettingsPage extends StatelessWidget {
                   ThemeMode.dark: Icons.mode_night_outlined,
                 },
                 segmentBuilder: (_, data) => Icon(data),
-                onChanged: context.settingsProvider.setTheme,
+                onChanged: Registry.settingsProvider.setTheme,
               ),
             ),
           ),
@@ -139,7 +140,7 @@ class SettingsPage extends StatelessWidget {
       ),
     );
     if (context.mounted && name != null) {
-      await context.contactProvider.setName(name);
+      await Registry.contactProvider.setName(name);
     }
   }
 }

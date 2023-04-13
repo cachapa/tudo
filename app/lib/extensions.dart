@@ -5,17 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_info/platform_info.dart';
-import 'package:provider/provider.dart';
-
-import 'auth/auth_provider.dart';
-import 'contacts/contact_provider.dart';
-import 'lists/list_provider.dart';
-import 'settings/settings_provider.dart';
-import 'sync/sync_provider.dart';
-import 'util/store.dart';
 
 export 'package:flutter_gen/gen_l10n/app_localizations.dart';
-export 'package:provider/provider.dart';
 
 extension BoolX on bool {
   int get toInt => this ? 1 : 0;
@@ -120,19 +111,6 @@ extension ContextExtensions on BuildContext {
   }
 
   EdgeInsets get padding => MediaQuery.of(this).padding;
-
-  // Providers
-  StoreProvider get storeProvider => read<StoreProvider>();
-
-  SettingsProvider get settingsProvider => read<SettingsProvider>();
-
-  AuthProvider get authProvider => read<AuthProvider>();
-
-  ContactProvider get contactProvider => read<ContactProvider>();
-
-  ListProvider get listProvider => read<ListProvider>();
-
-  SyncProvider get syncProvider => read<SyncProvider>();
 }
 
 extension UriX on Uri {

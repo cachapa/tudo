@@ -14,6 +14,7 @@ import '../common/share_list.dart';
 import '../common/text_input_dialog.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
+import '../registry.dart';
 import 'list_provider.dart';
 import 'manage_participants.dart';
 
@@ -177,7 +178,7 @@ class ToDoListPage extends StatelessWidget {
 
   Future<void> _addItem(
       BuildContext context, String listID, String name) async {
-    await context.listProvider.createItem(list.id, name);
+    await Registry.listProvider.createItem(list.id, name);
 
     // Scroll to bottom of list
     await Future.delayed(const Duration(milliseconds: 100));
@@ -196,7 +197,7 @@ class ToDoListPage extends StatelessWidget {
     if (checked.isEmpty) return;
 
     var indexes =
-        checked.map((e) => context.listProvider.deleteItem(e.id)).toList();
+        checked.map((e) => Registry.listProvider.deleteItem(e.id)).toList();
 
     // Insert in reverse order when undoing so the old indexes match
     checked = checked.reversed.toList();
@@ -208,7 +209,7 @@ class ToDoListPage extends StatelessWidget {
       () {
         for (var i = 0; i < checked.length; i++) {
           final item = checked[i];
-          context.listProvider.undeleteItem(item.id);
+          Registry.listProvider.undeleteItem(item.id);
         }
       },
     );
@@ -396,7 +397,7 @@ class ToDoListView extends StatelessWidget {
   }
 
   void _toggle(BuildContext context, ToDo toDo) =>
-      context.listProvider.setDone(toDo.id, !toDo.done);
+      Registry.listProvider.setDone(toDo.id, !toDo.done);
 
   Future<void> _editItem(BuildContext context, ToDo toDo) async {
     final title = await showDialog<String>(
@@ -408,13 +409,13 @@ class ToDoListView extends StatelessWidget {
       ),
     );
     if (context.mounted && title != null) {
-      await context.listProvider.setItemName(toDo.id, title);
+      await Registry.listProvider.setItemName(toDo.id, title);
     }
   }
 
   void _deleteItem(BuildContext context, ToDo toDo) {
     list.items.remove(toDo);
-    final listProvider = context.listProvider;
+    final listProvider = Registry.listProvider;
     listProvider.deleteItem(toDo.id);
 
     context.showSnackBar(
@@ -426,7 +427,7 @@ class ToDoListView extends StatelessWidget {
   void _swap(BuildContext context, int from, int to) {
     final item = items.removeAt(from);
     items.insert(to, item);
-    context.listProvider.setItemOrder(items);
+    Registry.listProvider.setItemOrder(items);
   }
 }
 

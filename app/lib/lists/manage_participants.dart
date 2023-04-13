@@ -7,6 +7,7 @@ import '../common/icon_label.dart';
 import '../common/value_builders.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
+import '../registry.dart';
 import 'list_provider.dart';
 
 Future<bool?> manageParticipants(BuildContext context, String listId) {
@@ -40,7 +41,7 @@ class _ManageParticipantsPage extends StatelessWidget {
 
     return Scaffold(
       body: ValueStreamBuilder<ToDoList>(
-        stream: context.listProvider.getList(listId),
+        stream: Registry.listProvider.getList(listId),
         builder: (context, list) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -116,7 +117,7 @@ class _ManageParticipantsPage extends StatelessWidget {
     );
 
     if (context.mounted && (result ?? false)) {
-      final listProvider = context.listProvider;
+      final listProvider = Registry.listProvider;
       await listProvider.removeUser(user.id, listId);
 
       if (context.mounted) {

@@ -14,6 +14,7 @@ import '../common/edit_list.dart';
 import '../common/offline_indicator.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
+import '../registry.dart';
 import '../settings/settings_page.dart';
 import 'list_provider.dart';
 import 'to_do_list_page.dart';
@@ -55,7 +56,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
       ),
       child: Scaffold(
         body: ValueStreamBuilder<List<ToDoList>>(
-          stream: context.listProvider.lists,
+          stream: Registry.listProvider.lists,
           builder: (_, lists) => CustomScrollView(
             slivers: [
               const SliverToBoxAdapter(child: Logo()),
@@ -126,7 +127,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
       editToDoList(context, list);
 
   Future<void> _deleteList(BuildContext context, ToDoList list) async {
-    final listManager = context.read<ListProvider>();
+    final listManager = Registry.listProvider;
     await listManager.removeList(list.id);
     if (context.mounted) {
       context.showSnackBar(
@@ -149,7 +150,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
   void _swap(List<ToDoList> lists, int from, int to) {
     final item = lists.removeAt(from);
     lists.insert(to, item);
-    context.listProvider.setListOrder(lists);
+    Registry.listProvider.setListOrder(lists);
   }
 
   void _monitorDeeplinks() {
@@ -158,13 +159,13 @@ class _ListManagerPageState extends State<ListManagerPage> {
         getInitialUri().then((uri) async {
           if (uri != null) {
             'Initial link: $uri'.log;
-            await context.listProvider.import(uri.pathSegments.last);
+            await Registry.listProvider.import(uri.pathSegments.last);
           }
         });
         uriLinkStream.where((e) => e != null).listen((uri) async {
           if (uri != null) {
             'Stream link: $uri'.log;
-            await context.listProvider.import(uri.pathSegments.last);
+            await Registry.listProvider.import(uri.pathSegments.last);
           }
         }).onError((e) => e.log);
       }
@@ -174,7 +175,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
   }
 
   Future<void> _checkForUpdates() async {
-    if (await context.syncProvider.isUpdateRequired()) {
+    if (await Registry.syncProvider.isUpdateRequired()) {
       final result = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
@@ -241,7 +242,7 @@ class Logo extends StatelessWidget {
                 onPressed: () => _launchQrScanner(context),
               ),
               ValueStreamBuilder<bool>(
-                stream: context.contactProvider.isNameSet,
+                stream: Registry.contactProvider.isNameSet,
                 initialValue: true,
                 builder: (_, isNameSet) => IconButton(
                   icon: Badge(
@@ -270,7 +271,7 @@ class Logo extends StatelessWidget {
     'Read QR: $code'.log;
     final uri = Uri.parse(code);
     if (context.mounted) {
-      await context.read<ListProvider>().import(uri.pathSegments.last);
+      await Registry.listProvider.import(uri.pathSegments.last);
     }
   }
 }

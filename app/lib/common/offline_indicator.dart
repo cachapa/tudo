@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import '../extensions.dart';
+import '../registry.dart';
 import 'value_builders.dart';
 
 class OfflineIndicator {
@@ -10,11 +11,13 @@ class OfflineIndicator {
   late final StreamSubscription<bool> _subscription;
   late final OverlayEntry _overlay;
 
+  final connectionState = Registry.syncProvider.connectionState;
+
   OfflineIndicator(this.context) {
     _overlay = OverlayEntry(
       opaque: false,
       builder: (_) => ValueStreamBuilder<bool>(
-        stream: context.syncProvider.connectionState,
+        stream: connectionState,
         initialValue: true,
         builder: (_, isConnected) => AnimatedSwitcher(
           duration: const Duration(milliseconds: 300),
