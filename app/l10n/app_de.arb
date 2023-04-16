@@ -39,7 +39,7 @@
   "userRemoved": "{name} entfernt",
   "nameCaption": "In geteilten Listen sichtbar",
   "copyLink": "Link kopieren",
-  "listShareMessage": "Die Liste \"{listName}\" aud deinem Gerät öffnen:\n{shareUrl}",
+  "listShareMessage": "Die Liste \"{listName}\" auf deinem Gerät öffnen:\n{shareUrl}",
   "updateRequired": "Aktualizierung nötig",
   "updateRequiredMessage": "Bitte die App aktualizieren um weiter zu syncen.",
   "clearCompleted": "Erledigte löschen"
