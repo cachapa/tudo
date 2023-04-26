@@ -1,12 +1,9 @@
 name: Quality Gate (server)
 
 on:
-  pull_request:
-    branches:
-      - '**'
   push:
     branches:
-      - master
+      - '**'
 
 defaults:
   run:

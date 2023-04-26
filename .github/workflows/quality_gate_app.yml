@@ -1,12 +1,9 @@
 name: Quality Gate (app)
 
 on:
-  pull_request:
-    branches:
-      - '**'
   push:
     branches:
-      - master
+      - '**'
 
 defaults:
   run:
