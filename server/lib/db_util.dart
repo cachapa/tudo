@@ -6,7 +6,7 @@ import 'package:postgres_crdt/postgres_crdt.dart';
 class DbUtil {
   DbUtil._();
 
-  static FutureOr<void> createTables(SqlCrdt crdt) async {
+  static Future<void> createTables(SqlCrdt crdt) async {
     await crdt.execute('''
       CREATE TABLE auth (
         token TEXT NOT NULL,

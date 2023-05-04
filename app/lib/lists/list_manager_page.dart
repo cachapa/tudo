@@ -5,8 +5,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:native_qr/native_qr.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -261,17 +261,16 @@ class Logo extends StatelessWidget {
   }
 
   Future<void> _launchQrScanner(BuildContext context) async {
-    final code = await FlutterBarcodeScanner.scanBarcode(
-      '#00000000',
-      context.t.close.toUpperCase(),
-      false,
-      ScanMode.QR,
-    );
-    if (code == '-1') return;
-    'Read QR: $code'.log;
-    final uri = Uri.parse(code);
-    if (context.mounted) {
-      await Registry.listProvider.import(uri.pathSegments.last);
+    try {
+      final code = await NativeQr().get();
+      if (code == null) return;
+      'Read QR: $code'.log;
+      final uri = Uri.parse(code);
+      if (context.mounted) {
+        await Registry.listProvider.import(uri.pathSegments.last);
+      }
+    } catch (e) {
+      context.showSnackBar('$e');
     }
   }
 }

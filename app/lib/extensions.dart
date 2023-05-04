@@ -81,7 +81,7 @@ extension ContextExtensions on BuildContext {
 
   void pop<T>([T? result]) => Navigator.of(this).pop<T>(result);
 
-  void showSnackBar(String message, VoidCallback onUndo) {
+  void showSnackBar(String message, [VoidCallback? onUndo]) {
     final scaffold = ScaffoldMessenger.of(this);
     scaffold.showSnackBar(
       SnackBar(
@@ -89,21 +89,22 @@ extension ContextExtensions on BuildContext {
         content: Row(
           children: [
             Expanded(child: Text(message)),
-            SizedBox(
-              height: 24,
-              child: IconButton(
-                padding: EdgeInsets.zero,
-                icon: Icon(
-                  Icons.undo,
-                  color: theme.primaryColor,
+            if (onUndo != null)
+              SizedBox(
+                height: 24,
+                child: IconButton(
+                  padding: EdgeInsets.zero,
+                  icon: Icon(
+                    Icons.undo,
+                    color: theme.primaryColor,
+                  ),
+                  onPressed: () {
+                    onUndo();
+                    scaffold.hideCurrentSnackBar(
+                        reason: SnackBarClosedReason.action);
+                  },
                 ),
-                onPressed: () {
-                  onUndo();
-                  scaffold.hideCurrentSnackBar(
-                      reason: SnackBarClosedReason.action);
-                },
               ),
-            ),
           ],
         ),
       ),

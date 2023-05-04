@@ -54,7 +54,7 @@ android {
 
     defaultConfig {
         applicationId "net.cachapa.tudo"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger() + 32
         versionName flutterVersionName

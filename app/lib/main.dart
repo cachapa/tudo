@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 
 import 'common/value_builders.dart';
 import 'extensions.dart';
-import 'home/home_page.dart';
+import 'lists/list_manager_page.dart';
 import 'registry.dart';
 import 'util/build_info.dart';
 import 'util/themes.dart';

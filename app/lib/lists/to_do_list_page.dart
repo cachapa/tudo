@@ -26,6 +26,8 @@ class ToDoListPage extends StatelessWidget {
   final ToDoList list;
   final _bottomOfList = GlobalKey();
 
+  late final _stream = Registry.listProvider.getList(list.id);
+
   ToDoListPage({super.key, required this.list});
 
   @override
@@ -38,7 +40,7 @@ class ToDoListPage extends StatelessWidget {
       // Close keyboard when tapping a non-focusable area
       onTap: () => FocusScope.of(context).unfocus(),
       child: ValueStreamBuilder<ToDoListWithItems>(
-        stream: context.listProvider.getList(list.id),
+        stream: _stream,
         initialValue: ToDoListWithItems.fromList(list, []),
         errorBuilder: (context, error) => Material(
           child: Column(
