@@ -1,2 +1,2 @@
 const apiSecret = 'secret';
-final serverUri = Uri.parse('ws://localhost:8080');
+final serverUri = Uri.parse('http://localhost:8080');
