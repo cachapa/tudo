@@ -1,6 +1,52 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../extensions.dart';
+
+const blurSigma = 8.0;
+
+class BlurredAppBar extends StatelessWidget implements PreferredSizeWidget {
+  @override
+  final preferredSize = const Size.fromHeight(kToolbarHeight);
+
+  final Widget? leading;
+  final Widget title;
+  final List<Widget>? actions;
+  final Color? foregroundColor;
+  final Color? backgroundColor;
+
+  const BlurredAppBar({
+    super.key,
+    this.leading,
+    required this.title,
+    this.actions,
+    this.foregroundColor,
+    this.backgroundColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+        child: AppBar(
+          systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarIconBrightness: context.theme.brightness.invert),
+          centerTitle: true,
+          foregroundColor: foregroundColor,
+          backgroundColor:
+              backgroundColor ?? context.theme.canvasColor.withOpacity(0.7),
+          surfaceTintColor: Colors.transparent,
+          leading: leading,
+          title: title,
+          actions: actions,
+        ),
+      ),
+    );
+  }
+}
 
 class DiscreteAppBar extends StatelessWidget with PreferredSizeWidget {
   final String title;

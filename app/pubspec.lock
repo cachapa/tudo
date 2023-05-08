@@ -17,6 +17,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.3.1"
+  animated_list_plus:
+    dependency: "direct main"
+    description:
+      name: animated_list_plus
+      sha256: f276e3c42a78a76c295186c4723e206dee7660741bd4e9592f9c5530511b7589
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.5.0"
   args:
     dependency: transitive
     description:
@@ -341,15 +349,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
-  implicitly_animated_reorderable_list:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: flutter_beta
-      resolved-ref: "720b1d4d6a67b0c03c9dd57569f401cd647a526f"
-      url: "https://github.com/storyark-app/implicitly_animated_reorderable_list.git"
-    source: git
-    version: "0.4.2"
   in_app_update:
     dependency: "direct main"
     description:

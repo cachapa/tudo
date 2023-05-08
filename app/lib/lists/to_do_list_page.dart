@@ -1,13 +1,15 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
+import '../common/appbars.dart';
 import '../common/check.dart';
 import '../common/edit_list.dart';
 import '../common/empty_page.dart';
 import '../common/icon_label.dart';
+import '../common/lists.dart';
 import '../common/popup_menu.dart';
 import '../common/progress.dart';
 import '../common/share_list.dart';
@@ -18,13 +20,11 @@ import '../registry.dart';
 import 'list_provider.dart';
 import 'manage_participants.dart';
 
-const blurSigma = 14.0;
-
 enum ListAction { delete }
 
 class ToDoListPage extends StatelessWidget {
   final ToDoList list;
-  final _bottomOfList = GlobalKey();
+  final _controller = ScrollController();
 
   late final _stream = Registry.listProvider.getList(list.id);
 
@@ -161,7 +161,10 @@ class ToDoListPage extends StatelessWidget {
             ),
             body: list.items.isEmpty
                 ? EmptyPage(text: t.toDoListEmptyMessage)
-                : ToDoListView(list: list, bottomOfListKey: _bottomOfList),
+                : ToDoListView(
+                    controller: _controller,
+                    list: list,
+                  ),
             bottomNavigationBar: Padding(
               padding: EdgeInsets.only(bottom: bottom),
               child: InputBar(
@@ -182,16 +185,14 @@ class ToDoListPage extends StatelessWidget {
       BuildContext context, String listID, String name) async {
     await Registry.listProvider.createItem(list.id, name);
 
+    // Wait for entry animation to finish
+    await Future.delayed(const Duration(milliseconds: 400));
     // Scroll to bottom of list
-    await Future.delayed(const Duration(milliseconds: 100));
-    final itemContext = _bottomOfList.currentContext;
-    if (itemContext != null && itemContext.mounted) {
-      await Scrollable.ensureVisible(
-        itemContext,
-        duration: const Duration(milliseconds: 300),
-        alignment: 0.90,
-      );
-    }
+    await _controller.animateTo(
+      _controller.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.fastOutSlowIn,
+    );
   }
 
   Future<void> _clearCompleted(BuildContext context, List<ToDo> items) async {
@@ -229,61 +230,49 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     final primaryColor = context.theme.primaryColor;
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
-        child: AppBar(
-          systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarIconBrightness: context.theme.brightness.invert),
-          foregroundColor: primaryColor,
-          centerTitle: true,
-          backgroundColor: primaryColor.withAlpha(20),
-          elevation: 0,
-          leading: InkResponse(
-            onTap: () => context.pop(),
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                const Positioned(
-                  left: 8,
-                  child: Icon(
-                    Icons.arrow_back_ios,
-                    size: 16,
-                  ),
-                ),
-                Positioned(
-                  right: 4,
-                  child: Hero(
-                    tag: 'progress_${list.id}',
-                    child: Progress(
-                      progress: list.doneCount,
-                      total: list.itemCount,
-                      color: list.color,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          title: Column(
-            children: [
-              Text(
-                list.name,
-                style: context.theme.textTheme.titleLarge,
+    return BlurredAppBar(
+      foregroundColor: primaryColor,
+      backgroundColor: primaryColor.withAlpha(20),
+      leading: InkResponse(
+        onTap: () => context.pop(),
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            const Positioned(
+              left: 8,
+              child: Icon(
+                Icons.arrow_back_ios,
+                size: 16,
               ),
-              if (list.isShared)
-                Text(
-                  list.memberNames(context),
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  style: context.theme.textTheme.bodyMedium!.copyWith(
-                      color: context.theme.textTheme.bodySmall!.color),
-                ),
-            ],
-          ),
-          actions: actions,
+            ),
+            Positioned(
+              right: 4,
+              child: Progress(
+                progress: list.doneCount,
+                total: list.itemCount,
+                color: list.color,
+              ),
+            ),
+          ],
         ),
       ),
+      title: Column(
+        children: [
+          Text(
+            list.name,
+            style: context.theme.textTheme.titleLarge,
+          ),
+          if (list.isShared)
+            Text(
+              list.memberNames(context),
+              softWrap: false,
+              overflow: TextOverflow.fade,
+              style: context.theme.textTheme.bodyMedium!
+                  .copyWith(color: context.theme.textTheme.bodySmall!.color),
+            ),
+        ],
+      ),
+      actions: actions,
     );
   }
 
@@ -353,48 +342,36 @@ class _InputBarState extends State<InputBar> {
   }
 }
 
-class ToDoListView extends StatelessWidget {
+class ToDoListView extends StatefulWidget {
+  final ScrollController? controller;
   final ToDoListWithItems list;
-  final GlobalKey bottomOfListKey;
 
-  const ToDoListView(
-      {super.key, required this.list, required this.bottomOfListKey});
+  const ToDoListView({super.key, this.controller, required this.list});
 
-  List<ToDo> get items => list.items;
+  @override
+  State<ToDoListView> createState() => _ToDoListViewState();
+}
+
+class _ToDoListViewState extends State<ToDoListView> {
+  String? _deletingItemId;
+
+  List<ToDo> get items => widget.list.items;
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(
-      // padding: context.padding,
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      slivers: [
-        const SliverSafeArea(
-          bottom: false,
-          sliver: SliverToBoxAdapter(),
-        ),
-        SliverReorderableList(
-          itemCount: items.length,
-          onReorder: (from, to) {
-            // Fix buggy swap indexes
-            if (from < to) to--;
-            if (from == to) return;
-            _swap(context, from, to);
-          },
-          itemBuilder: (context, i) => _ListTile(
-            key: ValueKey(items[i].id),
-            index: i,
-            item: items[i],
-            onToggle: () => _toggle(context, items[i]),
-            onEdit: () => _editItem(context, items[i]),
-            onDelete: () => _deleteItem(context, items[i]),
-            isShared: list.isShared,
-          ),
-        ),
-        SliverSafeArea(
-          top: false,
-          sliver: SliverToBoxAdapter(key: bottomOfListKey),
-        ),
-      ],
+    return AnimatedReorderableListBuilder(
+      controller: widget.controller,
+      items,
+      onReorder: (from, to) => _swap(context, from, to),
+      builder: (context, i, item) => _ListTile(
+        // key: item == items.last ? bottomOfListKey : ValueKey(item.id),
+        item: item,
+        onToggle: () => _toggle(context, item),
+        onEdit: () => _editItem(context, item),
+        onDelete: () => _deleteItem(context, item),
+        isShared: widget.list.isShared,
+        isDeleted: item.id == _deletingItemId,
+      ),
     );
   }
 
@@ -416,13 +393,16 @@ class ToDoListView extends StatelessWidget {
   }
 
   void _deleteItem(BuildContext context, ToDo toDo) {
-    list.items.remove(toDo);
+    setState(() => _deletingItemId = toDo.id);
     final listProvider = Registry.listProvider;
     listProvider.deleteItem(toDo.id);
 
     context.showSnackBar(
       context.t.itemDeleted(toDo.name),
-      () => listProvider.undeleteItem(toDo.id),
+      () {
+        _deletingItemId = null;
+        listProvider.undeleteItem(toDo.id);
+      },
     );
   }
 
@@ -434,21 +414,20 @@ class ToDoListView extends StatelessWidget {
 }
 
 class _ListTile extends StatelessWidget {
-  final int index;
   final ToDo item;
   final Function() onToggle;
   final Function() onEdit;
   final Function() onDelete;
   final bool isShared;
+  final bool isDeleted;
 
   const _ListTile({
-    super.key,
-    required this.index,
     required this.item,
     required this.onToggle,
     required this.onEdit,
     required this.onDelete,
     required this.isShared,
+    required this.isDeleted,
   });
 
   @override
@@ -471,24 +450,35 @@ class _ListTile extends StatelessWidget {
           color: Colors.red,
         ),
       ),
-      onDismissed: (_) => onDelete(),
-      child: Material(
-        child: ListTile(
-          leading: Check(
-            checked: item.done,
-            onChanged: onToggle,
+      confirmDismiss: (direction) async {
+        // Avoid conflicts between Dismissible and list animations.
+        // Calls the delete method to remove the item from the database
+        // but returns false as if the dismiss gesture was cancelled avoiding
+        // the Dismissible deletion animation.
+        onDelete();
+        return false;
+      },
+      child: Opacity(
+        opacity: isDeleted ? 0 : 1,
+        child: Container(
+          color: context.theme.canvasColor,
+          child: ListTile(
+            leading: Check(
+              checked: item.done,
+              onChanged: onToggle,
+            ),
+            title: Text(item.name),
+            subtitle: isShared && item.done
+                ? IconLabel(
+                    Icons.account_circle, item.doneBy ?? context.t.anonymous)
+                : null,
+            trailing: const Handle(
+              vibrate: true,
+              child: Icon(Icons.drag_indicator),
+            ),
+            onTap: () => onToggle(),
+            onLongPress: onEdit,
           ),
-          title: Text(item.name),
-          subtitle: isShared && item.done
-              ? IconLabel(
-                  Icons.account_circle, item.doneBy ?? context.t.anonymous)
-              : null,
-          trailing: ReorderableDragStartListener(
-            index: index,
-            child: const Icon(Icons.drag_indicator),
-          ),
-          onTap: () => onToggle(),
-          onLongPress: onEdit,
         ),
       ),
     );

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
-import 'package:implicitly_animated_reorderable_list/transitions.dart';
 
 import '../common/avatar.dart';
 import '../common/icon_label.dart';
+import '../common/lists.dart';
 import '../common/value_builders.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
@@ -53,36 +52,30 @@ class _ManageParticipantsPage extends StatelessWidget {
               ),
             ),
             Expanded(
-              child: ImplicitlyAnimatedList<Member>(
+              child: AnimatedListBuilder<Member>(
+                list.members,
                 controller: controller,
                 padding: EdgeInsets.only(bottom: context.padding.bottom),
-                items: list.members,
-                areItemsTheSame: (a, b) => a.id == b.id,
-                itemBuilder: (context, itemAnimation, user, __) =>
-                    SizeFadeTransition(
-                  sizeFraction: 0.7,
-                  curve: Curves.easeInOut,
-                  animation: itemAnimation,
-                  child: ListTile(
-                    leading: Avatar(color: list.color),
-                    title: Text(user.nameOr(context)),
-                    subtitle: user.joinedAt != null
-                        ? IconLabel(
-                            Icons.person_add,
-                            user.joinedAt!.toRelativeString(context),
-                          )
-                        : null,
-                    trailing: user.isCurrentUser
-                        ? Padding(
-                            padding: const EdgeInsets.only(right: 16),
-                            child: Text(t.you),
-                          )
-                        : IconButton(
-                            icon: const Icon(Icons.close),
-                            color: context.theme.colorScheme.error,
-                            onPressed: () => _removeUser(context, user),
-                          ),
-                  ),
+                itemComparison: (a, b) => a.id == b.id,
+                builder: (context, i, user) => ListTile(
+                  leading: Avatar(color: list.color),
+                  title: Text(user.nameOr(context)),
+                  subtitle: user.joinedAt != null
+                      ? IconLabel(
+                          Icons.person_add,
+                          user.joinedAt!.toRelativeString(context),
+                        )
+                      : null,
+                  trailing: user.isCurrentUser
+                      ? Padding(
+                          padding: const EdgeInsets.only(right: 16),
+                          child: Text(t.you),
+                        )
+                      : IconButton(
+                          icon: const Icon(Icons.close),
+                          color: context.theme.colorScheme.error,
+                          onPressed: () => _removeUser(context, user),
+                        ),
                 ),
               ),
             ),

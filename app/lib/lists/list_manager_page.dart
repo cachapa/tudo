@@ -10,7 +10,9 @@ import 'package:native_qr/native_qr.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
+import '../common/appbars.dart';
 import '../common/edit_list.dart';
+import '../common/lists.dart';
 import '../common/offline_indicator.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
@@ -50,37 +52,60 @@ class _ListManagerPageState extends State<ListManagerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.t;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarIconBrightness: context.theme.brightness.invert,
       ),
       child: Scaffold(
-        body: ValueStreamBuilder<List<ToDoList>>(
-          stream: Registry.listProvider.lists,
-          builder: (_, lists) => CustomScrollView(
-            slivers: [
-              const SliverToBoxAdapter(child: Logo()),
-              SliverReorderableList(
-                itemCount: lists.length,
-                onReorder: (from, to) {
-                  // Fix buggy swap indexes
-                  if (from < to) to--;
-                  if (from == to) return;
-                  _swap(lists, from, to);
-                },
-                itemBuilder: (context, i) => ToDoListTile(
-                  key: ValueKey(lists[i].id),
-                  list: lists[i],
-                  onTap: () => _openList(context, lists[i]),
-                  onLongPress: () => _editList(context, lists[i]),
-                  index: i,
-                ),
+        extendBodyBehindAppBar: true,
+        appBar: BlurredAppBar(
+          title: Stack(
+            alignment: Alignment.center,
+            children: [
+              Image.asset(
+                'assets/images/tudo_rainbow_bold.png',
+                height: 40,
               ),
-              SliverPadding(
-                key: _bottomOfList,
-                padding: EdgeInsets.only(bottom: context.padding.bottom + 88),
+              Image.asset(
+                'assets/images/tudo.png',
+                height: 40,
+                color: context.theme.textTheme.bodyLarge!.color,
               ),
             ],
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.qr_code_scanner),
+              tooltip: t.scanQrCode,
+              onPressed: () => _launchQrScanner(context),
+            ),
+            ValueStreamBuilder<bool>(
+              stream: Registry.contactProvider.isNameSet,
+              initialValue: true,
+              builder: (_, isNameSet) => IconButton(
+                icon: Badge(
+                  smallSize: isNameSet ? 0 : null,
+                  child: const Icon(Icons.tune_rounded),
+                ),
+                tooltip: t.settings,
+                onPressed: () => context.push(() => const SettingsPage()),
+              ),
+            ),
+          ],
+        ),
+        body: ValueStreamBuilder<List<ToDoList>>(
+          stream: Registry.listProvider.lists,
+          builder: (_, lists) => AnimatedReorderableListBuilder(
+            lists,
+            onReorder: (from, to) => _swap(lists, from, to),
+            builder: (context, i, item) => ToDoListTile(
+              key: ValueKey(item.id),
+              list: item,
+              onTap: () => _openList(context, item),
+              onLongPress: () => _editList(context, item),
+            ),
           ),
         ),
         floatingActionButton: FloatingActionButton(
@@ -101,6 +126,20 @@ class _ListManagerPageState extends State<ListManagerPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _launchQrScanner(BuildContext context) async {
+    try {
+      final code = await NativeQr().get();
+      if (code == null) return;
+      'Read QR: $code'.log;
+      final uri = Uri.parse(code);
+      if (context.mounted) {
+        await Registry.listProvider.import(uri.pathSegments.last);
+      }
+    } catch (e) {
+      context.showSnackBar('$e');
+    }
   }
 
   Future<void> _createList() async {
@@ -203,74 +242,6 @@ class _ListManagerPageState extends State<ListManagerPage> {
               'https://apps.apple.com/us/app/tudo-lists/id1550819275');
         }
       }
-    }
-  }
-}
-
-class Logo extends StatelessWidget {
-  const Logo({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final t = context.t;
-    final color = context.theme.textTheme.bodyLarge!.color;
-
-    return SafeArea(
-      bottom: false,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Image.asset(
-            'assets/images/tudo_rainbow_bold.png',
-            height: 40,
-          ),
-          Image.asset(
-            'assets/images/tudo.png',
-            height: 40,
-            color: color,
-          ),
-          ButtonBar(
-            buttonPadding: EdgeInsets.zero,
-            children: [
-              IconButton(
-                padding: const EdgeInsets.all(20),
-                icon: Icon(
-                  Icons.qr_code_scanner,
-                  color: color,
-                ),
-                tooltip: t.scanQrCode,
-                onPressed: () => _launchQrScanner(context),
-              ),
-              ValueStreamBuilder<bool>(
-                stream: Registry.contactProvider.isNameSet,
-                initialValue: true,
-                builder: (_, isNameSet) => IconButton(
-                  icon: Badge(
-                    smallSize: isNameSet ? 0 : null,
-                    child: const Icon(Icons.tune_rounded),
-                  ),
-                  tooltip: t.settings,
-                  onPressed: () => context.push(() => const SettingsPage()),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _launchQrScanner(BuildContext context) async {
-    try {
-      final code = await NativeQr().get();
-      if (code == null) return;
-      'Read QR: $code'.log;
-      final uri = Uri.parse(code);
-      if (context.mounted) {
-        await Registry.listProvider.import(uri.pathSegments.last);
-      }
-    } catch (e) {
-      context.showSnackBar('$e');
     }
   }
 }
