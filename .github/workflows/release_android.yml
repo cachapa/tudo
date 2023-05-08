@@ -21,15 +21,9 @@ jobs:
         with:
           java-version: '12.x'
 
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v1
-        with:
-          path: /opt/hostedtoolcache/flutter
-          key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}
-
       - uses: subosito/flutter-action@v2
-        with:
-          channel: 'beta'
+#        with:
+#          channel: 'beta'
 
       - name: Retrieve build name from tag
         id: get_version
