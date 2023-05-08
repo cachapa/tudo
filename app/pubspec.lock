@@ -703,34 +703,34 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: "963dad8c4aa2f814ce7d2d5b1da2f36f31bd1a439d8f27e3dc189bb9d26bc684"
+      sha256: e77abf6ff961d69dfef41daccbb66b51e9983cdd5cb35bf30733598057401555
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.3"
+    version: "2.4.5"
   sqflite_common_ffi:
     dependency: transitive
     description:
       name: sqflite_common_ffi
-      sha256: "0595da0b418deff5a93a20e15811e73ea1bbce89745eeebed87c37f8027b7a5d"
+      sha256: f86de82d37403af491b21920a696b19f01465b596f545d1acd4d29a0a72418ad
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.3"
+    version: "2.2.5"
   sqflite_common_ffi_web:
     dependency: transitive
     description:
       name: sqflite_common_ffi_web
-      sha256: cfeae4cac17f1e1621e1c7b582aff5ac51b2411fbfe63cb24896e7b1da274258
+      sha256: "5acaaf382ea88e07122682d18d51602023f405ce1177593df0fb8a64e94ea374"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.4"
+    version: "0.3.5"
   sql_crdt:
     dependency: transitive
     description:
       name: sql_crdt
-      sha256: "1517e5e93d9f6af70f33d3aa63b792eeca44a914e4b43c28654b9a8f74944753"
+      sha256: "5e3d237f335efaa6959c6e156f6a308506fe0e440824ef5a301ab177506d2b45"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.9+2"
+    version: "1.0.1"
   sqlite3:
     dependency: transitive
     description:
@@ -751,10 +751,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite_crdt
-      sha256: "51de97e67fecf7bb623f7db041dc77169bc4e62479bbd7ae62f7296c20527d36"
+      sha256: "96a4ca34efdac7a0b775ba7d797d9b0d8a621c8521591e0ad68768edd0b8a3a7"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.9+4"
+    version: "1.0.1"
   sqlparser:
     dependency: transitive
     description:
@@ -1013,4 +1013,4 @@ packages:
     version: "3.1.1"
 sdks:
   dart: ">=2.19.6 <3.0.0"
-  flutter: ">=3.0.0"
+  flutter: ">=3.7.0"

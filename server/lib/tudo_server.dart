@@ -12,6 +12,7 @@ import 'package:version/version.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'config.dart';
+import 'db_util.dart';
 import 'extensions.dart';
 
 class TudoServer {
@@ -21,6 +22,8 @@ class TudoServer {
 
   Future<void> serve(int port) async {
     _crdt = await PostgresCrdt.open('tudo', username: 'cachapa');
+
+    await DbUtil.createTables(_crdt);
 
     final router = Router()
       ..head('/check_version', (_) => Response(200))

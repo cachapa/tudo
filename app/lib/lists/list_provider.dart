@@ -11,7 +11,7 @@ const listIdsKey = 'list_id_keys';
 
 class ListProvider {
   final String userId;
-  final SqlCrdt _crdt;
+  final SqliteCrdt _crdt;
 
   Stream<List<ToDoList>> get lists => _queryLists()
       .asyncMap((l) => Future.wait(l.map(

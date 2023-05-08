@@ -14,7 +14,7 @@ import '../util/store.dart';
 import 'sync_client.dart';
 
 class SyncProvider {
-  final SqlCrdt _crdt;
+  final SqliteCrdt _crdt;
   late final SyncClient _client;
 
   var _online = false;

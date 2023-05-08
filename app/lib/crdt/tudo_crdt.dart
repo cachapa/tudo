@@ -10,7 +10,7 @@ const _version = 5;
 class TudoCrdt {
   TudoCrdt._();
 
-  static Future<SqlCrdt> open(String path) => SqliteCrdt.open(
+  static Future<SqliteCrdt> open(String path) => SqliteCrdt.open(
         path,
         version: _version,
         onCreate: _onCreate,

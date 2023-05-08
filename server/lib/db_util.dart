@@ -8,7 +8,7 @@ class DbUtil {
 
   static Future<void> createTables(SqlCrdt crdt) async {
     await crdt.execute('''
-      CREATE TABLE auth (
+      CREATE TABLE IF NOT EXISTS auth (
         token TEXT NOT NULL,
         user_id TEXT NOT NULL,
         created_at TEXT NOT NULL,
@@ -16,14 +16,14 @@ class DbUtil {
       )
     ''');
     await crdt.execute('''
-      CREATE TABLE users (
+      CREATE TABLE IF NOT EXISTS users (
         id TEXT NOT NULL,
         name TEXT,
         PRIMARY KEY (id)
       )
     ''');
     await crdt.execute('''
-      CREATE TABLE user_lists (
+      CREATE TABLE IF NOT EXISTS user_lists (
         user_id TEXT NOT NULL,
         list_id TEXT NOT NULL,
         position INTEGER,
@@ -32,7 +32,7 @@ class DbUtil {
       )
     ''');
     await crdt.execute('''
-      CREATE TABLE lists (
+      CREATE TABLE IF NOT EXISTS lists (
         id TEXT NOT NULL,
         name TEXT NOT NULL,
         color TEXT NOT NULL,
@@ -42,7 +42,7 @@ class DbUtil {
       )
     ''');
     await crdt.execute('''
-      CREATE TABLE todos (
+      CREATE TABLE IF NOT EXISTS todos (
         id TEXT NOT NULL,
         list_id TEXT NOT NULL,
         name TEXT NOT NULL,

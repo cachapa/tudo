@@ -6,7 +6,7 @@ import '../extensions.dart';
 
 class ContactProvider {
   final String userId;
-  final SqlCrdt _crdt;
+  final SqliteCrdt _crdt;
 
   final _contacts = BehaviorSubject<Map<String, User>>();
 
