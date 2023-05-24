@@ -53,7 +53,7 @@ class ListProvider {
       WHERE is_deleted = 0
     ''')).first['max_position'] as int? ?? -1;
     await crdt.execute('''
-      INSERT INTO user_lists (user_id, list_id, created_at, position)
+      REPLACE INTO user_lists (user_id, list_id, created_at, position)
       VALUES (?1, ?2, ?3, ?4)
     ''', [userId, listId, DateTime.now().toUtcString, maxPosition + 1]);
   }
