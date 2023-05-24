@@ -48,7 +48,7 @@ class BlurredAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-class DiscreteAppBar extends StatelessWidget with PreferredSizeWidget {
+class DiscreteAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
   final String? subtitle;
 

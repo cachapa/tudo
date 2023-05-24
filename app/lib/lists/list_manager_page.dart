@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:native_qr/native_qr.dart';
+import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -129,16 +129,33 @@ class _ListManagerPageState extends State<ListManagerPage> {
   }
 
   Future<void> _launchQrScanner(BuildContext context) async {
-    try {
-      final code = await NativeQr().get();
-      if (code == null) return;
-      'Read QR: $code'.log;
-      final uri = Uri.parse(code);
-      if (context.mounted) {
-        await Registry.listProvider.import(uri.pathSegments.last);
-      }
-    } catch (e) {
-      context.showSnackBar('$e');
+    final code = await showDialog<String>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.transparent,
+        contentPadding: EdgeInsets.zero,
+        content: AspectRatio(
+          aspectRatio: 1.0,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: MobileScanner(
+              placeholderBuilder: (p0, p1) => const Icon(Icons.camera_alt),
+              fit: BoxFit.cover,
+              controller: MobileScannerController(
+                  detectionSpeed: DetectionSpeed.noDuplicates),
+              onDetect: (barcodes) =>
+                  context.pop(barcodes.barcodes.first.rawValue),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (code == null) return;
+    'Read QR: $code'.log;
+    final uri = Uri.parse(code);
+    if (context.mounted) {
+      await Registry.listProvider.import(uri.pathSegments.last);
     }
   }
 
