@@ -154,7 +154,7 @@ class TudoServer {
     if (changeset.recordCount == 0) return;
 
     print('SEND ${changeset.recordCount} records');
-    print(JsonEncoder.withIndent('  ').convert(changeset));
+    // print(JsonEncoder.withIndent('  ').convert(changeset));
     webSocket.sink.add(jsonEncode(changeset));
   }
 
