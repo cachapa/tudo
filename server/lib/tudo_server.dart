@@ -128,11 +128,11 @@ class TudoServer {
           AND modified > CASE WHEN user_ids.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'user_lists': await _crdt.query('''
-        SELECT user_lists.list_id, user_id, position, created_at, is_deleted, hlc FROM
-          (SELECT list_id FROM user_lists WHERE user_id = ?1) AS list_ids
-        JOIN user_lists ON list_ids.list_id = user_lists.list_id
+        SELECT user_lists.list_id, user_id, position, user_lists.created_at, is_deleted, hlc FROM
+          (SELECT list_id, created_at FROM user_lists WHERE user_id = ?1) AS own_lists
+        JOIN user_lists ON own_lists.list_id = user_lists.list_id
         WHERE node_id != ?2
-          AND modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
+          AND modified > CASE WHEN own_lists.created_at >= ?3 THEN '' ELSE ?3 END
       ''', [userId, nodeId, modifiedSince]),
       'lists': await _crdt.query('''
         SELECT lists.id, lists.name, lists.color, lists.creator_id,
