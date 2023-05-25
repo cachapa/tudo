@@ -74,7 +74,7 @@ extension BrightnessExtensions on Brightness {
 extension ContextExtensions on BuildContext {
   ThemeData get theme => Theme.of(this);
 
-  AppLocalizations get t => AppLocalizations.of(this)!;
+  AppLocalizations get t => AppLocalizations.of(this);
 
   Future<T?> push<T>(Widget Function() builder) =>
       Navigator.of(this).push<T>(MaterialPageRoute(builder: (_) => builder()));

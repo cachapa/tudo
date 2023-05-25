@@ -55,10 +55,7 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
         debugShowCheckedModeBanner: false,
         title: 'tudo',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: const [
-          Locale('en'),
-          ...AppLocalizations.supportedLocales,
-        ],
+        supportedLocales: AppLocalizations.supportedLocales,
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: theme,
