@@ -7,6 +7,7 @@ class TextInputDialog extends StatelessWidget {
   final String? caption;
   final String? hint;
   final bool showClearButton;
+  final Widget? info;
   final String positiveLabel;
   final TextInputType? keyboardType;
   final TextCapitalization textCapitalization;
@@ -19,6 +20,7 @@ class TextInputDialog extends StatelessWidget {
     this.caption,
     this.hint,
     this.showClearButton = false,
+    this.info,
     this.positiveLabel = 'Set',
     required String value,
     this.keyboardType,
@@ -57,6 +59,7 @@ class TextInputDialog extends StatelessWidget {
               caption!,
               style: context.theme.textTheme.bodySmall,
             ),
+          if (info != null) info!,
         ],
       ),
       actions: <Widget>[

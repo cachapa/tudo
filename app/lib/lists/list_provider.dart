@@ -196,14 +196,17 @@ class ListProvider {
       todos.name,
       todos.done,
       todos.done_at,
-      users.name AS done_by,
+      done_users.name AS done_by,
       todos.position,
       todos.creator_id,
+      created_users.name AS created_by,
       todos.created_at
     FROM
       todos
     LEFT JOIN
-      users ON done_by = users.id
+      users AS done_users ON done_by = done_users.id
+    LEFT JOIN
+      users AS created_users ON creator_id = created_users.id
     WHERE
       list_id = ?
       AND todos.is_deleted = 0
@@ -278,10 +281,11 @@ class ToDo extends IdObject {
   final String? doneBy;
   final int position;
   final String? creatorId;
+  final String? createdBy;
   final DateTime? createdAt;
 
   ToDo(super.id, this.name, this.done, this.doneAt, this.doneBy, this.position,
-      this.creatorId, this.createdAt);
+      this.creatorId, this.createdBy, this.createdAt);
 
   factory ToDo.fromMap(Map<String, dynamic> map) => ToDo(
         map['id'],
@@ -291,6 +295,7 @@ class ToDo extends IdObject {
         map['done_by'],
         map['position'],
         map['creator_id'],
+        map['created_by'],
         (map['created_at'] as String?)?.asDateTime.toLocal(),
       );
 

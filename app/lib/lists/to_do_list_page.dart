@@ -383,6 +383,23 @@ class _ToDoListViewState extends State<ToDoListView> {
       builder: (context) => TextInputDialog(
         title: context.t.editItem,
         value: toDo.name,
+        info: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (toDo.createdBy != null)
+              IconLabel(
+                Icons.create_rounded,
+                toDo.createdBy!,
+                style: context.theme.textTheme.bodySmall,
+              ),
+            if (toDo.doneBy != null)
+              IconLabel(
+                Icons.check_box_rounded,
+                toDo.doneBy!,
+                style: context.theme.textTheme.bodySmall,
+              ),
+          ],
+        ),
         positiveLabel: context.t.update,
       ),
     );
@@ -467,10 +484,6 @@ class _ListTile extends StatelessWidget {
               onChanged: onToggle,
             ),
             title: Text(item.name),
-            subtitle: isShared && item.done
-                ? IconLabel(
-                    Icons.account_circle, item.doneBy ?? context.t.anonymous)
-                : null,
             trailing: const Handle(
               vibrate: true,
               child: Icon(Icons.drag_indicator),

@@ -5,12 +5,13 @@ import '../extensions.dart';
 class IconLabel extends StatelessWidget {
   final IconData icon;
   final String label;
+  final TextStyle? style;
 
-  const IconLabel(this.icon, this.label, {Key? key}) : super(key: key);
+  const IconLabel(this.icon, this.label, {super.key, this.style});
 
   @override
   Widget build(BuildContext context) {
-    final color = context.theme.textTheme.bodySmall!.color;
+    final color = (style ?? context.theme.textTheme.bodySmall!).color;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -23,7 +24,8 @@ class IconLabel extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           label,
-          style: context.theme.textTheme.bodyMedium!.copyWith(color: color),
+          style: style ??
+              context.theme.textTheme.bodyMedium!.copyWith(color: color),
           softWrap: false,
           overflow: TextOverflow.ellipsis,
         ),
