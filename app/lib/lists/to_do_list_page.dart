@@ -364,7 +364,6 @@ class _ToDoListViewState extends State<ToDoListView> {
       items,
       onReorder: (from, to) => _swap(context, from, to),
       builder: (context, i, item) => _ListTile(
-        // key: item == items.last ? bottomOfListKey : ValueKey(item.id),
         item: item,
         onToggle: () => _toggle(context, item),
         onEdit: () => _editItem(context, item),

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
+import '../common/lists.dart';
 import '../extensions.dart';
 
 class ContactProvider {
@@ -43,14 +44,13 @@ class ContactProvider {
       _contacts.map((m) => m[id] ?? User(userId, id, null));
 }
 
-class User {
-  final String id;
+class User extends IdObject {
   final String name;
   final bool isCurrentUser;
 
-  User(String userId, this.id, String? name)
+  User(String currentUserId, super.id, String? name)
       : name = name ?? '',
-        isCurrentUser = userId == id;
+        isCurrentUser = currentUserId == id;
 
   User.fromMap(String userId, Map<String, dynamic> map)
       : this(userId, map['id'], map['name']);

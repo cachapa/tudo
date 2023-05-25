@@ -56,7 +56,6 @@ class _ManageParticipantsPage extends StatelessWidget {
                 list.members,
                 controller: controller,
                 padding: EdgeInsets.only(bottom: context.padding.bottom),
-                itemComparison: (a, b) => a.id == b.id,
                 builder: (context, i, user) => ListTile(
                   leading: Avatar(color: list.color),
                   title: Text(user.nameOr(context)),

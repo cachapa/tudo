@@ -4,11 +4,10 @@ import 'package:flutter/widgets.dart';
 
 import '../extensions.dart';
 
-class AnimatedListBuilder<T extends Object> extends StatelessWidget {
+class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final ScrollController? controller;
   final List<T> items;
-  final bool Function(T a, T b)? itemComparison;
   final Widget Function(BuildContext context, int i, T item) builder;
 
   const AnimatedListBuilder(
@@ -16,7 +15,6 @@ class AnimatedListBuilder<T extends Object> extends StatelessWidget {
     super.key,
     this.padding,
     this.controller,
-    this.itemComparison,
     required this.builder,
   });
 
@@ -26,8 +24,9 @@ class AnimatedListBuilder<T extends Object> extends StatelessWidget {
       padding: padding,
       controller: controller,
       items: items,
-      areItemsTheSame: (a, b) => itemComparison?.call(a, b) ?? a == b,
+      areItemsTheSame: (a, b) => a.id == b.id,
       itemBuilder: (context, animation, item, i) => SizeFadeTransition(
+        key: ValueKey(item.id),
         sizeFraction: 0.7,
         curve: Curves.easeInOut,
         animation: animation,
@@ -37,10 +36,10 @@ class AnimatedListBuilder<T extends Object> extends StatelessWidget {
   }
 }
 
-class AnimatedReorderableListBuilder<T extends Object> extends StatelessWidget {
+class AnimatedReorderableListBuilder<T extends IdObject>
+    extends StatelessWidget {
   final ScrollController? controller;
   final List<T> items;
-  final bool Function(T a, T b)? itemComparison;
   final ReorderCallback onReorder;
   final Widget Function(BuildContext context, int i, T item) builder;
 
@@ -48,7 +47,6 @@ class AnimatedReorderableListBuilder<T extends Object> extends StatelessWidget {
     this.items, {
     super.key,
     this.controller,
-    this.itemComparison,
     required this.onReorder,
     required this.builder,
   });
@@ -60,13 +58,13 @@ class AnimatedReorderableListBuilder<T extends Object> extends StatelessWidget {
       padding: context.padding,
       controller: controller,
       items: items,
-      areItemsTheSame: (a, b) => itemComparison?.call(a, b) ?? a == b,
+      areItemsTheSame: (a, b) => a.id == b.id,
       onReorderFinished: (item, from, to, newItems) {
         if (from == to) return;
         onReorder(from, to);
       },
       itemBuilder: (context, animation, item, i) => Reorderable(
-        key: ValueKey(item),
+        key: ValueKey(item.id),
         child: SizeFadeTransition(
           sizeFraction: 0.7,
           curve: Curves.easeInOut,
@@ -76,4 +74,10 @@ class AnimatedReorderableListBuilder<T extends Object> extends StatelessWidget {
       ),
     );
   }
+}
+
+abstract class IdObject {
+  final String id;
+
+  const IdObject(this.id);
 }

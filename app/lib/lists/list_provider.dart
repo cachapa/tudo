@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
+import '../common/lists.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
 import '../util/store.dart';
@@ -223,8 +224,7 @@ class ToDoListWithItems extends ToDoList {
       : super.fromMap(map, members);
 }
 
-class ToDoList {
-  final String id;
+class ToDoList extends IdObject {
   final String name;
   final Color color;
   final String? creatorId;
@@ -240,8 +240,16 @@ class ToDoList {
 
   bool get isEmpty => itemCount == 0;
 
-  const ToDoList(this.id, this.name, this.color, this.creatorId, this.createdAt,
-      this.position, this.itemCount, this.doneCount, this.members);
+  const ToDoList(
+      super.id,
+      this.name,
+      this.color,
+      this.creatorId,
+      this.createdAt,
+      this.position,
+      this.itemCount,
+      this.doneCount,
+      this.members);
 
   ToDoList.fromMap(Map<String, dynamic> map, List<Member> members)
       : this(
@@ -263,8 +271,7 @@ class ToDoList {
   String toString() => '$name [$doneCount/$itemCount]';
 }
 
-class ToDo {
-  final String id;
+class ToDo extends IdObject {
   final String name;
   final bool done;
   final DateTime? doneAt;
@@ -273,7 +280,7 @@ class ToDo {
   final String? creatorId;
   final DateTime? createdAt;
 
-  ToDo(this.id, this.name, this.done, this.doneAt, this.doneBy, this.position,
+  ToDo(super.id, this.name, this.done, this.doneAt, this.doneBy, this.position,
       this.creatorId, this.createdAt);
 
   factory ToDo.fromMap(Map<String, dynamic> map) => ToDo(

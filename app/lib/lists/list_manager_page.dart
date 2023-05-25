@@ -139,7 +139,11 @@ class _ListManagerPageState extends State<ListManagerPage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: MobileScanner(
-              placeholderBuilder: (p0, p1) => const Icon(Icons.camera_alt),
+              placeholderBuilder: (p0, p1) => Container(
+                color: Colors.black,
+                alignment: Alignment.center,
+                child: const Icon(Icons.qr_code_scanner_rounded),
+              ),
               fit: BoxFit.cover,
               controller: MobileScannerController(
                   detectionSpeed: DetectionSpeed.noDuplicates),
