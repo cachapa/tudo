@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+import '../extensions.dart';
+
 Widget _defaultEmptyBuilder(BuildContext context) => const SizedBox();
 
 Widget _defaultErrorBuilder(BuildContext context, Object error) =>
@@ -62,6 +64,8 @@ class _ValueStreamBuilderState<T> extends State<ValueStreamBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
+    if (_error != null) '$_error'.log;
+
     return _error != null
         ? widget.errorBuilder?.call(context, _error!) ??
             _defaultErrorBuilder(context, _error!)
