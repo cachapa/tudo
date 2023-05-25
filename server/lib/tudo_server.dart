@@ -21,7 +21,11 @@ class TudoServer {
   var userCount = 0;
 
   Future<void> serve(int port) async {
-    _crdt = await PostgresCrdt.open('tudo', username: 'cachapa');
+    _crdt = await PostgresCrdt.open(
+      'tudo',
+      username: dbUsername,
+      password: dbPassword,
+    );
 
     await DbUtil.createTables(_crdt);
 
