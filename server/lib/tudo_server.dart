@@ -72,7 +72,7 @@ class TudoServer {
     final slug = '${userId.short} (${nodeId.short})';
     print('$slug: connect [${++userCount}]');
 
-    var handler = webSocketHandler((WebSocketChannel webSocket) async {
+    final handler = webSocketHandler((WebSocketChannel webSocket) async {
       List<StreamSubscription>? changeSubscriptions;
 
       // Monitor remote changesets
@@ -86,12 +86,13 @@ class TudoServer {
         // print(JsonEncoder.withIndent('  ').convert(changeset));
 
         final count = changeset.recordCount;
-        print('RECV $count records');
+        final affectedTables = changeset.keys.join(', ');
+        print('RECV ${userId.short} [$affectedTables] $count records');
 
         // Merge remote changeset
         await _crdt.merge(changeset);
       }, onDone: () {
-        changeSubscriptions?.map((e) => e.cancel());
+        changeSubscriptions?.forEach((s) => s.cancel());
         print('$slug: leave [${--userCount}] ');
       }, onError: (e) {
         print(e);
@@ -147,7 +148,7 @@ class TudoServer {
         modifiedSince = _crdt.canonicalTime;
 
         if (changeset.isNotEmpty) {
-          print('[$table] SEND ${changeset.length} records');
+          print('SEND ${userId.short} [$table] ${changeset.length} records');
           webSocket.sink.add(jsonEncode({table: changeset}));
         }
       },
