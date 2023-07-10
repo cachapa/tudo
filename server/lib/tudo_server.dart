@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:postgres_crdt/postgres_crdt.dart';
-import 'package:rxdart/transformers.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_router/shelf_router.dart';
@@ -67,14 +66,14 @@ class TudoServer {
 
   Future<Response> _wsHandler(Request request, String userId) async {
     final nodeId = request.compatParams('node_id')!;
-    var lastSend =
+    final lastSend =
         request.compatParams('last_receive')?.toHlc.apply(nodeId: _crdt.nodeId);
 
     final slug = '${userId.short} (${nodeId.short})';
     print('$slug: connect [${++userCount}]');
 
     var handler = webSocketHandler((WebSocketChannel webSocket) async {
-      StreamSubscription? changesSubscription;
+      List<StreamSubscription>? changeSubscriptions;
 
       // Monitor remote changesets
       webSocket.stream.listen((message) async {
@@ -92,74 +91,67 @@ class TudoServer {
         // Merge remote changeset
         await _crdt.merge(changeset);
       }, onDone: () {
-        changesSubscription?.cancel();
+        changeSubscriptions?.map((e) => e.cancel());
         print('$slug: leave [${--userCount}] ');
       }, onError: (e) {
         print(e);
       });
 
-      // Monitor local database
-      changesSubscription = _crdt.watch('''
-        SELECT hlc FROM users UNION ALL
-        SELECT hlc FROM user_lists UNION ALL
-        SELECT hlc FROM lists UNION ALL
-        SELECT hlc FROM todos
-        LIMIT 1
-      ''').debounceTime(Duration(milliseconds: 200)).listen(
-            (_) async {
-              await _sendChangeset(webSocket, userId, nodeId, lastSend);
-              lastSend = _crdt.canonicalTime;
-            },
-          );
+      // Monitor changes
+      changeSubscriptions = [
+        _watchChangeset(webSocket, userId, nodeId, lastSend, 'users', '''
+          SELECT users.id, users.name, users.is_deleted, users.hlc FROM
+            (SELECT user_id, max(created_at) AS created_at FROM
+              (SELECT list_id FROM user_lists WHERE user_id = ?1 AND is_deleted = 0) AS list_ids
+              JOIN user_lists ON user_lists.list_id = list_ids.list_id
+              GROUP BY user_lists.user_id
+            ) AS user_ids
+          JOIN users ON users.id = user_ids.user_id
+          WHERE node_id != ?2
+            AND modified > CASE WHEN user_ids.created_at >= ?3 THEN '' ELSE ?3 END
+        '''),
+        _watchChangeset(webSocket, userId, nodeId, lastSend, 'user_lists', '''
+          SELECT user_lists.list_id, user_id, position, user_lists.created_at, is_deleted, hlc FROM
+            (SELECT list_id, created_at FROM user_lists WHERE user_id = ?1) AS own_lists
+          JOIN user_lists ON own_lists.list_id = user_lists.list_id
+          WHERE node_id != ?2
+            AND modified > CASE WHEN own_lists.created_at >= ?3 THEN '' ELSE ?3 END
+        '''),
+        _watchChangeset(webSocket, userId, nodeId, lastSend, 'lists', '''
+          SELECT lists.id, lists.name, lists.color, lists.creator_id,
+            lists.created_at, lists.is_deleted, lists.hlc FROM user_lists
+          JOIN lists ON list_id = lists.id AND user_id = ?1 AND user_lists.is_deleted = 0
+          WHERE lists.node_id != ?2
+            AND lists.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
+        '''),
+        _watchChangeset(webSocket, userId, nodeId, lastSend, 'todos', '''
+          SELECT todos.id, todos.list_id, todos.name, todos.done, todos.position,
+            todos.creator_id, todos.created_at, todos.done_at, todos.done_by,
+            todos.is_deleted, todos.hlc FROM user_lists
+          JOIN todos ON user_lists.list_id = todos.list_id AND user_id = ?1 AND user_lists.is_deleted = 0
+          WHERE todos.node_id != ?2
+            AND todos.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
+        '''),
+      ];
     });
 
     return await handler(request);
   }
 
-  Future<void> _sendChangeset(WebSocketChannel webSocket, String userId,
-      String nodeId, Hlc? modifiedSince) async {
+  StreamSubscription _watchChangeset(WebSocketChannel webSocket, String userId,
+      String nodeId, Hlc? modifiedSince, String table, String query) {
     modifiedSince ??= Hlc.zero(_crdt.nodeId);
-    final changeset = <String, Iterable<Map<String, Object?>>>{
-      'users': await _crdt.query('''
-        SELECT users.id, users.name, users.is_deleted, users.hlc FROM
-          (SELECT user_id, max(created_at) AS created_at FROM
-            (SELECT list_id FROM user_lists WHERE user_id = ?1 AND is_deleted = 0) AS list_ids
-            JOIN user_lists ON user_lists.list_id = list_ids.list_id
-            GROUP BY user_lists.user_id
-          ) AS user_ids
-        JOIN users ON users.id = user_ids.user_id
-        WHERE node_id != ?2
-          AND modified > CASE WHEN user_ids.created_at >= ?3 THEN '' ELSE ?3 END
-      ''', [userId, nodeId, modifiedSince]),
-      'user_lists': await _crdt.query('''
-        SELECT user_lists.list_id, user_id, position, user_lists.created_at, is_deleted, hlc FROM
-          (SELECT list_id, created_at FROM user_lists WHERE user_id = ?1) AS own_lists
-        JOIN user_lists ON own_lists.list_id = user_lists.list_id
-        WHERE node_id != ?2
-          AND modified > CASE WHEN own_lists.created_at >= ?3 THEN '' ELSE ?3 END
-      ''', [userId, nodeId, modifiedSince]),
-      'lists': await _crdt.query('''
-        SELECT lists.id, lists.name, lists.color, lists.creator_id,
-          lists.created_at, lists.is_deleted, lists.hlc FROM user_lists
-        JOIN lists ON list_id = lists.id AND user_id = ?1 AND user_lists.is_deleted = 0
-        WHERE lists.node_id != ?2
-          AND lists.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
-      ''', [userId, nodeId, modifiedSince]),
-      'todos': await _crdt.query('''
-        SELECT todos.id, todos.list_id, todos.name, todos.done, todos.position,
-          todos.creator_id, todos.created_at, todos.done_at, todos.done_by,
-          todos.is_deleted, todos.hlc FROM user_lists
-        JOIN todos ON user_lists.list_id = todos.list_id AND user_id = ?1 AND user_lists.is_deleted = 0
-        WHERE todos.node_id != ?2
-          AND todos.modified > CASE WHEN user_lists.created_at >= ?3 THEN '' ELSE ?3 END
-      ''', [userId, nodeId, modifiedSince]),
-    }..removeWhere((_, value) => value.isEmpty);
 
-    if (changeset.recordCount == 0) return;
+    return _crdt.watch(query, () => [userId, nodeId, modifiedSince]).listen(
+      (changeset) {
+        modifiedSince = _crdt.canonicalTime;
 
-    print('SEND ${changeset.recordCount} records');
-    // print(JsonEncoder.withIndent('  ').convert(changeset));
-    webSocket.sink.add(jsonEncode(changeset));
+        if (changeset.isNotEmpty) {
+          print('[$table] SEND ${changeset.length} records');
+          webSocket.sink.add(jsonEncode({table: changeset}));
+        }
+      },
+    );
   }
 
   Handler _validateVersion(Handler innerHandler) => (request) async {
