@@ -66,12 +66,13 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
 
   void manageConnection(AppLifecycleState state) {
     final syncProvider = Registry.syncProvider;
-    final appVisible = (state == AppLifecycleState.resumed ||
-        state == AppLifecycleState.inactive);
-    if (appVisible) {
-      syncProvider.connect();
-    } else {
-      syncProvider.disconnect();
+    switch (state) {
+      case AppLifecycleState.resumed:
+        syncProvider.connect();
+      case AppLifecycleState.paused:
+        syncProvider.disconnect();
+      default:
+      // Do nothing
     }
   }
 }
