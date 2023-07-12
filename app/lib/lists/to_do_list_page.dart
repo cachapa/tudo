@@ -151,7 +151,7 @@ class ToDoListPage extends StatelessWidget {
                       ),
                     PopupEntry(
                       Icons.exit_to_app,
-                      t.leaveList,
+                      list.isShared ? t.leaveList : t.removeList,
                       () => context.pop(ListAction.delete),
                       context.theme.colorScheme.error,
                     ),
