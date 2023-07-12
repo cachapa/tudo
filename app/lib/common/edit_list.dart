@@ -32,7 +32,7 @@ class _EditListFormState extends State<_EditListForm> {
 
   bool get editMode => widget.list != null;
 
-  String get name => _textController.text;
+  String get name => _textController.text.trim();
 
   Color get color => _colorController.color;
 

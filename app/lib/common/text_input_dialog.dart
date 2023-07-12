@@ -14,6 +14,8 @@ class TextInputDialog extends StatelessWidget {
 
   final TextEditingController _controller;
 
+  String get text => _controller.text.trim();
+
   TextInputDialog({
     Key? key,
     this.title,
@@ -51,7 +53,7 @@ class TextInputDialog extends StatelessWidget {
                     )
                   : null,
             ),
-            onSubmitted: (value) => context.pop(_controller.text),
+            onSubmitted: (value) => context.pop(text),
           ),
           const SizedBox(height: 16),
           if (caption != null)
@@ -69,7 +71,7 @@ class TextInputDialog extends StatelessWidget {
         ),
         ElevatedButton(
           style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
-          onPressed: () => context.pop(_controller.text),
+          onPressed: () => context.pop(text),
           child: Text(positiveLabel.toUpperCase()),
         ),
       ],

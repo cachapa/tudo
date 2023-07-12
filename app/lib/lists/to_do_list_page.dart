@@ -293,6 +293,8 @@ class _InputBarState extends State<InputBar> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
 
+  String get text => _controller.text.trim();
+
   @override
   Widget build(BuildContext context) {
     final primaryColor = context.theme.primaryColor;
@@ -319,9 +321,7 @@ class _InputBarState extends State<InputBar> {
               suffixIcon: IconButton(
                 padding: const EdgeInsets.only(right: 10),
                 icon: const Icon(Icons.add),
-                onPressed: _controller.text.isEmpty
-                    ? null
-                    : () => _onSubmitted(_controller.text),
+                onPressed: text.isEmpty ? null : () => _onSubmitted(text),
               ),
             ),
             maxLines: 1,
