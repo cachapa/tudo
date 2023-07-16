@@ -97,7 +97,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
         ),
         body: ValueStreamBuilder<List<ToDoList>>(
           stream: Registry.listProvider.lists,
-          builder: (_, lists) => AnimatedReorderableListBuilder(
+          builder: (context, lists) => AnimatedReorderableListBuilder(
             lists,
             padding: context.padding.add(const EdgeInsets.only(bottom: 80)),
             onReorder: (from, to) => _swap(lists, from, to),
