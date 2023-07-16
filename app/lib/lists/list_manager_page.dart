@@ -99,6 +99,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
           stream: Registry.listProvider.lists,
           builder: (_, lists) => AnimatedReorderableListBuilder(
             lists,
+            padding: context.padding.add(const EdgeInsets.only(bottom: 80)),
             onReorder: (from, to) => _swap(lists, from, to),
             builder: (context, i, item) => ToDoListTile(
               key: ValueKey(item.id),

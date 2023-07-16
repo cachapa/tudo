@@ -42,6 +42,7 @@ class AnimatedReorderableListBuilder<T extends IdObject>
   final List<T> items;
   final ReorderCallback onReorder;
   final Widget Function(BuildContext context, int i, T item) builder;
+  final EdgeInsetsGeometry? padding;
 
   const AnimatedReorderableListBuilder(
     this.items, {
@@ -49,13 +50,14 @@ class AnimatedReorderableListBuilder<T extends IdObject>
     this.controller,
     required this.onReorder,
     required this.builder,
+    this.padding,
   });
 
   @override
   Widget build(BuildContext context) {
     return ImplicitlyAnimatedReorderableList<T>(
       shrinkWrap: true,
-      padding: context.padding,
+      padding: padding ?? context.padding,
       controller: controller,
       items: items,
       areItemsTheSame: (a, b) => a.id == b.id,
