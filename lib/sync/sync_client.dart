@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:platform_info/platform_info.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -53,7 +54,8 @@ class SyncClient {
     if (isConnected) return;
 
     // Dart's WebSocket uses a global static client, so the user agent needs to be set like so:
-    // WebSocket.userAgent = BuildInfo.userAgent;
+    if (platform.isIO) WebSocket.userAgent = BuildInfo.userAgent;
+
     final uri = serverUri.apply('ws/$userId',
         scheme: serverUri.scheme.replaceFirst('http', 'ws'),
         queryParameters: {

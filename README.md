@@ -11,7 +11,7 @@ It uses [sqlite_crdt](https://github.com/cachapa/sqlite_crdt) and is a useful de
 [<img src="images/google_play.png" height="50">](https://play.google.com/store/apps/details?id=net.cachapa.tudo)
 [<img src="images/app_store.png" height="50">](https://apps.apple.com/us/app/tudo-lists/id1550819275)
 
-The server part of this project can be found here: [server](server).
+The server part of this project can be found here: [server](https://github.com/cachapa/tudo_server).
 
 ## Features
 

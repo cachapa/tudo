@@ -3,10 +3,6 @@ on:
   release:
     types: [ published ]
 
-defaults:
-  run:
-    working-directory: app
-
 jobs:
   build:
     timeout-minutes: 25
@@ -22,13 +18,13 @@ jobs:
           SIGNING_CERTIFICATE_P12_DATA: ${{ secrets.SIGNING_CERTIFICATE_P12_DATA }}
           SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.SIGNING_CERTIFICATE_PASSWORD }}
         run: |
-          exec ../.github/scripts/import-certificate.sh
+          exec .github/scripts/import-certificate.sh
 
       - name: Import provisioning profile
         env:
           PROVISIONING_PROFILE_DATA: ${{ secrets.PROVISIONING_PROFILE_DATA }}
         run: |
-          exec ../.github/scripts/import-profile.sh
+          exec .github/scripts/import-profile.sh
 
       - uses: subosito/flutter-action@v2
 #        with:
@@ -44,7 +40,7 @@ jobs:
       - name: Build app
         env:
           BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}
-        run: flutter build ipa --export-options-plist=../.github/provisioning/ExportOptions.plist --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
+        run: flutter build ipa --export-options-plist=.github/provisioning/ExportOptions.plist --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
       - name: Upload app to App Store Connect
         env:

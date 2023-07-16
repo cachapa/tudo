@@ -3,10 +3,6 @@ on:
   release:
     types: [ published ]
 
-defaults:
-  run:
-    working-directory: app
-
 jobs:
   build:
     timeout-minutes: 25
@@ -30,7 +26,7 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Load secrets
-        working-directory: app/android
+        working-directory: android
         run: |
           echo "${{ secrets.KEYSTORE }}" | base64 -d > app/keystore.jks
           echo "${{ secrets.KEYSTORE_PROPERTIES }}" > app/keystore.properties
@@ -49,7 +45,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.cachapa.tudo
-          releaseFiles: app/build/app/outputs/bundle/release/*.aab
-          mappingFile: app/build/app/outputs/mapping/release/mapping.txt
+          releaseFiles: build/app/outputs/bundle/release/*.aab
+          mappingFile: build/app/outputs/mapping/release/mapping.txt
           track: internal
 
