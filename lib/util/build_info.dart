@@ -40,8 +40,8 @@ class BuildInfo {
       platformVersion = info.version.release;
     } else if (_p.isIOS) {
       final info = await DeviceInfoPlugin().iosInfo;
-      deviceModel = info.model!;
-      platformVersion = info.systemVersion!;
+      deviceModel = info.model;
+      platformVersion = info.systemVersion;
     }
     // Desktop
     else if (_p.isLinux) {
