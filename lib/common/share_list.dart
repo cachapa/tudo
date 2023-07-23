@@ -43,7 +43,7 @@ class _ShareListForm extends StatelessWidget {
                   .copyWith(color: list.color),
             ),
             const SizedBox(height: 20),
-            QrImage(
+            QrImageView(
               data: shareUrl,
               version: QrVersions.auto,
               size: 250.0,
