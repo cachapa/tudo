@@ -185,6 +185,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.3"
+  crdt_sync:
+    dependency: "direct main"
+    description:
+      name: crdt_sync
+      sha256: c8dadf30f325e29ab8128412cba8eca26aa9d156339942609d8da06c54d16d87
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.1"
   cross_file:
     dependency: transitive
     description:
@@ -702,34 +710,34 @@ packages:
     dependency: transitive
     description:
       name: sqflite_common
-      sha256: "8f7603f3f8f126740bc55c4ca2d1027aab4b74a1267a3e31ce51fe40e3b65b8f"
+      sha256: "1b92f368f44b0dee2425bb861cfa17b6f6cf3961f762ff6f941d20b33355660a"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.5+1"
+    version: "2.5.0"
   sqflite_common_ffi:
     dependency: transitive
     description:
       name: sqflite_common_ffi
-      sha256: f86de82d37403af491b21920a696b19f01465b596f545d1acd4d29a0a72418ad
+      sha256: "8e3b8fc8bc53e1eac87a80a255a1fb88549359aafcfb58107402c69bf0b88828"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.5"
+    version: "2.3.0"
   sqflite_common_ffi_web:
     dependency: transitive
     description:
       name: sqflite_common_ffi_web
-      sha256: eb8cd50fa1451e8fa5edf5860d68d504572afaf1e68079933f95e95bf273d445
+      sha256: db9a7ef6adcfb6c9b4115f628c1d3efe3774b385309a80e75c1bafb97da2c9d1
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.6"
+    version: "0.4.0"
   sql_crdt:
     dependency: transitive
     description:
       name: sql_crdt
-      sha256: "22a90ff113f356f477ea07ea4db010f1097d251defb17190cfa18b420a532172"
+      sha256: "8aaadd9afb728aa7079c17cb334d0ffc58b91841462afdcda37727b5c5cb9953"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "1.1.0"
   sqlite3:
     dependency: transitive
     description:
@@ -750,10 +758,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite_crdt
-      sha256: d9567573252474371534c2f1027b7e196a76da3399910f6cd0ee2a1108035f09
+      sha256: e860a7927c866051dc9279a551fe97781e4751ed14d3f4dbf3aba07f5b47449f
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.3"
+    version: "1.1.0"
   sqlparser:
     dependency: transitive
     description:
@@ -971,7 +979,7 @@ packages:
     source: hosted
     version: "1.0.2"
   web_socket_channel:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: web_socket_channel
       sha256: d88238e5eac9a42bb43ca4e721edba3c08c6354d4a53063afaa568516217621b
