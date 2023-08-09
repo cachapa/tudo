@@ -14,7 +14,10 @@ import '../util/build_info.dart';
 class SyncProvider {
   late final CrdtSyncClient _client;
   late final connectionState = BehaviorSubject.seeded(false)
-    ..addStream(_client.watchState.map((e) => e == SocketState.connected));
+    ..addStream(_client.watchState.map((e) {
+      '$e'.log;
+      return e == SocketState.connected;
+    }));
 
   SyncProvider(AuthProvider authProvider, SqlCrdt crdt) {
     _client = CrdtSyncClient(
@@ -26,15 +29,13 @@ class SyncProvider {
             'api_secret': apiSecret,
             'token': authProvider.token,
           }),
-      onConnect: (_, __) => 'Connected'.log,
-      onDisconnect: (_, __, ___) => 'Disconnected'.log,
       onChangesetReceived: (recordCounts) =>
           '⬇️ ${recordCounts.entries.map((e) => '${e.key}: ${e.value}').join(', ')}'
               .log,
       onChangesetSent: (recordCounts) =>
           '⬆️ ${recordCounts.entries.map((e) => '${e.key}: ${e.value}').join(', ')}'
               .log,
-    )..connect();
+    );
   }
 
   void connect() => _client.connect();
