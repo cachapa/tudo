@@ -41,7 +41,7 @@
   "nameCaption": "In geteilten Listen sichtbar",
   "copyLink": "Link kopieren",
   "listShareMessage": "Die Liste \"{listName}\" auf deinem Gerät öffnen:\n{shareUrl}",
-  "updateRequired": "Aktualizierung nötig",
-  "updateRequiredMessage": "Bitte die App aktualizieren um weiter zu syncen.",
+  "updateRequired": "Aktualisierung nötig",
+  "updateRequiredMessage": "Bitte die App aktualisieren um weiter zu synchronisieren.",
   "clearCompleted": "Erledigte löschen"
 }
