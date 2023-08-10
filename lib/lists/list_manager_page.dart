@@ -258,12 +258,25 @@ class _ListManagerPageState extends State<ListManagerPage> {
 
       if (result == true) {
         if (Platform.isAndroid) {
-          await InAppUpdate.performImmediateUpdate();
+          final result = await _attemptAppUpdate();
+          if (result == AppUpdateResult.inAppUpdateFailed) {
+            await launchUrlString(
+                'https://play.google.com/store/apps/details?id=net.cachapa.tudo');
+          }
         } else {
           await launchUrlString(
               'https://apps.apple.com/us/app/tudo-lists/id1550819275');
         }
       }
     }
+  }
+}
+
+Future<AppUpdateResult> _attemptAppUpdate() async {
+  try {
+    return await InAppUpdate.performImmediateUpdate();
+  } on Exception catch (e) {
+    print(e);
+    return AppUpdateResult.inAppUpdateFailed;
   }
 }
