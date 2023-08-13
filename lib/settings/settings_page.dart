@@ -89,6 +89,17 @@ class SettingsPage extends StatelessWidget {
           Header(t.otherApps),
           ListTile(
             leading: Image.asset(
+              'assets/images/libra_icon.png',
+              width: 32,
+            ),
+            title: const Text('Libra'),
+            subtitle: Text(t.libraDescription),
+            onTap: () => launchUrlString(platform.isIOS
+                ? 'https://apps.apple.com/us/app/libra-weight-manager/id1644353761'
+                : 'https://play.google.com/store/apps/details?id=net.cachapa.libra'),
+          ),
+          ListTile(
+            leading: Image.asset(
               'assets/images/storyark_icon.png',
               width: 32,
             ),
@@ -98,17 +109,6 @@ class SettingsPage extends StatelessWidget {
                 ? 'https://apps.apple.com/US/app/id1558910365'
                 : 'https://play.google.com/store/apps/details?id=de.storyark.app'),
           ),
-          if (!platform.isIOS)
-            ListTile(
-              leading: Image.asset(
-                'assets/images/libra_icon.png',
-                width: 32,
-              ),
-              title: const Text('Libra'),
-              subtitle: Text(t.libraDescription),
-              onTap: () => launchUrlString(
-                  'https://play.google.com/store/apps/details?id=net.cachapa.libra'),
-            ),
         ],
       ),
       bottomNavigationBar: SafeArea(
