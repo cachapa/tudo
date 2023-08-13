@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../extensions.dart';
+
 class EmptyPage extends StatelessWidget {
   final String text;
 
@@ -8,7 +10,11 @@ class EmptyPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(text),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: context.theme.textTheme.titleMedium,
+      ),
     );
   }
 }

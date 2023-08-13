@@ -12,6 +12,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/edit_list.dart';
+import '../common/empty_page.dart';
 import '../common/lists.dart';
 import '../common/offline_indicator.dart';
 import '../common/value_builders.dart';
@@ -97,17 +98,20 @@ class _ListManagerPageState extends State<ListManagerPage> {
         ),
         body: ValueStreamBuilder<List<ToDoList>>(
           stream: Registry.listProvider.lists,
-          builder: (context, lists) => AnimatedReorderableListBuilder(
-            lists,
-            padding: context.padding.add(const EdgeInsets.only(bottom: 80)),
-            onReorder: (from, to) => _swap(lists, from, to),
-            builder: (context, i, item) => ToDoListTile(
-              key: ValueKey(item.id),
-              list: item,
-              onTap: () => _openList(context, item),
-              onLongPress: () => _editList(context, item),
-            ),
-          ),
+          builder: (context, lists) => lists.isEmpty
+              ? EmptyPage(text: t.listsEmptyMessage)
+              : AnimatedReorderableListBuilder(
+                  lists,
+                  padding:
+                      context.padding.add(const EdgeInsets.only(bottom: 80)),
+                  onReorder: (from, to) => _swap(lists, from, to),
+                  builder: (context, i, item) => ToDoListTile(
+                    key: ValueKey(item.id),
+                    list: item,
+                    onTap: () => _openList(context, item),
+                    onLongPress: () => _editList(context, item),
+                  ),
+                ),
         ),
         floatingActionButton: FloatingActionButton(
           clipBehavior: Clip.antiAlias,

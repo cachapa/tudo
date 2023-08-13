@@ -36,6 +36,7 @@
   "cancel": "Cancel",
   "addItem": "Add item",
   "editItem": "Edit item",
+  "listsEmptyMessage": "Create a new to-do list\nusing the \"+\" button below",
   "toDoListEmptyMessage": "Create a new to-do item below",
   "itemDeleted": "Deleted \"{name}\"",
   "@itemDeleted": {
