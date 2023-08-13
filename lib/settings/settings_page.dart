@@ -20,8 +20,7 @@ class SettingsPage extends StatelessWidget {
 
     return Scaffold(
       appBar: DiscreteAppBar(title: t.settings),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      body: ListView(
         children: [
           ValueStreamBuilder<User>(
             stream: Registry.contactProvider.currentUser,
@@ -110,18 +109,17 @@ class SettingsPage extends StatelessWidget {
               onTap: () => launchUrlString(
                   'https://play.google.com/store/apps/details?id=net.cachapa.libra'),
             ),
-          const Spacer(),
-          SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                t.version(BuildInfo.version),
-                style: context.theme.textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          ),
         ],
+      ),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Text(
+            t.version(BuildInfo.version),
+            style: context.theme.textTheme.bodySmall,
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }
