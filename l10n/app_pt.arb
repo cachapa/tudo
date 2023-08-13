@@ -43,5 +43,6 @@
   "listShareMessage": "Abre a a lista \"{listName}\" no teu aparelho\n:{shareUrl}",
   "updateRequired": "Atualização necessária",
   "updateRequiredMessage": "Por favor actualiza a aplicação para continuar a sincronizar.",
-  "clearCompleted": "Eliminar completos"
+  "clearCompleted": "Eliminar completos",
+  "listsEmptyMessage": "Cria uma lista nova\ncom o botão \"+\" em baixo"
 }
