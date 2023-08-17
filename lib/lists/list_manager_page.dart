@@ -291,7 +291,8 @@ class _EmptyPage extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 52, right: 80),
+        padding:
+            EdgeInsets.only(bottom: context.padding.bottom + 52, right: 80),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
