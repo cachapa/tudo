@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import '../extensions.dart';
 
 Future<T?> showIndeterminateProgressDialog<T>(
-    BuildContext context, {
-      required String message,
-      required Future<T> future,
-      Function(dynamic e)? onError,
-    }) async {
+  BuildContext context, {
+  required String message,
+  required Future<T> future,
+  Function(dynamic e)? onError,
+}) async {
   // Do not wait on dialog since we rely on the Future below to close it
   // ignore: unawaited_futures
   showDialog(
