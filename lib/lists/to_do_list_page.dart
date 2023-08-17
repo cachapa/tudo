@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import '../common/appbars.dart';
 import '../common/check.dart';
 import '../common/edit_list.dart';
-import '../common/empty_page.dart';
 import '../common/icon_label.dart';
 import '../common/lists.dart';
 import '../common/popup_menu.dart';
@@ -159,12 +158,15 @@ class ToDoListPage extends StatelessWidget {
                 ),
               ],
             ),
-            body: list.items.isEmpty
-                ? EmptyPage(text: t.toDoListEmptyMessage)
-                : ToDoListView(
-                    controller: _controller,
-                    list: list,
-                  ),
+            body: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              child: list.items.isEmpty
+                  ? _EmptyPage()
+                  : ToDoListView(
+                      controller: _controller,
+                      list: list,
+                    ),
+            ),
             bottomNavigationBar: Padding(
               padding: EdgeInsets.only(bottom: bottom),
               child: InputBar(
@@ -492,6 +494,32 @@ class _ListTile extends StatelessWidget {
             onLongPress: onEdit,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _EmptyPage extends StatelessWidget {
+  static const sigma = 16.0;
+  static const size = 80.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Stack(
+        children: [
+          ImageFiltered(
+            imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
+            child: const Icon(
+              Icons.check_rounded,
+              size: size,
+            ),
+          ),
+          const Icon(
+            Icons.check_rounded,
+            size: size,
+          )
+        ],
       ),
     );
   }
