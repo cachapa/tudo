@@ -4,6 +4,7 @@
   "close": "Schließen",
   "listDeleted": "{name} gelöscht",
   "createList": "Liste erstellen",
+  "createAList": "Erstelle eine Liste",
   "editList": "Liste bearbeiten",
   "name": "Name",
   "update": "Aktualisieren",
@@ -43,6 +44,5 @@
   "listShareMessage": "Die Liste \"{listName}\" auf deinem Gerät öffnen:\n{shareUrl}",
   "updateRequired": "Aktualisierung nötig",
   "updateRequiredMessage": "Bitte die App aktualisieren um weiter zu synchronisieren.",
-  "clearCompleted": "Erledigte löschen",
-  "listsEmptyMessage": "Drücke den \"+\" Knopf,\num eine neue Liste zu erstellen"
+  "clearCompleted": "Erledigte löschen"
 }

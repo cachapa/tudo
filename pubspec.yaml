@@ -32,6 +32,7 @@ dependencies:
   clipboard: ^0.1.3
   device_info_plus: ^9.0.3
   mobile_scanner: ^3.4.1
+  flutter_svg: ^2.0.7
 
   in_app_update: ^4.1.4
   package_info_plus: ^4.1.0
@@ -55,3 +56,9 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/fonts/
+
+  fonts:
+    - family: WaitingfortheSunrise
+      fonts:
+        - asset: assets/fonts/WaitingfortheSunrise-Regular.ttf

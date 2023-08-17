@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:uni_links/uni_links.dart';
@@ -12,7 +13,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/edit_list.dart';
-import '../common/empty_page.dart';
 import '../common/lists.dart';
 import '../common/offline_indicator.dart';
 import '../common/value_builders.dart';
@@ -99,7 +99,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
         body: ValueStreamBuilder<List<ToDoList>>(
           stream: Registry.listProvider.lists,
           builder: (context, lists) => lists.isEmpty
-              ? EmptyPage(text: t.listsEmptyMessage)
+              ? _EmptyPage()
               : AnimatedReorderableListBuilder(
                   lists,
                   padding:
@@ -282,5 +282,41 @@ Future<AppUpdateResult> _attemptAppUpdate() async {
   } on Exception catch (e) {
     print(e);
     return AppUpdateResult.inAppUpdateFailed;
+  }
+}
+
+class _EmptyPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Align(
+      alignment: Alignment.bottomRight,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 52, right: 80),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Transform.rotate(
+              angle: -0.2,
+              child: Text(
+                context.t.createAList,
+                style: context.theme.textTheme.displaySmall!
+                    .apply(fontFamily: 'WaitingfortheSunrise'),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8, left: 80),
+              child: SvgPicture.asset(
+                'assets/images/arrow.svg',
+                width: 40,
+                colorFilter: ColorFilter.mode(
+                  context.theme.textTheme.displaySmall!.color!,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
