@@ -4,7 +4,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/segmented_control.dart';
-import '../common/text_input_dialog.dart';
+import '../common/dialogs.dart';
 import '../common/value_builders.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';

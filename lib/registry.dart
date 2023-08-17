@@ -37,6 +37,6 @@ class Registry {
     authProvider = AuthProvider(storeProvider);
     contactProvider = ContactProvider(authProvider.userId, crdt);
     listProvider = ListProvider(authProvider.userId, crdt, storeProvider);
-    syncProvider = SyncProvider(authProvider, crdt);
+    syncProvider = SyncProvider(authProvider, storeProvider, crdt);
   }
 }

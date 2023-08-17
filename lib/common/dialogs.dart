@@ -2,6 +2,42 @@ import 'package:flutter/material.dart';
 
 import '../extensions.dart';
 
+Future<T?> showIndeterminateProgressDialog<T>(
+    BuildContext context, {
+      required String message,
+      required Future<T> future,
+      Function(dynamic e)? onError,
+    }) async {
+  // Do not wait on dialog since we rely on the Future below to close it
+  // ignore: unawaited_futures
+  showDialog(
+    context: context,
+    useRootNavigator: true,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(message, style: context.theme.textTheme.titleMedium),
+          const SizedBox(height: 24),
+          const LinearProgressIndicator(),
+        ],
+      ),
+    ),
+  );
+
+  try {
+    return await future.whenComplete(() => context.pop());
+  } catch (e) {
+    if (context.mounted) {
+      context.pop();
+      e.toString().log;
+      onError?.call(e);
+    }
+    return null;
+  }
+}
+
 class TextInputDialog extends StatelessWidget {
   final String? title;
   final String? caption;

@@ -14,10 +14,11 @@ class ListProvider {
   final String userId;
   final SqliteCrdt _crdt;
 
-  Stream<List<ToDoList>> get lists => _queryLists()
-      .asyncMap((l) => Future.wait(l.map(
-          (map) async => ToDoList.fromMap(map, await _getMembers(map['id'])))))
-      .doOnError((p0, p1) => '$p0\n$p1'.log);
+  late final lists = BehaviorSubject<List<ToDoList>>()
+    ..addStream(_queryLists()
+        .asyncMap((l) => Future.wait(l.map((map) async =>
+            ToDoList.fromMap(map, await _getMembers(map['id'])))))
+        .doOnError((p0, p1) => '$p0\n$p1'.log));
 
   ListProvider(this.userId, this._crdt, StoreProvider storeProvider);
 
@@ -25,39 +26,26 @@ class ListProvider {
     final listId = uuid();
 
     await _crdt.transaction((txn) async {
+      final createdAt = DateTime.now().toUtcString;
+      // Create list
       await txn.execute('''
         INSERT INTO lists (id, name, color, creator_id, created_at)
         VALUES (?1, ?2, ?3, ?4, ?5)
-      ''', [listId, name, color.hexValue, userId, DateTime.now().toUtcString]);
-      await _setListReference(txn, listId);
+      ''', [listId, name, color.hexValue, userId, createdAt]);
+      // Get max position
+      final maxPosition = (await txn.query('''
+        SELECT max(position) as max_position FROM user_lists
+        WHERE user_id = ?1 AND is_deleted = 0
+      ''', [userId])).first['max_position'] as int? ?? -1;
+      // Associate list to user
+      await txn.execute('''
+        INSERT INTO user_lists (user_id, list_id, created_at, position)
+        VALUES (?1, ?2, ?3, ?4)
+      ''', [userId, listId, createdAt, maxPosition + 1]);
     });
   }
 
-  Future<void> import(String listId) async {
-    final exists = await _crdt.query('''
-      SELECT EXISTS (
-        SELECT * FROM user_lists WHERE user_id = ? AND list_id = ? AND is_deleted = 0
-      ) AS e
-    ''', [userId, listId]);
-    if (exists.first['e'] == 1) {
-      'Import: already have $listId'.log;
-      return;
-    }
-
-    'Importing $listId'.log;
-    await _setListReference(_crdt, listId);
-  }
-
-  Future<void> _setListReference(TimestampedCrdt crdt, String listId) async {
-    final maxPosition = (await crdt.query('''
-      SELECT max(position) as max_position FROM user_lists
-      WHERE is_deleted = 0
-    ''')).first['max_position'] as int? ?? -1;
-    await crdt.execute('''
-      REPLACE INTO user_lists (user_id, list_id, created_at, position)
-      VALUES (?1, ?2, ?3, ?4)
-    ''', [userId, listId, DateTime.now().toUtcString, maxPosition + 1]);
-  }
+  bool hasList(String listId) => lists.value.map((e) => e.id).contains(listId);
 
   Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
       _crdt.watch('''

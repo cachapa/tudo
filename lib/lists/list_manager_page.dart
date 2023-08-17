@@ -12,6 +12,7 @@ import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
+import '../common/dialogs.dart';
 import '../common/edit_list.dart';
 import '../common/lists.dart';
 import '../common/offline_indicator.dart';
@@ -134,6 +135,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
   }
 
   Future<void> _launchQrScanner(BuildContext context) async {
+    var detected = false;
     final code = await showDialog<String>(
       context: context,
       builder: (context) => AlertDialog(
@@ -144,17 +146,19 @@ class _ListManagerPageState extends State<ListManagerPage> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: MobileScanner(
-              placeholderBuilder: (p0, p1) => Container(
-                color: Colors.black,
-                alignment: Alignment.center,
-                child: const Icon(Icons.qr_code_scanner_rounded),
-              ),
-              fit: BoxFit.cover,
-              controller: MobileScannerController(
-                  detectionSpeed: DetectionSpeed.noDuplicates),
-              onDetect: (barcodes) =>
-                  context.pop(barcodes.barcodes.first.rawValue),
-            ),
+                placeholderBuilder: (p0, p1) => Container(
+                      color: Colors.black,
+                      alignment: Alignment.center,
+                      child: const Icon(Icons.qr_code_scanner_rounded),
+                    ),
+                fit: BoxFit.cover,
+                onDetect: (barcodes) {
+                  if (!detected) {
+                    // Avoid subsequent triggers
+                    detected = true;
+                    context.pop(barcodes.barcodes.first.rawValue);
+                  }
+                }),
           ),
         ),
       ),
@@ -163,8 +167,23 @@ class _ListManagerPageState extends State<ListManagerPage> {
     if (code == null) return;
     'Read QR: $code'.log;
     final uri = Uri.parse(code);
-    if (context.mounted) {
-      await Registry.listProvider.import(uri.pathSegments.last);
+
+    await _joinList(uri.pathSegments.last);
+  }
+
+  Future<void> _joinList(String listId) async {
+    try {
+      if (!Registry.listProvider.hasList(listId)) {
+        await showIndeterminateProgressDialog(
+          context,
+          message: context.t.joiningList,
+          future: Registry.syncProvider.joinList(listId),
+        );
+      } else {
+        context.showSnackBar(context.t.listAlreadyJoined);
+      }
+    } catch (e) {
+      if (context.mounted) context.showSnackBar('$e');
     }
   }
 
@@ -224,13 +243,13 @@ class _ListManagerPageState extends State<ListManagerPage> {
         getInitialUri().then((uri) async {
           if (uri != null) {
             'Initial link: $uri'.log;
-            await Registry.listProvider.import(uri.pathSegments.last);
+            await _joinList(uri.pathSegments.last);
           }
         });
         uriLinkStream.where((e) => e != null).listen((uri) async {
           if (uri != null) {
             'Stream link: $uri'.log;
-            await Registry.listProvider.import(uri.pathSegments.last);
+            await _joinList(uri.pathSegments.last);
           }
         }).onError((e) => e.log);
       }

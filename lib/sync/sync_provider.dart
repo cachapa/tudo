@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:crdt_sync/crdt_sync.dart';
@@ -10,18 +11,29 @@ import '../auth/auth_provider.dart';
 import '../config.dart';
 import '../extensions.dart';
 import '../util/build_info.dart';
+import '../util/store.dart';
+import 'api_client.dart';
 
 class SyncProvider {
-  late final CrdtSyncClient _client;
+  final String _userId;
+  final SqlCrdt _crdt;
+  final Store _store;
+
+  late final ApiClient _apiClient;
+  late final CrdtSyncClient _syncClient;
   late final connectionState = BehaviorSubject.seeded(false)
-    ..addStream(_client.watchState.map((e) {
+    ..addStream(_syncClient.watchState.map((e) {
       '$e'.log;
       return e == SocketState.connected;
     }));
 
-  SyncProvider(AuthProvider authProvider, SqlCrdt crdt) {
-    _client = CrdtSyncClient(
-      crdt,
+  SyncProvider(
+      AuthProvider authProvider, StoreProvider storeProvider, this._crdt)
+      : _userId = authProvider.userId,
+        _store = storeProvider.getStore('sync') {
+    _apiClient = ApiClient(authProvider);
+    _syncClient = CrdtSyncClient(
+      _crdt,
       serverUri.replace(
           scheme: serverUri.scheme.replaceFirst('http', 'ws'),
           path: 'ws/${authProvider.userId}',
@@ -29,18 +41,39 @@ class SyncProvider {
             'api_secret': apiSecret,
             'token': authProvider.token,
           }),
-      onChangesetReceived: (recordCounts) =>
+      validateRecord: (table, record) {
+        // Perform full sync whenever user_lists is changed remotely.
+        // Makes sure this node gets all relevant records even if they were
+        // created before joining a new list (lists, todos, user info).
+        if (table == 'user_lists' && record['is_deleted'] == 0) {
+          _store.put('need_full_sync', true);
+          _fullSync();
+        }
+        return true;
+      },
+      onConnect: (peerId, customData) {
+        if (_store.get('need_full_sync', defaultValue: true)) {
+          _fullSync();
+        }
+      },
+      onChangesetReceived: (nodeId, recordCounts) =>
           '⬇️ ${recordCounts.entries.map((e) => '${e.key}: ${e.value}').join(', ')}'
               .log,
-      onChangesetSent: (recordCounts) =>
+      onChangesetSent: (nodeId, recordCounts) =>
           '⬆️ ${recordCounts.entries.map((e) => '${e.key}: ${e.value}').join(', ')}'
               .log,
+      verbose: true,
     );
   }
 
-  void connect() => _client.connect();
+  void connect() => _syncClient.connect();
 
-  void disconnect() => _client.disconnect();
+  void disconnect() => _syncClient.disconnect();
+
+  Future<void> joinList(String listId) async {
+    'Joining list $listId…'.log;
+    await _apiClient.post(serverUri.apply('lists/$_userId/$listId'));
+  }
 
   Future<bool> isUpdateRequired() async {
     try {
@@ -52,5 +85,18 @@ class SyncProvider {
     } catch (_) {
       return false;
     }
+  }
+
+  Future<void> _fullSync() async {
+    'Performing full sync…'.log;
+    final start = DateTime.now().millisecondsSinceEpoch;
+    final result = await _apiClient
+        .get(serverUri.apply('changeset/$_userId/${_crdt.nodeId}'));
+    final changeset = (jsonDecode(result.body) as Map<String, dynamic>).map(
+        (key, value) =>
+            MapEntry(key, (value as List).cast<CrdtRecord>().toList()));
+    await _crdt.merge(changeset);
+    _store.put('need_full_sync', false);
+    'Full sync done in ${DateTime.now().millisecondsSinceEpoch - start}ms'.log;
   }
 }

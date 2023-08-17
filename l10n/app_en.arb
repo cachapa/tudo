@@ -89,5 +89,7 @@
   "updateRequired": "Update required",
   "updateRequiredMessage": "Please update tudo to resume synchronization.",
   "clearCompleted": "Clear completed",
-  "delete": "Delete"
+  "delete": "Delete",
+  "joiningList": "Joining list…",
+  "listAlreadyJoined": "List already joined"
 }

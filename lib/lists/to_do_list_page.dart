@@ -6,13 +6,13 @@ import 'package:flutter/material.dart';
 
 import '../common/appbars.dart';
 import '../common/check.dart';
+import '../common/dialogs.dart';
 import '../common/edit_list.dart';
 import '../common/icon_label.dart';
 import '../common/lists.dart';
 import '../common/popup_menu.dart';
 import '../common/progress.dart';
 import '../common/share_list.dart';
-import '../common/text_input_dialog.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
