@@ -123,12 +123,14 @@ class ToDoListPage extends StatelessWidget {
             appBar: TitleBar(
               list: list,
               actions: [
-                IconButton(
-                  tooltip: t.clearCompleted,
-                  icon: const Icon(Icons.delete_sweep_outlined),
-                  onPressed: list.doneCount == 0
-                      ? null
-                      : () => _clearCompleted(context, list.items),
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: list.doneCount == 0 ? 0 : 1,
+                  child: IconButton(
+                    tooltip: list.doneCount == 0 ? null : t.clearCompleted,
+                    icon: const Icon(Icons.delete_sweep_outlined),
+                    onPressed: () => _clearCompleted(context, list.items),
+                  ),
                 ),
                 PopupMenu(
                   entries: [
