@@ -255,8 +255,9 @@ class ToDoList extends IdObject {
           members,
         );
 
-  String memberNames(BuildContext context) =>
-      members.map((e) => e.nameOr(context)).join(' • ');
+  String memberNames(BuildContext context) => shareCount < 4
+      ? members.map((e) => e.nameOr(context)).join(' • ')
+      : context.t.memberCount(shareCount);
 
   @override
   String toString() => '$name [$doneCount/$itemCount]';
