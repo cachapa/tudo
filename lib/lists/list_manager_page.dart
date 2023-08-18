@@ -168,7 +168,12 @@ class _ListManagerPageState extends State<ListManagerPage> {
     'Read QR: $code'.log;
     final uri = Uri.parse(code);
 
-    await _joinList(uri.pathSegments.last);
+    try {
+      await _joinList(uri.pathSegments.last);
+    } catch (e) {
+      '$e'.log;
+      context.showSnackBar('$e');
+    }
   }
 
   Future<void> _joinList(String listId) async {
