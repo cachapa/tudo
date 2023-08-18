@@ -5,6 +5,8 @@ import 'package:flutter/widgets.dart';
 import '../extensions.dart';
 
 class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
+  final Axis scrollDirection;
+  final bool shrinkWrap;
   final EdgeInsetsGeometry? padding;
   final ScrollController? controller;
   final List<T> items;
@@ -13,6 +15,8 @@ class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
   const AnimatedListBuilder(
     this.items, {
     super.key,
+    this.scrollDirection = Axis.vertical,
+    this.shrinkWrap = false,
     this.padding,
     this.controller,
     required this.builder,
@@ -21,6 +25,8 @@ class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ImplicitlyAnimatedList<T>(
+      scrollDirection: scrollDirection,
+      shrinkWrap: shrinkWrap,
       padding: padding,
       controller: controller,
       items: items,

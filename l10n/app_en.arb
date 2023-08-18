@@ -13,7 +13,15 @@
   "createList": "Create list",
   "createAList": "Create a list",
   "editList": "Edit list",
-  "participants": "Participants",
+  "members": "Members",
+  "memberCount": "{count, plural, =1{1 member} other{{count} members}}",
+  "@memberCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "you": "You",
   "share": "Share",
   "leaveList": "Leave list",

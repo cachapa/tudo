@@ -7,17 +7,13 @@ import 'package:flutter/material.dart';
 import '../common/appbars.dart';
 import '../common/check.dart';
 import '../common/dialogs.dart';
-import '../common/edit_list.dart';
 import '../common/icon_label.dart';
 import '../common/lists.dart';
-import '../common/popup_menu.dart';
 import '../common/progress.dart';
-import '../common/share_list.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
 import 'list_provider.dart';
-import 'manage_participants.dart';
 
 enum ListAction { delete }
 
@@ -132,31 +128,10 @@ class ToDoListPage extends StatelessWidget {
                     onPressed: () => _clearCompleted(context, list.items),
                   ),
                 ),
-                PopupMenu(
-                  entries: [
-                    PopupEntry(
-                      Icons.share,
-                      t.share,
-                      () => shareToDoList(context, list),
-                    ),
-                    PopupEntry(
-                      Icons.edit,
-                      t.editList,
-                      () => editToDoList(context, list),
-                    ),
-                    if (list.isShared)
-                      PopupEntry(
-                        Icons.supervised_user_circle,
-                        t.participants,
-                        () => editParticipants(context),
-                      ),
-                    PopupEntry(
-                      Icons.exit_to_app,
-                      list.isShared ? t.leaveList : t.removeList,
-                      () => context.pop(ListAction.delete),
-                      context.theme.colorScheme.error,
-                    ),
-                  ],
+                IconButton(
+                  tooltip: t.editList,
+                  icon: const Icon(Icons.settings_outlined),
+                  onPressed: () => _clearCompleted(context, list.items),
                 ),
               ],
             ),
@@ -181,9 +156,6 @@ class ToDoListPage extends StatelessWidget {
       ),
     );
   }
-
-  void editParticipants(BuildContext context) =>
-      manageParticipants(context, list.id);
 
   Future<void> _addItem(
       BuildContext context, String listID, String name) async {
