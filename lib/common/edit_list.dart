@@ -160,13 +160,13 @@ class _MemberList extends StatelessWidget {
                   ...list.members.map(
                     (e) => Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 16),
+                          horizontal: 4, vertical: 8),
                       child: InputChip(
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24)),
                         backgroundColor: context.theme.primaryColor
                             .withOpacity(e.isCurrentUser ? 0.2 : 0.1),
-                        label: Text(e.name),
+                        label: Text(e.nameOr(context)),
                         onPressed: e.isCurrentUser ? () {} : null,
                         onDeleted: e.isCurrentUser
                             ? null

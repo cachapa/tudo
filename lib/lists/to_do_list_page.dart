@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../common/appbars.dart';
 import '../common/check.dart';
 import '../common/dialogs.dart';
+import '../common/edit_list.dart';
 import '../common/icon_label.dart';
 import '../common/lists.dart';
 import '../common/progress.dart';
@@ -120,7 +121,7 @@ class ToDoListPage extends StatelessWidget {
               list: list,
               actions: [
                 AnimatedOpacity(
-                  duration: const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 300),
                   opacity: list.doneCount == 0 ? 0 : 1,
                   child: IconButton(
                     tooltip: list.doneCount == 0 ? null : t.clearCompleted,
@@ -131,7 +132,7 @@ class ToDoListPage extends StatelessWidget {
                 IconButton(
                   tooltip: t.editList,
                   icon: const Icon(Icons.settings_outlined),
-                  onPressed: () => _clearCompleted(context, list.items),
+                  onPressed: () => editToDoList(context, list),
                 ),
               ],
             ),
