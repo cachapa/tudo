@@ -100,16 +100,17 @@ class _EditListFormState extends State<_EditListForm> {
                         (editMode ? t.update : t.create).toUpperCase(),
                       ),
                     ),
-                    const SizedBox(height: 16),
-                    TextButton(
-                      style: FilledButton.styleFrom(
-                          foregroundColor: context.theme.colorScheme.error),
-                      onPressed: () {},
-                      child: Text(
-                        (widget.list!.isShared ? t.leaveList : t.removeList)
-                            .toUpperCase(),
+                    SizedBox(height: editMode ? 16 : 8),
+                    if (editMode)
+                      TextButton(
+                        style: FilledButton.styleFrom(
+                            foregroundColor: context.theme.colorScheme.error),
+                        onPressed: () {},
+                        child: Text(
+                          (widget.list!.isShared ? t.leaveList : t.removeList)
+                              .toUpperCase(),
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
