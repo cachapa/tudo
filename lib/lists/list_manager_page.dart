@@ -284,7 +284,8 @@ class _ListManagerPageState extends State<ListManagerPage> {
           final result = await _attemptAppUpdate();
           if (result == AppUpdateResult.inAppUpdateFailed) {
             await launchUrlString(
-                'https://play.google.com/store/apps/details?id=net.cachapa.tudo');
+                'https://play.google.com/store/apps/details?id=net.cachapa.tudo',
+                mode: LaunchMode.externalApplication);
           }
         } else {
           await launchUrlString(
