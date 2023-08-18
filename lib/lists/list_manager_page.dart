@@ -138,7 +138,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
     var detected = false;
     final code = await showDialog<String>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (context) => AlertDialog.adaptive(
         backgroundColor: Colors.transparent,
         contentPadding: EdgeInsets.zero,
         content: AspectRatio(
@@ -262,17 +262,17 @@ class _ListManagerPageState extends State<ListManagerPage> {
     if (await Registry.syncProvider.isUpdateRequired()) {
       final result = await showDialog<bool>(
         context: context,
-        builder: (context) => AlertDialog(
+        builder: (context) => AlertDialog.adaptive(
           title: Text(context.t.updateRequired),
           content: Text(context.t.updateRequiredMessage),
           actions: [
             TextButton(
-              child: Text(context.t.close),
+              child: Text(context.t.close.toUpperCase()),
               onPressed: () => context.pop(false),
             ),
             if (PlatformX.isMobile)
               TextButton(
-                child: Text(context.t.update),
+                child: Text(context.t.update.toUpperCase()),
                 onPressed: () => context.pop(true),
               ),
           ],

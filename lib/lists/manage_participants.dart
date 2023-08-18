@@ -89,7 +89,7 @@ class _ManageParticipantsPage extends StatelessWidget {
 
     final result = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
+      builder: (_) => AlertDialog.adaptive(
         title: Text(t.removeConfirmation),
         content: Text(user.nameOr(context)),
         actions: [

@@ -14,7 +14,7 @@ Future<T?> showIndeterminateProgressDialog<T>(
     context: context,
     useRootNavigator: true,
     barrierDismissible: false,
-    builder: (context) => AlertDialog(
+    builder: (context) => AlertDialog.adaptive(
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -68,7 +68,7 @@ class TextInputDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    return AlertDialog.adaptive(
       title: title == null ? null : Text(title!),
       content: Column(
         mainAxisSize: MainAxisSize.min,
