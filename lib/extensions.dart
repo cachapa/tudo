@@ -6,6 +6,8 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_info/platform_info.dart';
 
+import 'config.dart';
+
 export 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 extension BoolX on bool {
@@ -120,7 +122,10 @@ extension UriX on Uri {
       replace(
         scheme: scheme,
         path: '${this.path}/$path',
-        queryParameters: queryParameters,
+        queryParameters: {
+          ...?queryParameters,
+          'api_secret': apiSecret,
+        },
       );
 }
 

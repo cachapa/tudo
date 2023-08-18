@@ -1,6 +1,6 @@
 name: tudo
 description: A simple to-do app
-version: 2.3.1
+version: 2.3.4
 homepage: https://github.com/cachapa/tudo
 publish_to: none
 
