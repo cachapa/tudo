@@ -163,11 +163,11 @@ class ToDoListPage extends StatelessWidget {
     await Registry.listProvider.createItem(list.id, name);
 
     // Wait for entry animation to finish
-    await Future.delayed(const Duration(milliseconds: 400));
+    await Future.delayed(Durations.long);
     // Scroll to bottom of list
     await _controller.animateTo(
       _controller.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 300),
+      duration: Durations.medium,
       curve: Curves.fastOutSlowIn,
     );
   }

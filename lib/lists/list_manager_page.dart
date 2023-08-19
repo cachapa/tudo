@@ -33,7 +33,7 @@ class ListManagerPage extends StatefulWidget {
 
 class _ListManagerPageState extends State<ListManagerPage> {
   late final OfflineIndicator _offlineIndicator;
-  final _bottomOfList = GlobalKey();
+  final _controller = ScrollController();
 
   @override
   void initState() {
@@ -103,6 +103,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
               ? _EmptyPage()
               : AnimatedReorderableListBuilder(
                   lists,
+                  controller: _controller,
                   padding:
                       context.padding.add(const EdgeInsets.only(bottom: 80)),
                   onReorder: (from, to) => _swap(lists, from, to),
@@ -195,9 +196,14 @@ class _ListManagerPageState extends State<ListManagerPage> {
   Future<void> _createList() async {
     final result = await editToDoList(context);
     if (result ?? false) {
-      // Scroll to the new item
-      await Future.delayed(const Duration(milliseconds: 100));
-      _scrollToLastItem();
+      // Wait for entry animation to finish
+      await Future.delayed(Durations.long);
+      // Scroll to bottom of list
+      await _controller.animateTo(
+        _controller.position.maxScrollExtent,
+        duration: Durations.medium,
+        curve: Curves.fastOutSlowIn,
+      );
     }
   }
 
@@ -206,7 +212,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
     if (action != null && action == ListAction.delete) {
       Future.delayed(
         // Wait for pop animation to complete
-        const Duration(milliseconds: 310),
+        Durations.medium,
         () => _deleteList(context, list),
       );
     }
@@ -222,16 +228,6 @@ class _ListManagerPageState extends State<ListManagerPage> {
       context.showSnackBar(
         context.t.listDeleted(list.name),
         () => listManager.undoRemoveList(list.id),
-      );
-    }
-  }
-
-  void _scrollToLastItem() {
-    final itemContext = _bottomOfList.currentContext;
-    if (itemContext != null) {
-      Scrollable.ensureVisible(
-        itemContext,
-        duration: const Duration(milliseconds: 300),
       );
     }
   }

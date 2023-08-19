@@ -11,6 +11,8 @@ import 'settings/settings_provider.dart';
 import 'sync/sync_provider.dart';
 import 'util/store.dart';
 
+export 'util/durations.dart';
+
 class Registry {
   static late final StoreProvider storeProvider;
   static late final SettingsProvider settingsProvider;
