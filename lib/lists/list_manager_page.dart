@@ -195,7 +195,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
 
   Future<void> _createList() async {
     final result = await editToDoList(context);
-    if (result ?? false) {
+    if (result == ListAction.create) {
       // Wait for entry animation to finish
       await Future.delayed(Durations.long);
       // Scroll to bottom of list
@@ -209,7 +209,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
 
   void _openList(BuildContext context, ToDoList list) async {
     final action = await context.push(() => ToDoListPage(list: list));
-    if (action != null && action == ListAction.delete) {
+    if (action == ListAction.delete) {
       Future.delayed(
         // Wait for pop animation to complete
         Durations.medium,

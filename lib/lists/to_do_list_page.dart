@@ -16,8 +16,6 @@ import '../extensions.dart';
 import '../registry.dart';
 import 'list_provider.dart';
 
-enum ListAction { delete }
-
 class ToDoListPage extends StatelessWidget {
   final ToDoList list;
   final _controller = ScrollController();
@@ -132,7 +130,7 @@ class ToDoListPage extends StatelessWidget {
                 IconButton(
                   tooltip: t.editList,
                   icon: const Icon(Icons.settings_outlined),
-                  onPressed: () => editToDoList(context, list),
+                  onPressed: () => _editList(context),
                 ),
               ],
             ),
@@ -193,6 +191,13 @@ class ToDoListPage extends StatelessWidget {
         }
       },
     );
+  }
+
+  Future<void> _editList(BuildContext context) async {
+    final result = await editToDoList(context, list);
+    if (context.mounted && result == ListAction.delete) {
+      context.pop(result);
+    }
   }
 }
 

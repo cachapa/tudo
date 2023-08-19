@@ -5,20 +5,22 @@ import 'package:share_plus/share_plus.dart';
 
 import '../extensions.dart';
 import '../lists/list_provider.dart';
+import '../lists/to_do_list_page.dart';
 import '../registry.dart';
 import 'color_selector.dart';
 
-Future<bool?> editToDoList(BuildContext context, [ToDoList? list]) {
-  return showModalBottomSheet<bool>(
-    enableDrag: true,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    context: context,
-    builder: (context) => _EditListForm(
-      list: list,
-    ),
-  );
-}
+enum ListAction { create, edit, delete }
+
+Future<ListAction?> editToDoList(BuildContext context, [ToDoList? list]) =>
+    showModalBottomSheet<ListAction>(
+      enableDrag: true,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (context) => _EditListForm(
+        list: list,
+      ),
+    );
 
 class _EditListForm extends StatefulWidget {
   final ToDoList? list;
@@ -105,7 +107,7 @@ class _EditListFormState extends State<_EditListForm> {
                       TextButton(
                         style: FilledButton.styleFrom(
                             foregroundColor: context.theme.colorScheme.error),
-                        onPressed: () {},
+                        onPressed: () => _removeList(context),
                         child: Text(
                           (widget.list!.isShared ? t.leaveList : t.removeList)
                               .toUpperCase(),
@@ -136,8 +138,10 @@ class _EditListFormState extends State<_EditListForm> {
       Registry.listProvider.createList(name, color);
     }
 
-    context.pop(true);
+    context.pop(editMode ? ListAction.edit : ListAction.create);
   }
+
+  void _removeList(BuildContext context) => context.pop(ListAction.delete);
 }
 
 class _MemberList extends StatelessWidget {
