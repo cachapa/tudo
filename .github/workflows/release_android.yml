@@ -38,7 +38,9 @@ jobs:
       - name: Build app
         env:
           BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}
-        run: flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
+        run: |
+          flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
+          flutter build apk --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
       - name: Publish Android
         uses: r0adkll/upload-google-play@v1.0.15
@@ -49,3 +51,12 @@ jobs:
           mappingFile: build/app/outputs/mapping/release/mapping.txt
           track: internal
 
+      - name: Archive APK
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/app/outputs/bundle/release/app-release.apk
+          asset_name: tudo.apk
+          asset_content_type: application/zip
