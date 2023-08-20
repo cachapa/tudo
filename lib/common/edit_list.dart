@@ -2,6 +2,7 @@ import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tudo/common/value_builders.dart';
 
 import '../extensions.dart';
 import '../lists/list_provider.dart';
@@ -65,7 +66,11 @@ class _EditListFormState extends State<_EditListForm> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (editMode) _MemberList(list!),
+            if (editMode)
+              ValueStreamBuilder<ToDoList>(
+                  stream: Registry.listProvider.getList(list!.id),
+                  initialValue: list!,
+                  builder: (context, list) => _MemberList(list)),
             const SizedBox(height: 20),
             Material(
               shape: RoundedRectangleBorder(

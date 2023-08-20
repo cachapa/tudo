@@ -49,13 +49,19 @@ class ListProvider {
 
   Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
       _crdt.watch('''
-        SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count FROM user_lists
-        LEFT JOIN lists ON user_lists.user_id = ? AND user_lists.list_id = id
-        LEFT JOIN (
-          SELECT list_id as item_count_list_id, count(*) as item_count, sum(done) as done_count
+        SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count, member_count FROM user_lists
+        JOIN lists
+          ON user_lists.user_id = ?1
+          AND user_lists.list_id = id
+        JOIN (
+          SELECT list_id, count(*) AS item_count, sum(done) AS done_count
           FROM todos WHERE is_deleted = 0 GROUP BY list_id
-        ) ON item_count_list_id = id
-        WHERE id IS NOT NULL AND user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
+        ) items ON items.list_id = id
+        JOIN (
+          SELECT list_id, count(*) AS member_count
+          FROM user_lists WHERE is_deleted = 0 GROUP BY list_id
+        ) members ON members.list_id = id
+        WHERE user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
         ORDER BY position
       ''', () => [userId, if (listId != null) listId]);
 
