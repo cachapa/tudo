@@ -47,13 +47,12 @@ class ListProvider {
 
   bool hasList(String listId) => lists.value.map((e) => e.id).contains(listId);
 
-  Stream<List<Map<String, dynamic>>> _queryLists([String? listId]) =>
-      _crdt.watch('''
+  Stream<List<Map<String, dynamic>>> _queryLists() => _crdt.watch('''
         SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count, member_count FROM user_lists
         JOIN lists
           ON user_lists.user_id = ?1
           AND user_lists.list_id = id
-        JOIN (
+        LEFT JOIN (
           SELECT list_id, count(*) AS item_count, sum(done) AS done_count
           FROM todos WHERE is_deleted = 0 GROUP BY list_id
         ) items ON items.list_id = id
@@ -61,17 +60,14 @@ class ListProvider {
           SELECT list_id, count(*) AS member_count
           FROM user_lists WHERE is_deleted = 0 GROUP BY list_id
         ) members ON members.list_id = id
-        WHERE user_lists.is_deleted = 0 ${listId != null ? 'AND id = ?' : ''}
+        WHERE user_lists.is_deleted = 0
         ORDER BY position
-      ''', () => [userId, if (listId != null) listId]);
+      ''', () => [userId]);
 
-  Stream<ToDoListWithItems> getList(String listId) => _queryLists(listId)
-      .map((e) => e.first)
-      .asyncMap((map) async => ToDoListWithItems.fromMap(
-            map,
-            await _getMembers(listId),
-            await _getToDos(listId),
-          ));
+  Stream<ToDoListWithItems> getList(String listId) => lists
+      .map((e) => e.firstWhere((e) => e.id == listId))
+      .asyncMap((list) async =>
+          ToDoListWithItems.fromList(list, await _getToDos(listId)));
 
   /// Removes the list from the user's references
   /// Does not actually delete the list, since it could be used by others
