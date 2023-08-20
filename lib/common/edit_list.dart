@@ -109,8 +109,8 @@ class _EditListFormState extends State<_EditListForm> {
                     SizedBox(height: editMode ? 16 : 8),
                     if (editMode)
                       TextButton(
-                        style: FilledButton.styleFrom(
-                            foregroundColor: context.theme.colorScheme.error),
+                        style:
+                            FilledButton.styleFrom(foregroundColor: Colors.red),
                         onPressed: () => _removeList(context),
                         child: Text(
                           (widget.list!.isShared ? t.leaveList : t.removeList)
