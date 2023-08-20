@@ -304,8 +304,7 @@ class _ListManagerPageState extends State<ListManagerPage> {
 Future<AppUpdateResult> _attemptAppUpdate() async {
   try {
     return await InAppUpdate.performImmediateUpdate();
-  } on Exception catch (e) {
-    print(e);
+  } on Exception {
     return AppUpdateResult.inAppUpdateFailed;
   }
 }
