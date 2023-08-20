@@ -40,20 +40,20 @@ jobs:
           flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
-      - name: Store artifact
-        id: store_artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: Android package
-          path: build/app/outputs/apk/release/app-release.apk
+#      - name: Store artifact
+#        id: store_artifact
+#        uses: actions/upload-artifact@v1
+#        with:
+#          name: Android package
+#          path: build/app/outputs/apk/release/app-release.apk
 
       - name: Archive APK
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.store_artifact.outputs.upload_url }}
-          asset_path: ./app-release.apk
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: build/app/outputs/apk/release/app-release.apk
           asset_name: tudo.apk
           asset_content_type: application/zip
 
