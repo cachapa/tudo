@@ -18,8 +18,6 @@ jobs:
           java-version: '12.x'
 
       - uses: subosito/flutter-action@v2
-#        with:
-#          channel: 'beta'
 
       - name: Retrieve build name from tag
         id: get_version
@@ -42,6 +40,23 @@ jobs:
           flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
+      - name: Store artifact
+        id: store_artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: Android package
+          path: build/app/outputs/apk/release/app-release.apk
+
+      - name: Archive APK
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.store_artifact.outputs.upload_url }}
+          asset_path: ./app-release.apk
+          asset_name: tudo.apk
+          asset_content_type: application/zip
+
       - name: Publish Android
         uses: r0adkll/upload-google-play@v1.0.15
         with:
@@ -51,12 +66,12 @@ jobs:
           mappingFile: build/app/outputs/mapping/release/mapping.txt
           track: internal
 
-      - name: Archive APK
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/app/outputs/bundle/release/app-release.apk
-          asset_name: tudo.apk
-          asset_content_type: application/zip
+#      - name: Create release
+#        id: create_release
+#        uses: actions/create-release@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          tag_name: ${{ github.ref }}
+#          release_name: ${{ github.ref }}
+#
