@@ -218,8 +218,12 @@ class _ListManagerPageState extends State<ListManagerPage> {
     }
   }
 
-  void _editList(BuildContext context, ToDoList list) =>
-      editToDoList(context, list);
+  Future<void> _editList(BuildContext context, ToDoList list) async {
+    final action = await editToDoList(context, list);
+    if (action == ListAction.delete) {
+      await _deleteList(context, list);
+    }
+  }
 
   Future<void> _deleteList(BuildContext context, ToDoList list) async {
     final listManager = Registry.listProvider;
