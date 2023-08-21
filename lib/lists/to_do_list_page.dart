@@ -5,12 +5,12 @@ import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:flutter/material.dart';
 
 import '../common/appbars.dart';
-import '../common/check.dart';
 import '../common/dialogs.dart';
 import '../common/edit_list.dart';
 import '../common/icon_label.dart';
 import '../common/lists.dart';
 import '../common/progress.dart';
+import '../common/shape_borders.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
@@ -461,9 +461,16 @@ class _ListTile extends StatelessWidget {
         child: Container(
           color: context.theme.canvasColor,
           child: ListTile(
-            leading: Check(
-              checked: item.done,
-              onChanged: onToggle,
+            leading: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Checkbox(
+                shape: SquircleBorder(color: context.theme.primaryColor),
+                visualDensity:
+                    const VisualDensity(horizontal: -4, vertical: -4),
+                side: BorderSide(color: context.theme.primaryColor, width: 2),
+                value: item.done,
+                onChanged: (value) => onToggle(),
+              ),
             ),
             title: Text(item.name),
             trailing: const Handle(

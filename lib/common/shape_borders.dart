@@ -1,12 +1,17 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 // Adapted from https://gist.github.com/slightfoot/e35e8d5877371417e9803143e2501b0a
 
-class SquircleBorder extends ShapeBorder {
-  final BorderSide side;
+class SquircleBorder extends OutlinedBorder {
+  final Color color;
   final double superRadius;
 
-  const SquircleBorder({this.side = BorderSide.none, this.superRadius = 5.0});
+  const SquircleBorder({
+    super.side = BorderSide.none,
+    required this.color,
+    this.superRadius = 5.0,
+  });
 
   @override
   EdgeInsetsGeometry get dimensions => EdgeInsets.all(side.width);
@@ -15,13 +20,14 @@ class SquircleBorder extends ShapeBorder {
   ShapeBorder scale(double t) {
     return SquircleBorder(
       side: side.scale(t),
+      color: color,
       superRadius: superRadius * t,
     );
   }
 
   @override
   Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    return _squirclePath(rect.deflate(side.width), superRadius);
+    return _squirclePath(rect.deflate(side.strokeInset), superRadius);
   }
 
   @override
@@ -48,9 +54,18 @@ class SquircleBorder extends ShapeBorder {
       case BorderStyle.none:
         break;
       case BorderStyle.solid:
-        var path = getOuterPath(rect.deflate(side.width / 2.0),
-            textDirection: textDirection);
-        canvas.drawPath(path, side.toPaint());
+        final path = getOuterPath(rect, textDirection: textDirection);
+        canvas.drawPath(path, side.toPaint()..color = color);
     }
+  }
+
+  @override
+  SquircleBorder copyWith(
+      {BorderSide? side, Color? color, double? superRadius}) {
+    return SquircleBorder(
+      side: side ?? this.side,
+      color: color ?? this.color,
+      superRadius: superRadius ?? this.superRadius,
+    );
   }
 }
