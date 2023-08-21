@@ -8,10 +8,9 @@ It uses [sqlite_crdt](https://github.com/cachapa/sqlite_crdt) and is a useful de
 
 ## Try it out
 
+[<img src="images/apk_download.png" height="50">](https://github.com/cachapa/tudo/releases/latest)
 [<img src="images/google_play.png" height="50">](https://play.google.com/store/apps/details?id=net.cachapa.tudo)
 [<img src="images/app_store.png" height="50">](https://apps.apple.com/us/app/tudo-lists/id1550819275)
-
-Or download the installation package for Android: [tudo.apk](https://github.com/cachapa/tudo/releases/latest).
 
 The server part of this project can be found here: [server](https://github.com/cachapa/tudo_server).
 
