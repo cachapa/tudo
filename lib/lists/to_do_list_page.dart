@@ -5,12 +5,12 @@ import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:flutter/material.dart';
 
 import '../common/appbars.dart';
+import '../common/check.dart';
 import '../common/dialogs.dart';
 import '../common/edit_list.dart';
 import '../common/icon_label.dart';
 import '../common/lists.dart';
 import '../common/progress.dart';
-import '../common/shape_borders.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
@@ -461,15 +461,20 @@ class _ListTile extends StatelessWidget {
         child: Container(
           color: context.theme.canvasColor,
           child: ListTile(
-            leading: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8),
-              child: Checkbox(
-                shape: SquircleBorder(color: context.theme.primaryColor),
-                visualDensity:
-                    const VisualDensity(horizontal: -4, vertical: -4),
-                side: BorderSide(color: context.theme.primaryColor, width: 2),
-                value: item.done,
-                onChanged: (value) => onToggle(),
+            leading: AnimatedSwitcher(
+              duration: Durations.short,
+              reverseDuration: Durations.veryShort,
+              switchInCurve: Curves.fastOutSlowIn,
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: animation.value == 0
+                    ? animation
+                    : Tween(begin: 1.0, end: 1.0).animate(animation),
+                child: child,
+              ),
+              child: Check(
+                key: ValueKey('${item.id}${item.done}'),
+                checked: item.done,
+                onChanged: onToggle,
               ),
             ),
             title: Text(item.name),
