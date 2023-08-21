@@ -189,10 +189,10 @@ packages:
     dependency: "direct main"
     description:
       name: crdt_sync
-      sha256: "4bc4b026169f2d5ceb89389a9d2faf49ac6c42b96ba16e2216c9391c60db6419"
+      sha256: "0c54a6ee175cf7d67ae29f8e2e17dad51aee44aa08730f27ba22950dfb684b64"
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.4"
+    version: "0.0.5"
   cross_file:
     dependency: transitive
     description:

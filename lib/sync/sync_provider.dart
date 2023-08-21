@@ -62,7 +62,7 @@ class SyncProvider {
       onChangesetSent: (nodeId, recordCounts) =>
           '⬆️ ${recordCounts.entries.map((e) => '${e.key}: ${e.value}').join(', ')}'
               .log,
-      verbose: true,
+      // verbose: true,
     );
   }
 
