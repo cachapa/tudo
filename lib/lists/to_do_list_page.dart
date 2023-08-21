@@ -473,9 +473,12 @@ class _ListTile extends StatelessWidget {
               ),
             ),
             title: Text(item.name),
-            trailing: const Handle(
+            trailing: Handle(
               vibrate: true,
-              child: Icon(Icons.drag_indicator),
+              child: Icon(
+                Icons.drag_indicator,
+                color: context.theme.disabledColor,
+              ),
             ),
             onTap: () => onToggle(),
             onLongPress: onEdit,

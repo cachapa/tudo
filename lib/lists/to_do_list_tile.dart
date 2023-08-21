@@ -36,9 +36,12 @@ class ToDoListTile extends StatelessWidget {
               overflow: TextOverflow.fade,
             )
           : null,
-      trailing: const Handle(
+      trailing: Handle(
         vibrate: true,
-        child: Icon(Icons.drag_indicator),
+        child: Icon(
+          Icons.drag_indicator,
+          color: context.theme.disabledColor,
+        ),
       ),
       onTap: onTap,
       onLongPress: onLongPress,
