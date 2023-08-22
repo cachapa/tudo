@@ -59,58 +59,6 @@ class ToDoListPage extends StatelessWidget {
             primaryColor: list.color,
             primaryTextTheme:
                 TextTheme(titleLarge: TextStyle(color: list.color)),
-            primaryIconTheme: IconThemeData(color: list.color),
-            iconTheme: IconThemeData(color: list.color),
-            textSelectionTheme: TextSelectionThemeData(
-              selectionHandleColor: list.color,
-              cursorColor: list.color,
-            ),
-            checkboxTheme: CheckboxThemeData(
-              fillColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                if (states.contains(MaterialState.disabled)) {
-                  return null;
-                }
-                if (states.contains(MaterialState.selected)) {
-                  return list.color;
-                }
-                return null;
-              }),
-            ),
-            radioTheme: RadioThemeData(
-              fillColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                if (states.contains(MaterialState.disabled)) {
-                  return null;
-                }
-                if (states.contains(MaterialState.selected)) {
-                  return list.color;
-                }
-                return null;
-              }),
-            ),
-            switchTheme: SwitchThemeData(
-              thumbColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                if (states.contains(MaterialState.disabled)) {
-                  return null;
-                }
-                if (states.contains(MaterialState.selected)) {
-                  return list.color;
-                }
-                return null;
-              }),
-              trackColor: MaterialStateProperty.resolveWith<Color?>(
-                  (Set<MaterialState> states) {
-                if (states.contains(MaterialState.disabled)) {
-                  return null;
-                }
-                if (states.contains(MaterialState.selected)) {
-                  return list.color;
-                }
-                return null;
-              }),
-            ),
           ),
           child: Scaffold(
             extendBodyBehindAppBar: true,
