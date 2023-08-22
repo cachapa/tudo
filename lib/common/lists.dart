@@ -3,6 +3,7 @@ import 'package:animated_list_plus/transitions.dart';
 import 'package:flutter/widgets.dart';
 
 import '../extensions.dart';
+import '../util/durations.dart';
 
 class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
   final Axis scrollDirection;
@@ -31,6 +32,8 @@ class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
       controller: controller,
       items: items,
       areItemsTheSame: (a, b) => a.id == b.id,
+      insertDuration: Durations.long,
+      removeDuration: Durations.medium,
       itemBuilder: (context, animation, item, i) => SizeFadeTransition(
         key: ValueKey(item.id),
         sizeFraction: 0.7,
@@ -46,6 +49,7 @@ class AnimatedReorderableListBuilder<T extends IdObject>
     extends StatelessWidget {
   final ScrollController? controller;
   final List<T> items;
+  final bool shrinkWrap;
   final ReorderCallback onReorder;
   final Widget Function(BuildContext context, int i, T item) builder;
   final EdgeInsetsGeometry? padding;
@@ -54,6 +58,7 @@ class AnimatedReorderableListBuilder<T extends IdObject>
     this.items, {
     super.key,
     this.controller,
+    this.shrinkWrap = false,
     required this.onReorder,
     required this.builder,
     this.padding,
@@ -62,8 +67,8 @@ class AnimatedReorderableListBuilder<T extends IdObject>
   @override
   Widget build(BuildContext context) {
     return ImplicitlyAnimatedReorderableList<T>(
-      shrinkWrap: true,
-      padding: padding ?? context.padding,
+      shrinkWrap: shrinkWrap,
+      padding: padding ?? (shrinkWrap ? null : context.padding),
       controller: controller,
       items: items,
       areItemsTheSame: (a, b) => a.id == b.id,
@@ -71,6 +76,8 @@ class AnimatedReorderableListBuilder<T extends IdObject>
         if (from == to) return;
         onReorder(from, to);
       },
+      insertDuration: Durations.long,
+      removeDuration: Durations.medium,
       itemBuilder: (context, animation, item, i) => Reorderable(
         key: ValueKey(item.id),
         child: SizeFadeTransition(
