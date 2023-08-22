@@ -292,15 +292,15 @@ class _ToDoListViewState extends State<ToDoListView> {
     return AnimatedReorderableListBuilder(
       controller: widget.controller,
       items,
-      onReorder: (from, to) => _swap(context, from, to),
-      builder: (context, i, item) => _ListTile(
-        item: item,
-        onToggle: () => _toggle(context, item),
-        onEdit: () => _editItem(context, item),
-        onDelete: () => _deleteItem(context, item),
-        isShared: widget.list.isShared,
-        isDeleted: item.id == _deletingItemId,
-      ),
+      onReorder: _swap,
+      builder: (context, i, item) => item.id == _deletingItemId
+          ? const SizedBox.shrink()
+          : _ListTile(
+              item: item,
+              onToggle: () => _toggle(context, item),
+              onEdit: () => _editItem(context, item),
+              onDelete: () => _deleteItem(context, item),
+            ),
     );
   }
 
@@ -339,7 +339,7 @@ class _ToDoListViewState extends State<ToDoListView> {
   }
 
   void _deleteItem(BuildContext context, ToDo toDo) {
-    setState(() => _deletingItemId = toDo.id);
+    _deletingItemId = toDo.id;
     final listProvider = Registry.listProvider;
     listProvider.deleteItem(toDo.id);
 
@@ -352,7 +352,7 @@ class _ToDoListViewState extends State<ToDoListView> {
     );
   }
 
-  void _swap(BuildContext context, int from, int to) {
+  void _swap(int from, int to) {
     final item = items.removeAt(from);
     items.insert(to, item);
     Registry.listProvider.setItemOrder(items);
@@ -364,16 +364,12 @@ class _ListTile extends StatelessWidget {
   final Function() onToggle;
   final Function() onEdit;
   final Function() onDelete;
-  final bool isShared;
-  final bool isDeleted;
 
   const _ListTile({
     required this.item,
     required this.onToggle,
     required this.onEdit,
     required this.onDelete,
-    required this.isShared,
-    required this.isDeleted,
   });
 
   @override
@@ -381,61 +377,55 @@ class _ListTile extends StatelessWidget {
     return Dismissible(
       key: Key(item.id),
       background: Container(
+        color: Colors.red,
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Icon(
-          Icons.delete,
-          color: Colors.red,
+        child: Icon(
+          Icons.delete_outline_rounded,
+          color: context.theme.canvasColor,
         ),
       ),
       secondaryBackground: Container(
+        color: Colors.red,
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: const Icon(
-          Icons.delete,
-          color: Colors.red,
+        child: Icon(
+          Icons.delete_outline_rounded,
+          color: context.theme.canvasColor,
         ),
       ),
-      confirmDismiss: (direction) async {
-        // Avoid conflicts between Dismissible and list animations.
-        // Calls the delete method to remove the item from the database
-        // but returns false as if the dismiss gesture was cancelled avoiding
-        // the Dismissible deletion animation.
-        onDelete();
-        return false;
-      },
-      child: Opacity(
-        opacity: isDeleted ? 0 : 1,
-        child: Container(
-          color: context.theme.canvasColor,
-          child: ListTile(
-            leading: AnimatedSwitcher(
-              duration: Durations.short,
-              reverseDuration: Durations.veryShort,
-              switchInCurve: Curves.fastOutSlowIn,
-              transitionBuilder: (child, animation) => ScaleTransition(
-                scale: animation.value == 0
-                    ? animation
-                    : Tween(begin: 1.0, end: 1.0).animate(animation),
-                child: child,
-              ),
-              child: Check(
-                key: ValueKey('${item.id}${item.done}'),
-                checked: item.done,
-                onChanged: onToggle,
-              ),
+      onDismissed: (direction) => onDelete(),
+      child: Container(
+        color: context.theme.canvasColor,
+        child: ListTile(
+          leading: AnimatedSwitcher(
+            duration: Durations.short,
+            reverseDuration: Durations.veryShort,
+            switchInCurve: Curves.fastOutSlowIn,
+            transitionBuilder: (child, animation) => ScaleTransition(
+              scale: animation.value == 0
+                  ? animation
+                  : Tween(begin: 1.0, end: 1.0).animate(animation),
+              child: child,
             ),
-            title: Text(item.name),
-            trailing: Handle(
-              vibrate: true,
-              child: Icon(
-                Icons.drag_indicator,
-                color: context.theme.disabledColor,
-              ),
+            child: Check(
+              key: ValueKey('${item.id}${item.done}'),
+              checked: item.done,
+              onChanged: onToggle,
             ),
-            onTap: () => onToggle(),
-            onLongPress: onEdit,
           ),
+          title: Text(item.name),
+          trailing: item.done
+              ? null
+              : Handle(
+                  vibrate: true,
+                  child: Icon(
+                    Icons.drag_indicator,
+                    color: context.theme.disabledColor,
+                  ),
+                ),
+          onTap: () => onToggle(),
+          onLongPress: onEdit,
         ),
       ),
     );
