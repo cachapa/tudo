@@ -165,7 +165,7 @@ class _MemberList extends StatelessWidget {
               scrollDirection: Axis.horizontal,
               child: Row(
                 children: [
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 4),
                   ...list.members.map(
                     (e) => Padding(
                       padding: const EdgeInsets.symmetric(
@@ -183,7 +183,7 @@ class _MemberList extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 8),
                 ],
               ),
             ),
@@ -193,7 +193,7 @@ class _MemberList extends StatelessWidget {
             color: context.theme.primaryColor,
             icon: const Icon(Icons.person_add_alt_1_rounded),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 8),
         ],
       ),
     );
