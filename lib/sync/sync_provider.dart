@@ -23,7 +23,7 @@ class SyncProvider {
   late final CrdtSyncClient _syncClient;
   late final connectionState = BehaviorSubject.seeded(false)
     ..addStream(_syncClient.watchState.map((e) {
-      '$e'.log;
+      // '$e'.log;
       return e == SocketState.connected;
     }));
 
