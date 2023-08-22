@@ -28,7 +28,7 @@ dependencies:
   # Required for Android and iOS because UPSERTs are only supported on very recent OS versions
   sqlite3_flutter_libs: ^0.5.15
 
-  animated_list_plus: ^0.5.1
+  animated_list_plus: ^0.5.2
   clipboard: ^0.1.3
   device_info_plus: ^9.0.3
   mobile_scanner: ^3.4.1

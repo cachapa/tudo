@@ -21,10 +21,10 @@ packages:
     dependency: "direct main"
     description:
       name: animated_list_plus
-      sha256: "39179ffed5da720fdbe89e0590626a3f5fb2012b3c3c1dbefd263b63f674799a"
+      sha256: fb3d7f1fbaf5af84907f3c739236bacda8bf32cbe1f118dd51510752883ff50c
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.1"
+    version: "0.5.2"
   args:
     dependency: transitive
     description:

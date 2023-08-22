@@ -85,15 +85,30 @@ class ListProvider {
     WHERE user_id = ?1 AND list_id = ?2
   ''', [userId, listId]);
 
+  Future<void> deleteCompleted(String listId) => _crdt.execute('''
+    UPDATE todos SET is_deleted = 1
+    WHERE list_id = ?1 AND done = 1
+  ''', [listId]);
+
   Future<void> deleteItem(String id) => _crdt.execute('''
     UPDATE todos SET is_deleted = 1
     WHERE id = ?1
   ''', [id]);
 
-  Future<void> undeleteItem(String id) => _crdt.execute('''
-    UPDATE todos SET is_deleted = 0
-    WHERE id = ?1
-  ''', [id]);
+  Future<void> undeleteItem(String id) => undeleteItems([id]);
+
+  Future<void> undeleteItems(Iterable<String> ids) async {
+    if (ids.isEmpty) return;
+
+    await _crdt.transaction((txn) async {
+      for (final id in ids) {
+        await txn.execute('''
+          UPDATE todos SET is_deleted = 0
+          WHERE id = ?1
+        ''', [id]);
+      }
+    });
+  }
 
   Future<void> setDone(String itemId, bool isDone) => _crdt.execute('''
     UPDATE todos SET

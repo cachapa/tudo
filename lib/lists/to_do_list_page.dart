@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:ui';
 
 import 'package:animated_list_plus/animated_list_plus.dart';
+import 'package:animated_list_plus/transitions.dart';
 import 'package:flutter/material.dart';
 
 import '../common/appbars.dart';
@@ -66,15 +67,6 @@ class ToDoListPage extends StatelessWidget {
             appBar: TitleBar(
               list: list,
               actions: [
-                AnimatedOpacity(
-                  duration: const Duration(milliseconds: 300),
-                  opacity: list.doneCount == 0 ? 0 : 1,
-                  child: IconButton(
-                    tooltip: list.doneCount == 0 ? null : t.clearCompleted,
-                    icon: const Icon(Icons.delete_sweep_outlined),
-                    onPressed: () => _clearCompleted(context, list.items),
-                  ),
-                ),
                 IconButton(
                   tooltip: t.editList,
                   icon: const Icon(Icons.settings_outlined),
@@ -115,29 +107,6 @@ class ToDoListPage extends StatelessWidget {
       _controller.position.maxScrollExtent,
       duration: Durations.medium,
       curve: Curves.fastOutSlowIn,
-    );
-  }
-
-  Future<void> _clearCompleted(BuildContext context, List<ToDo> items) async {
-    var checked = items.where((item) => item.done).toList();
-    if (checked.isEmpty) return;
-
-    var indexes =
-        checked.map((e) => Registry.listProvider.deleteItem(e.id)).toList();
-
-    // Insert in reverse order when undoing so the old indexes match
-    checked = checked.reversed.toList();
-    indexes = indexes.reversed.toList();
-    final count = checked.length;
-
-    context.showSnackBar(
-      context.t.itemsCleared(count),
-      () {
-        for (var i = 0; i < checked.length; i++) {
-          final item = checked[i];
-          Registry.listProvider.undeleteItem(item.id);
-        }
-      },
     );
   }
 
@@ -285,22 +254,79 @@ class ToDoListView extends StatefulWidget {
 class _ToDoListViewState extends State<ToDoListView> {
   String? _deletingItemId;
 
-  List<ToDo> get items => widget.list.items;
+  late List<ToDo> toDoItems;
+  late List<ToDo> doneItems;
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedReorderableListBuilder(
-      controller: widget.controller,
-      items,
-      onReorder: _swap,
-      builder: (context, i, item) => item.id == _deletingItemId
-          ? const SizedBox.shrink()
-          : _ListTile(
-              item: item,
-              onToggle: () => _toggle(context, item),
-              onEdit: () => _editItem(context, item),
-              onDelete: () => _deleteItem(context, item),
-            ),
+    toDoItems = widget.list.items.where((e) => !e.done).toList();
+    doneItems = widget.list.items.where((e) => e.done).toList()
+      ..sort((a, b) => a.doneAt != null && b.doneAt != null
+          ? a.doneAt!.compareTo(b.doneAt!)
+          : a.position.compareTo(b.position));
+
+    return ListView(
+      children: [
+        AnimatedReorderableListBuilder(
+          // controller: widget.controller,
+          toDoItems,
+          shrinkWrap: true,
+          onReorder: _swap,
+          builder: (context, i, item) => item.id == _deletingItemId
+              ? const SizedBox.shrink()
+              : _ListTile(
+                  item: item,
+                  onToggle: () => _toggle(context, item),
+                  onEdit: () => _editItem(context, item),
+                  onDelete: () => _deleteItem(context, item),
+                ),
+        ),
+        AnimatedSwitcher(
+          duration: Durations.medium,
+          transitionBuilder: (child, animation) => SizeFadeTransition(
+            animation: animation,
+            child: child,
+          ),
+          child: widget.list.doneCount == 0
+              ? const SizedBox.shrink()
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(context.t.completed,
+                              style: context.theme.textTheme.titleMedium!
+                                  .copyWith(color: context.theme.primaryColor)),
+                          IconButton(
+                            color: context.theme.primaryColor,
+                            onPressed: () => _clearCompleted(context),
+                            icon: const Icon(Icons.delete_sweep_outlined),
+                            tooltip: context.t.clearCompleted,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Divider(color: context.theme.primaryColor),
+                  ],
+                ),
+        ),
+        AnimatedListBuilder(
+          // controller: widget.controller,
+          doneItems,
+          shrinkWrap: true,
+          builder: (context, i, item) => item.id == _deletingItemId
+              ? const SizedBox.shrink()
+              : _ListTile(
+                  item: item,
+                  onToggle: () => _toggle(context, item),
+                  onEdit: () => _editItem(context, item),
+                  onDelete: () => _deleteItem(context, item),
+                ),
+        ),
+      ],
     );
   }
 
@@ -338,6 +364,12 @@ class _ToDoListViewState extends State<ToDoListView> {
     }
   }
 
+  void _swap(int from, int to) {
+    final item = toDoItems.removeAt(from);
+    toDoItems.insert(to, item);
+    Registry.listProvider.setItemOrder(toDoItems);
+  }
+
   void _deleteItem(BuildContext context, ToDo toDo) {
     _deletingItemId = toDo.id;
     final listProvider = Registry.listProvider;
@@ -352,10 +384,19 @@ class _ToDoListViewState extends State<ToDoListView> {
     );
   }
 
-  void _swap(int from, int to) {
-    final item = items.removeAt(from);
-    items.insert(to, item);
-    Registry.listProvider.setItemOrder(items);
+  Future<void> _clearCompleted(BuildContext context) async {
+    if (doneItems.isEmpty) return;
+
+    // Copy deleted ids in case the user wants to undo the operation
+    final deleted = doneItems.map((e) => e.id);
+
+    await Registry.listProvider.deleteCompleted(widget.list.id);
+
+    if (!context.mounted) return;
+    context.showSnackBar(
+      context.t.itemsCleared(deleted.length),
+      () => Registry.listProvider.undeleteItems(deleted),
+    );
   }
 }
 
@@ -398,21 +439,10 @@ class _ListTile extends StatelessWidget {
       child: Container(
         color: context.theme.canvasColor,
         child: ListTile(
-          leading: AnimatedSwitcher(
-            duration: Durations.short,
-            reverseDuration: Durations.veryShort,
-            switchInCurve: Curves.fastOutSlowIn,
-            transitionBuilder: (child, animation) => ScaleTransition(
-              scale: animation.value == 0
-                  ? animation
-                  : Tween(begin: 1.0, end: 1.0).animate(animation),
-              child: child,
-            ),
-            child: Check(
-              key: ValueKey('${item.id}${item.done}'),
-              checked: item.done,
-              onChanged: onToggle,
-            ),
+          leading: Check(
+            key: ValueKey('${item.id}${item.done}'),
+            checked: item.done,
+            onChanged: onToggle,
           ),
           title: Text(item.name),
           trailing: item.done
