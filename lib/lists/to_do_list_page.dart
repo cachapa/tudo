@@ -475,14 +475,16 @@ class _EmptyPage extends StatelessWidget {
         children: [
           ImageFiltered(
             imageFilter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
-            child: const Icon(
+            child: Icon(
               Icons.check_rounded,
               size: size,
+              color: context.theme.primaryColor,
             ),
           ),
-          const Icon(
+          Icon(
             Icons.check_rounded,
             size: size,
+            color: context.theme.primaryColor,
           )
         ],
       ),
