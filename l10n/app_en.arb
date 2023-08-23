@@ -54,7 +54,7 @@
       }
     }
   },
-  "itemsCleared": "Cleared {count, plural, =1{item} other{{count} items}}",
+  "itemsCleared": "Cleared {count, plural, =1{1 item} other{{count} items}}",
   "@itemsCleared": {
     "placeholders": {
       "count": {

@@ -13,7 +13,7 @@
   "editItem": "Editar item",
   "toDoListEmptyMessage": "Cria um item novo em baixo",
   "itemDeleted": "\"{name}\" apagado",
-  "itemsCleared": "{count, plural, =1{item apagado} other{{count} itens apagados}}",
+  "itemsCleared": "{count, plural, =1{1 item apagado} other{{count} itens apagados}}",
   "completed": "Completos",
   "settings": "Configuração",
   "sendFeedback": "Enviar comentários",
@@ -45,5 +45,7 @@
   "listShareMessage": "Abre a a lista \"{listName}\" no teu aparelho\n:{shareUrl}",
   "updateRequired": "Atualização necessária",
   "updateRequiredMessage": "Por favor actualiza a aplicação para continuar a sincronizar.",
-  "clearCompleted": "Eliminar completos"
+  "clearCompleted": "Eliminar completos",
+  "joiningList": "A aderir à lista…",
+  "listAlreadyJoined": "Lista já aderida"
 }

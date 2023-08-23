@@ -13,7 +13,7 @@
   "editItem": "Eintrag bearbeiten",
   "toDoListEmptyMessage": "Neuen Eintrag unten anlegen",
   "itemDeleted": "\"{name}\" gelöscht",
-  "itemsCleared": "{count, plural, =1{Eintrag} other{{count} Einträge gelöscht}}",
+  "itemsCleared": "{count, plural, =1{1 Eintrag} other{{count} Einträge gelöscht}}",
   "completed": "Erledigt",
   "settings": "Einstellungen",
   "sendFeedback": "Feedback geben",
@@ -45,5 +45,7 @@
   "listShareMessage": "Die Liste \"{listName}\" auf deinem Gerät öffnen:\n{shareUrl}",
   "updateRequired": "Aktualisierung nötig",
   "updateRequiredMessage": "Bitte die App aktualisieren um weiter zu synchronisieren.",
-  "clearCompleted": "Erledigte löschen"
+  "clearCompleted": "Erledigte löschen",
+  "joiningList": "Liste beitreten…",
+  "listAlreadyJoined": "Liste bereits beigetreten"
 }
