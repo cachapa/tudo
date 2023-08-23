@@ -305,6 +305,7 @@ class _ToDoListViewState extends State<ToDoListView> {
                             onPressed: () => _clearCompleted(context),
                             icon: const Icon(Icons.delete_sweep_outlined),
                             tooltip: context.t.clearCompleted,
+              physics: const NeverScrollableScrollPhysics(),
                           ),
                         ],
                       ),
@@ -325,6 +326,7 @@ class _ToDoListViewState extends State<ToDoListView> {
                   onEdit: () => _editItem(context, item),
                   onDelete: () => _deleteItem(context, item),
                 ),
+              physics: const NeverScrollableScrollPhysics(),
         ),
       ],
     );

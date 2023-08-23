@@ -8,6 +8,7 @@ import '../util/durations.dart';
 class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
   final Axis scrollDirection;
   final bool shrinkWrap;
+  final ScrollPhysics? physics;
   final EdgeInsetsGeometry? padding;
   final ScrollController? controller;
   final List<T> items;
@@ -18,6 +19,7 @@ class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
     super.key,
     this.scrollDirection = Axis.vertical,
     this.shrinkWrap = false,
+    this.physics,
     this.padding,
     this.controller,
     required this.builder,
@@ -28,6 +30,7 @@ class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
     return ImplicitlyAnimatedList<T>(
       scrollDirection: scrollDirection,
       shrinkWrap: shrinkWrap,
+      physics: physics,
       padding: padding,
       controller: controller,
       items: items,
@@ -50,6 +53,7 @@ class AnimatedReorderableListBuilder<T extends IdObject>
   final ScrollController? controller;
   final List<T> items;
   final bool shrinkWrap;
+  final ScrollPhysics? physics;
   final ReorderCallback onReorder;
   final Widget Function(BuildContext context, int i, T item) builder;
   final EdgeInsetsGeometry? padding;
@@ -59,6 +63,7 @@ class AnimatedReorderableListBuilder<T extends IdObject>
     super.key,
     this.controller,
     this.shrinkWrap = false,
+    this.physics,
     required this.onReorder,
     required this.builder,
     this.padding,
@@ -68,6 +73,7 @@ class AnimatedReorderableListBuilder<T extends IdObject>
   Widget build(BuildContext context) {
     return ImplicitlyAnimatedReorderableList<T>(
       shrinkWrap: shrinkWrap,
+      physics: physics,
       padding: padding ?? (shrinkWrap ? null : context.padding),
       controller: controller,
       items: items,
