@@ -19,7 +19,7 @@ import 'list_provider.dart';
 
 class ToDoListPage extends StatelessWidget {
   final ToDoList list;
-  final _controller = ScrollController();
+  final _listKey = GlobalKey();
 
   late final _stream = Registry.listProvider.getList(list.id);
 
@@ -79,14 +79,13 @@ class ToDoListPage extends StatelessWidget {
               child: list.items.isEmpty
                   ? _EmptyPage()
                   : ToDoListView(
-                      controller: _controller,
                       list: list,
+                      toDoListKey: _listKey,
                     ),
             ),
             bottomNavigationBar: Padding(
               padding: EdgeInsets.only(bottom: bottom),
               child: InputBar(
-                // key: inputKey,
                 onSubmitted: (value) => _addItem(context, list.id, value),
               ),
             ),
@@ -103,11 +102,14 @@ class ToDoListPage extends StatelessWidget {
     // Wait for entry animation to finish
     await Future.delayed(Durations.long);
     // Scroll to bottom of list
-    await _controller.animateTo(
-      _controller.position.maxScrollExtent,
-      duration: Durations.medium,
-      curve: Curves.fastOutSlowIn,
-    );
+    final dividerContext = _listKey.currentContext;
+    if (context.mounted && dividerContext != null) {
+      await Scrollable.ensureVisible(
+        dividerContext,
+        duration: Durations.medium,
+        alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
+      );
+    }
   }
 
   Future<void> _editList(BuildContext context) async {
@@ -218,6 +220,7 @@ class _InputBarState extends State<InputBar> {
               hintText: context.t.addItem,
               border: InputBorder.none,
               suffixIcon: IconButton(
+                color: primaryColor,
                 padding: const EdgeInsets.only(right: 10),
                 icon: const Icon(Icons.add),
                 onPressed: text.isEmpty ? null : () => _onSubmitted(text),
@@ -242,10 +245,14 @@ class _InputBarState extends State<InputBar> {
 }
 
 class ToDoListView extends StatefulWidget {
-  final ScrollController? controller;
   final ToDoListWithItems list;
+  final GlobalKey toDoListKey;
 
-  const ToDoListView({super.key, this.controller, required this.list});
+  const ToDoListView({
+    super.key,
+    required this.list,
+    required this.toDoListKey,
+  });
 
   @override
   State<ToDoListView> createState() => _ToDoListViewState();
@@ -265,70 +272,75 @@ class _ToDoListViewState extends State<ToDoListView> {
           ? a.doneAt!.compareTo(b.doneAt!)
           : a.position.compareTo(b.position));
 
-    return ListView(
-      children: [
-        AnimatedReorderableListBuilder(
-          // controller: widget.controller,
-          toDoItems,
-          shrinkWrap: true,
-          onReorder: _swap,
-          builder: (context, i, item) => item.id == _deletingItemId
-              ? const SizedBox.shrink()
-              : _ListTile(
-                  item: item,
-                  onToggle: () => _toggle(context, item),
-                  onEdit: () => _editItem(context, item),
-                  onDelete: () => _deleteItem(context, item),
-                ),
-        ),
-        AnimatedSwitcher(
-          duration: Durations.medium,
-          transitionBuilder: (child, animation) => SizeFadeTransition(
-            animation: animation,
-            child: child,
-          ),
-          child: widget.list.doneCount == 0
-              ? const SizedBox.shrink()
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(context.t.completed,
-                              style: context.theme.textTheme.titleMedium!
-                                  .copyWith(color: context.theme.primaryColor)),
-                          IconButton(
-                            color: context.theme.primaryColor,
-                            onPressed: () => _clearCompleted(context),
-                            icon: const Icon(Icons.delete_sweep_outlined),
-                            tooltip: context.t.clearCompleted,
+    return SafeArea(
+      child: SingleChildScrollView(
+        clipBehavior: Clip.none,
+        child: Column(
+          children: [
+            AnimatedReorderableListBuilder(
+              toDoItems,
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-                          ),
-                        ],
-                      ),
+              onReorder: _swap,
+              builder: (context, i, item) => item.id == _deletingItemId
+                  ? const SizedBox.shrink()
+                  : _ListTile(
+                      item: item,
+                      onToggle: () => _toggle(context, item),
+                      onEdit: () => _editItem(context, item),
+                      onDelete: () => _deleteItem(context, item),
                     ),
-                    Divider(color: context.theme.primaryColor),
-                  ],
-                ),
-        ),
-        AnimatedListBuilder(
-          // controller: widget.controller,
-          doneItems,
-          shrinkWrap: true,
-          builder: (context, i, item) => item.id == _deletingItemId
-              ? const SizedBox.shrink()
-              : _ListTile(
-                  item: item,
-                  onToggle: () => _toggle(context, item),
-                  onEdit: () => _editItem(context, item),
-                  onDelete: () => _deleteItem(context, item),
-                ),
+            ),
+            AnimatedSwitcher(
+              key: widget.toDoListKey,
+              duration: Durations.medium,
+              transitionBuilder: (child, animation) => SizeFadeTransition(
+                animation: animation,
+                child: child,
+              ),
+              child: widget.list.doneCount == 0
+                  ? const SizedBox.shrink()
+                  : Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(context.t.completed,
+                                  style: context.theme.textTheme.titleMedium!
+                                      .copyWith(
+                                          color: context.theme.primaryColor)),
+                              IconButton(
+                                color: context.theme.primaryColor,
+                                onPressed: () => _clearCompleted(context),
+                                icon: const Icon(Icons.delete_sweep_outlined),
+                                tooltip: context.t.clearCompleted,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Divider(color: context.theme.primaryColor),
+                      ],
+                    ),
+            ),
+            AnimatedListBuilder(
+              doneItems,
+              shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
+              builder: (context, i, item) => item.id == _deletingItemId
+                  ? const SizedBox.shrink()
+                  : _ListTile(
+                      item: item,
+                      onToggle: () => _toggle(context, item),
+                      onEdit: () => _editItem(context, item),
+                      onDelete: () => _deleteItem(context, item),
+                    ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
