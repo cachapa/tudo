@@ -47,5 +47,12 @@
   "updateRequiredMessage": "Bitte die App aktualisieren um weiter zu synchronisieren.",
   "clearCompleted": "Erledigte löschen",
   "joiningList": "Liste beitreten…",
-  "listAlreadyJoined": "Liste bereits beigetreten"
+  "listAlreadyJoined": "Liste bereits beigetreten",
+  "accountKey": "Kontoschlüssel",
+  "accountKeyExplanation": "Der Kontoschlüssel kann dieses Konto wiederherstellen oder auf einem anderen Gerät öffnen.",
+  "accountKeyAdvice": "An einem sicheren Ort speichern.",
+  "startFromCleanSlate": "Neues Konto erstellen",
+  "or": "oder",
+  "linkExistingAccount": "Mit bestehendem Konto verbinden",
+  "scanAccountKeyExplanation": "Den Kontoschlüssel aus der Einstellungsseite eines anderen Geräts scannen."
 }

@@ -2,15 +2,14 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 
-import '../auth/auth_provider.dart';
 import '../util/build_info.dart';
 
 class ApiClient extends BaseClient {
-  final AuthProvider _auth;
+  final String? _token;
   final Client _client = Client();
   final _userAgent = BuildInfo.userAgent;
 
-  ApiClient(this._auth);
+  ApiClient([this._token]);
 
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
@@ -19,11 +18,11 @@ class ApiClient extends BaseClient {
         ..headers.addAll({
           HttpHeaders.userAgentHeader: _userAgent,
           HttpHeaders.acceptLanguageHeader: BuildInfo.locale,
-          HttpHeaders.authorizationHeader: 'bearer ${_auth.token}',
+          if (_token != null) HttpHeaders.authorizationHeader: 'bearer $_token',
         }),
     );
 
-    if (response.statusCode < 200 || response.statusCode >= 300) {
+    if (response.statusCode ~/ 100 != 2) {
       final body = (await Response.fromStream(response)).body;
       throw ApiError(response.statusCode, body);
     }

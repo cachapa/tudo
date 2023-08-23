@@ -1,6 +1,7 @@
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:platform_info/platform_info.dart';
+import 'package:sqlite_crdt/sqlite_crdt.dart';
 
 import 'auth/auth_provider.dart';
 import 'contacts/contact_provider.dart';
@@ -15,11 +16,13 @@ export 'util/durations.dart';
 
 class Registry {
   static late final StoreProvider storeProvider;
-  static late final SettingsProvider settingsProvider;
-  static late final AuthProvider authProvider;
-  static late final ContactProvider contactProvider;
-  static late final ListProvider listProvider;
-  static late final SyncProvider syncProvider;
+  static late final SqlCrdt _crdt;
+
+  static final settingsProvider = SettingsProvider(storeProvider);
+  static final authProvider = AuthProvider(storeProvider);
+  static final contactProvider = ContactProvider(authProvider, _crdt);
+  static final listProvider = ListProvider(authProvider, storeProvider, _crdt);
+  static final syncProvider = SyncProvider(authProvider, storeProvider, _crdt);
 
   Registry._();
 
@@ -32,13 +35,6 @@ class Registry {
 
     // Init storage
     storeProvider = await StoreProvider.open();
-    final crdt = await TudoCrdt.open('$dir/tudo.db');
-
-    // Init providers
-    settingsProvider = SettingsProvider(storeProvider);
-    authProvider = AuthProvider(storeProvider);
-    contactProvider = ContactProvider(authProvider.userId, crdt);
-    listProvider = ListProvider(authProvider.userId, crdt, storeProvider);
-    syncProvider = SyncProvider(authProvider, storeProvider, crdt);
+    _crdt = await TudoCrdt.open('$dir/tudo.db');
   }
 }

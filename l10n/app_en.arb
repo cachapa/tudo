@@ -99,5 +99,12 @@
   "clearCompleted": "Clear completed",
   "delete": "Delete",
   "joiningList": "Joining list…",
-  "listAlreadyJoined": "List already joined"
+  "listAlreadyJoined": "List already joined",
+  "accountKey": "Account key",
+  "accountKeyExplanation": "You can use this key to recover your account, or open it in another device.",
+  "accountKeyAdvice": "Store it in a safe place.",
+  "startFromCleanSlate": "Start from a clean slate",
+  "or": "or",
+  "linkExistingAccount": "Link existing account",
+  "scanAccountKeyExplanation": "Scan your account key from the settings page in your other device."
 }

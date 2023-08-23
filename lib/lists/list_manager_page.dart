@@ -7,7 +7,6 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:uni_links/uni_links.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -20,6 +19,7 @@ import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
 import '../settings/settings_page.dart';
+import '../util/qr_scanner.dart';
 import 'list_provider.dart';
 import 'to_do_list_page.dart';
 import 'to_do_list_tile.dart';
@@ -31,19 +31,28 @@ class ListManagerPage extends StatefulWidget {
   State<ListManagerPage> createState() => _ListManagerPageState();
 }
 
-class _ListManagerPageState extends State<ListManagerPage> {
+class _ListManagerPageState extends State<ListManagerPage>
+    with WidgetsBindingObserver {
   late final OfflineIndicator _offlineIndicator;
   final _controller = ScrollController();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _manageConnection(AppLifecycleState.resumed);
+
     SchedulerBinding.instance.addPostFrameCallback((_) {
       _offlineIndicator = OfflineIndicator(context);
     });
     _monitorDeeplinks();
-
     _checkForUpdates();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    _manageConnection(state);
   }
 
   @override
@@ -135,36 +144,20 @@ class _ListManagerPageState extends State<ListManagerPage> {
     );
   }
 
+  void _manageConnection(AppLifecycleState state) {
+    final syncProvider = Registry.syncProvider;
+    switch (state) {
+      case AppLifecycleState.resumed:
+        syncProvider.connect();
+      case AppLifecycleState.paused:
+        syncProvider.disconnect();
+      default:
+      // Do nothing
+    }
+  }
+
   Future<void> _launchQrScanner(BuildContext context) async {
-    var detected = false;
-    final code = await showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog.adaptive(
-        backgroundColor: Colors.transparent,
-        contentPadding: EdgeInsets.zero,
-        content: AspectRatio(
-          aspectRatio: 1.0,
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: MobileScanner(
-              placeholderBuilder: (p0, p1) => Container(
-                color: Colors.black,
-                alignment: Alignment.center,
-                child: const Icon(Icons.qr_code_scanner_rounded),
-              ),
-              fit: BoxFit.cover,
-              onDetect: (barcodes) {
-                if (!detected) {
-                  // Avoid subsequent triggers
-                  detected = true;
-                  context.pop(barcodes.barcodes.first.rawValue);
-                }
-              },
-            ),
-          ),
-        ),
-      ),
-    );
+    final code = await scanQrCode(context);
 
     if (code == null) return;
     'Read QR: $code'.log;

@@ -4,6 +4,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'auth/auth_page.dart';
 import 'common/value_builders.dart';
 import 'extensions.dart';
 import 'lists/list_manager_page.dart';
@@ -26,26 +27,8 @@ void main() async {
   runApp(const TudoApp());
 }
 
-class TudoApp extends StatefulWidget {
+class TudoApp extends StatelessWidget {
   const TudoApp({Key? key}) : super(key: key);
-
-  @override
-  State<TudoApp> createState() => _TudoAppState();
-}
-
-class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    manageConnection(AppLifecycleState.resumed);
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    manageConnection(state);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,21 +42,11 @@ class _TudoAppState extends State<TudoApp> with WidgetsBindingObserver {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: theme,
-        home: const ListManagerPage(),
+        home: !Registry.authProvider.isAuthComplete
+            ? const AuthPage()
+            : const ListManagerPage(),
       ),
     );
-  }
-
-  void manageConnection(AppLifecycleState state) {
-    final syncProvider = Registry.syncProvider;
-    switch (state) {
-      case AppLifecycleState.resumed:
-        syncProvider.connect();
-      case AppLifecycleState.paused:
-        syncProvider.disconnect();
-      default:
-      // Do nothing
-    }
   }
 }
 

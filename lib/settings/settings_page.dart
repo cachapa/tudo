@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:platform_info/platform_info.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/segmented_control.dart';
 import '../common/dialogs.dart';
 import '../common/value_builders.dart';
+import '../config.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
 import '../registry.dart';
@@ -53,6 +57,11 @@ class SettingsPage extends StatelessWidget {
                 onChanged: Registry.settingsProvider.setTheme,
               ),
             ),
+          ),
+          ListTile(
+            leading: const Icon(Icons.phonelink_lock),
+            title: Text(t.accountKey),
+            onTap: () => _showAccountKey(context),
           ),
           Header(t.aboutTudo),
           ListTile(
@@ -140,6 +149,66 @@ class SettingsPage extends StatelessWidget {
     if (context.mounted && name != null) {
       await Registry.contactProvider.setName(name);
     }
+  }
+
+  Future<void> _showAccountKey(BuildContext context) async {
+    final localAuth = LocalAuthentication();
+    try {
+      if (await localAuth.canCheckBiometrics) {
+        final isAuthenticated =
+            await localAuth.authenticate(localizedReason: context.t.accountKey);
+        if (!isAuthenticated) return;
+      }
+    } catch (e) {
+      e.toString().log;
+    }
+
+    if (!context.mounted) return;
+    final keyUrl =
+        serverUri.apply('key/${Registry.authProvider.token}').toString();
+    await showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      builder: (context) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                context.t.accountKeyExplanation,
+                style: context.theme.textTheme.titleSmall,
+              ),
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: QrImageView(
+                  size: 200,
+                  padding: const EdgeInsets.all(12),
+                  data: keyUrl,
+                  version: QrVersions.auto,
+                  backgroundColor: ThemeData.light().canvasColor,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                context.t.accountKeyAdvice,
+                style: context.theme.textTheme.titleSmall,
+              ),
+              const SizedBox(height: 16),
+              TextButton.icon(
+                icon: Icon(Icons.adaptive.share),
+                label: Text(context.t.share.toUpperCase()),
+                onPressed: () {
+                  Share.share(keyUrl);
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 

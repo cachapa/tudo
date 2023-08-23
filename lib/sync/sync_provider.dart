@@ -31,7 +31,7 @@ class SyncProvider {
       AuthProvider authProvider, StoreProvider storeProvider, this._crdt)
       : _userId = authProvider.userId,
         _store = storeProvider.getStore('sync') {
-    _apiClient = ApiClient(authProvider);
+    _apiClient = ApiClient(authProvider.token);
     _syncClient = CrdtSyncClient(
       _crdt,
       serverUri.replace(

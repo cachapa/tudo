@@ -206,20 +206,16 @@ class _MemberList extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog.adaptive(
-        content: Container(
-          clipBehavior: Clip.antiAlias,
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: Colors.white,
-          ),
-          alignment: Alignment.center,
-          width: 240,
-          height: 240,
-          child: QrImageView(
-            data: shareUrl,
-            version: QrVersions.auto,
-            backgroundColor: ThemeData.light().canvasColor,
+        content: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: QrImageView(
+              padding: const EdgeInsets.all(12),
+              data: shareUrl,
+              version: QrVersions.auto,
+              backgroundColor: ThemeData.light().canvasColor,
+            ),
           ),
         ),
         actions: [

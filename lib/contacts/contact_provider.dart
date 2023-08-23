@@ -2,12 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
+import '../auth/auth_provider.dart';
 import '../common/lists.dart';
 import '../extensions.dart';
 
 class ContactProvider {
   final String userId;
-  final SqliteCrdt _crdt;
+  final SqlCrdt _crdt;
 
   final _contacts = BehaviorSubject<Map<String, User>>();
 
@@ -15,7 +16,8 @@ class ContactProvider {
 
   Stream<User> get currentUser => getUser(userId);
 
-  ContactProvider(this.userId, this._crdt) {
+  ContactProvider(AuthProvider authProvider, this._crdt)
+      : userId = authProvider.userId {
     _contacts.addStream(_crdt
         .watch('''
           SELECT * FROM users

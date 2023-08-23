@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
+import '../auth/auth_provider.dart';
 import '../common/lists.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
@@ -12,7 +13,7 @@ const listIdsKey = 'list_id_keys';
 
 class ListProvider {
   final String userId;
-  final SqliteCrdt _crdt;
+  final SqlCrdt _crdt;
 
   late final lists = BehaviorSubject<List<ToDoList>>()
     ..addStream(_queryLists()
@@ -20,7 +21,9 @@ class ListProvider {
             ToDoList.fromMap(map, await _getMembers(map['id'])))))
         .doOnError((p0, p1) => '$p0\n$p1'.log));
 
-  ListProvider(this.userId, this._crdt, StoreProvider storeProvider);
+  ListProvider(
+      AuthProvider authProvider, StoreProvider storeProvider, this._crdt)
+      : userId = authProvider.userId;
 
   Future<void> createList(String name, Color color) async {
     final listId = uuid();
