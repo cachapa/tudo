@@ -19,7 +19,7 @@ class Registry {
   static late final SqlCrdt _crdt;
 
   static final settingsProvider = SettingsProvider(storeProvider);
-  static final authProvider = AuthProvider(storeProvider);
+  static final authProvider = AuthProvider(storeProvider, _crdt);
   static final contactProvider = ContactProvider(authProvider, _crdt);
   static final listProvider = ListProvider(authProvider, storeProvider, _crdt);
   static final syncProvider = SyncProvider(authProvider, storeProvider, _crdt);

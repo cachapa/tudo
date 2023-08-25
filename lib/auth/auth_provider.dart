@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:sqlite_crdt/sqlite_crdt.dart';
+
 import '../config.dart';
 import '../extensions.dart';
 import '../sync/api_client.dart';
@@ -7,6 +9,7 @@ import '../util/store.dart';
 import '../util/uuid.dart';
 
 class AuthProvider {
+  final SqlCrdt _crdt;
   final Store _store;
 
   bool get isAuthComplete => _store.contains('token');
@@ -15,7 +18,7 @@ class AuthProvider {
 
   String get userId => _store.get('user_id');
 
-  AuthProvider(StoreProvider storeProvider)
+  AuthProvider(StoreProvider storeProvider, this._crdt)
       : _store = storeProvider.getStore('auth');
 
   void create() {
@@ -26,7 +29,14 @@ class AuthProvider {
 
   Future<void> login(String token) async {
     final result = await ApiClient(token).post(serverUri.apply('auth/login'));
-    final userId = jsonDecode(result.body)['user_id'] as String;
+    final body = jsonDecode(result.body);
+
+    final userId = body['user_id'] as String;
+    final changeset = (body['changeset'] as Map<String, dynamic>).map(
+        (key, value) =>
+            MapEntry(key, (value as List).cast<CrdtRecord>().toList()));
+
+    await _crdt.merge(changeset);
     _storeCredentials(token, userId);
   }
 
