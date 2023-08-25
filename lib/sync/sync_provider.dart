@@ -38,7 +38,6 @@ class SyncProvider {
           scheme: serverUri.scheme.replaceFirst('http', 'ws'),
           path: 'ws/${authProvider.userId}',
           queryParameters: {
-            'api_secret': apiSecret,
             'token': authProvider.token,
           }),
       validateRecord: (table, record) {
