@@ -6,8 +6,8 @@ import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
-import '../common/segmented_control.dart';
 import '../common/dialogs.dart';
+import '../common/segmented_control.dart';
 import '../common/value_builders.dart';
 import '../config.dart';
 import '../contacts/contact_provider.dart';
@@ -154,7 +154,7 @@ class SettingsPage extends StatelessWidget {
   Future<void> _showAccountKey(BuildContext context) async {
     final localAuth = LocalAuthentication();
     try {
-      if (await localAuth.canCheckBiometrics) {
+      if (await localAuth.canCheckBiometrics && context.mounted) {
         final isAuthenticated =
             await localAuth.authenticate(localizedReason: context.t.accountKey);
         if (!isAuthenticated) return;
