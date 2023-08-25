@@ -11,6 +11,7 @@ import '../auth/auth_provider.dart';
 import '../config.dart';
 import '../extensions.dart';
 import '../util/build_info.dart';
+import '../util/durations.dart';
 import '../util/store.dart';
 import 'api_client.dart';
 
@@ -26,6 +27,8 @@ class SyncProvider {
       // '$e'.log;
       return e == SocketState.connected;
     }));
+
+  Timer? _fullSyncTimer;
 
   SyncProvider(
       AuthProvider authProvider, StoreProvider storeProvider, this._crdt)
@@ -46,11 +49,14 @@ class SyncProvider {
         // created before joining a new list (lists, todos, user info).
         if (table == 'user_lists' && record['is_deleted'] == 0) {
           _store.put('need_full_sync', true);
-          _fullSync();
+          // Avoid triggering full syncs on every user_lists record
+          _fullSyncTimer?.cancel();
+          _fullSyncTimer = Timer(Durations.long, () => _fullSync());
         }
         return true;
       },
       onConnect: (peerId, customData) {
+        // TODO Default to false
         if (_store.get('need_full_sync', defaultValue: true)) {
           _fullSync();
         }
