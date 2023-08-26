@@ -269,7 +269,7 @@ class _ToDoListViewState extends State<ToDoListView> {
     toDoItems = widget.list.items.where((e) => !e.done).toList();
     doneItems = widget.list.items.where((e) => e.done).toList()
       ..sort((a, b) => a.doneAt != null && b.doneAt != null
-          ? a.doneAt!.compareTo(b.doneAt!)
+          ? b.doneAt!.compareTo(a.doneAt!)
           : a.position.compareTo(b.position));
 
     return SafeArea(
