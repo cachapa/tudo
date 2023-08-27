@@ -1,5 +1,10 @@
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:platform_info/platform_info.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
@@ -166,6 +171,7 @@ class SettingsPage extends StatelessWidget {
     if (!context.mounted) return;
     final keyUrl =
         serverUri.apply('key/${Registry.authProvider.token}').toString();
+    final _qrKey = GlobalKey();
     await showModalBottomSheet(
       context: context,
       showDragHandle: true,
@@ -182,12 +188,8 @@ class SettingsPage extends StatelessWidget {
               const SizedBox(height: 16),
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
-                child: QrImageView(
-                  size: 200,
-                  padding: const EdgeInsets.all(12),
-                  data: keyUrl,
-                  version: QrVersions.auto,
-                  backgroundColor: ThemeData.light().canvasColor,
+                child: RepaintBoundary(
+                  key: _qrKey,
                   child: QrView(keyUrl, size: 200),
                 ),
               ),
@@ -200,9 +202,19 @@ class SettingsPage extends StatelessWidget {
               TextButton.icon(
                 icon: Icon(Icons.adaptive.share),
                 label: Text(context.t.share.toUpperCase()),
-                onPressed: () {
-                  Share.share(keyUrl);
-                  Navigator.pop(context);
+                onPressed: () async {
+                  final boundary = _qrKey.currentContext!.findRenderObject()
+                      as RenderRepaintBoundary;
+                  ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+                  final byteData =
+                      await image.toByteData(format: ui.ImageByteFormat.png);
+                  var pngBytes = byteData!.buffer.asUint8List();
+                  final path =
+                      '${(await getApplicationCacheDirectory()).path}/tudo_account_key.png';
+                  await File(path).writeAsBytes(pngBytes, flush: true);
+                  await Share.shareXFiles([XFile(path)],
+                      subject: 'tudo account key');
+                  if (context.mounted) context.pop();
                 },
               ),
               const SizedBox(height: 16),
