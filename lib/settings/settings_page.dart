@@ -171,7 +171,7 @@ class SettingsPage extends StatelessWidget {
     if (!context.mounted) return;
     final keyUrl =
         serverUri.apply('key/${Registry.authProvider.token}').toString();
-    final _qrKey = GlobalKey();
+    final qrKey = GlobalKey();
     await showModalBottomSheet(
       context: context,
       showDragHandle: true,
@@ -189,7 +189,7 @@ class SettingsPage extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: RepaintBoundary(
-                  key: _qrKey,
+                  key: qrKey,
                   child: QrView(keyUrl, size: 200),
                 ),
               ),
@@ -203,7 +203,7 @@ class SettingsPage extends StatelessWidget {
                 icon: Icon(Icons.adaptive.share),
                 label: Text(context.t.share.toUpperCase()),
                 onPressed: () async {
-                  final boundary = _qrKey.currentContext!.findRenderObject()
+                  final boundary = qrKey.currentContext!.findRenderObject()
                       as RenderRepaintBoundary;
                   ui.Image image = await boundary.toImage(pixelRatio: 3.0);
                   final byteData =

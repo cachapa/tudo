@@ -1,12 +1,12 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:tudo/common/qr_util.dart';
 
 import '../extensions.dart';
 import '../lists/list_provider.dart';
 import '../registry.dart';
 import 'color_selector.dart';
+import 'qr_util.dart';
 import 'value_builders.dart';
 
 enum ListAction { create, edit, delete }
