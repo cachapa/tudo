@@ -1,7 +1,7 @@
 import 'package:clipboard/clipboard.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:tudo/common/qr_util.dart';
 
 import '../extensions.dart';
 import '../lists/list_provider.dart';
@@ -210,12 +210,7 @@ class _MemberList extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
           child: AspectRatio(
             aspectRatio: 1,
-            child: QrImageView(
-              padding: const EdgeInsets.all(12),
-              data: shareUrl,
-              version: QrVersions.auto,
-              backgroundColor: ThemeData.light().canvasColor,
-            ),
+            child: QrView(shareUrl),
           ),
         ),
         actions: [

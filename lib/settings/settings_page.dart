@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:platform_info/platform_info.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/dialogs.dart';
+import '../common/qr_util.dart';
 import '../common/segmented_control.dart';
 import '../common/value_builders.dart';
 import '../config.dart';
@@ -188,6 +188,7 @@ class SettingsPage extends StatelessWidget {
                   data: keyUrl,
                   version: QrVersions.auto,
                   backgroundColor: ThemeData.light().canvasColor,
+                  child: QrView(keyUrl, size: 200),
                 ),
               ),
               const SizedBox(height: 16),
@@ -204,6 +205,7 @@ class SettingsPage extends StatelessWidget {
                   Navigator.pop(context);
                 },
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
