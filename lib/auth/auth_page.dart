@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import '../extensions.dart';
 import '../lists/list_manager_page.dart';
 import '../registry.dart';
-import '../util/qr_scanner.dart';
+import '../common/qr_widgets.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 import '../extensions.dart';
 
@@ -43,4 +44,22 @@ Future<String?> scanQrCode(BuildContext context, {String? message}) async {
   );
 
   return code;
+}
+
+class QrView extends StatelessWidget {
+  final double? size;
+  final String data;
+
+  const QrView(this.data, {super.key, this.size});
+
+  @override
+  Widget build(BuildContext context) {
+    return QrImageView(
+      size: size,
+      padding: const EdgeInsets.all(16),
+      data: data,
+      version: QrVersions.auto,
+      backgroundColor: Colors.white,
+    );
+  }
 }

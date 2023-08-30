@@ -5,8 +5,8 @@ import 'package:share_plus/share_plus.dart';
 import '../extensions.dart';
 import '../lists/list_provider.dart';
 import '../registry.dart';
+import 'qr_widgets.dart';
 import 'color_selector.dart';
-import 'qr_util.dart';
 import 'value_builders.dart';
 
 enum ListAction { create, edit, delete }

@@ -19,7 +19,7 @@ import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
 import '../settings/settings_page.dart';
-import '../util/qr_scanner.dart';
+import '../common/qr_widgets.dart';
 import 'list_provider.dart';
 import 'to_do_list_page.dart';
 import 'to_do_list_tile.dart';

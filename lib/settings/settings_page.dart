@@ -11,7 +11,6 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/dialogs.dart';
-import '../common/qr_util.dart';
 import '../common/segmented_control.dart';
 import '../common/value_builders.dart';
 import '../config.dart';
@@ -19,6 +18,7 @@ import '../contacts/contact_provider.dart';
 import '../extensions.dart';
 import '../registry.dart';
 import '../util/build_info.dart';
+import '../common/qr_widgets.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
