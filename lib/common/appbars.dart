@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../extensions.dart';
 
-const blurSigma = 8.0;
+const blurSigma = 12.0;
 
 class BlurredAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
