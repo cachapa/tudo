@@ -321,7 +321,11 @@ class _ToDoListViewState extends State<ToDoListView> {
                             ],
                           ),
                         ),
-                        Divider(color: context.theme.primaryColor),
+                        Container(
+                          color: context.theme.primaryColor,
+                          height: 2,
+                          margin: const EdgeInsets.only(top: 4),
+                        ),
                       ],
                     ),
             ),
