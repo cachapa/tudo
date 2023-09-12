@@ -140,7 +140,7 @@ class _RestoreItemsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: context.padding.add(const EdgeInsets.fromLTRB(12, 64, 12, 74)),
+      margin: context.padding.add(const EdgeInsets.fromLTRB(12, 64, 12, 80)),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -148,7 +148,6 @@ class _RestoreItemsDialog extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: Material(
-          // color: context.theme.cardColor.withOpacity(0.3),
           color: list.color.withOpacity(0.1),
           child: Column(
             children: [
