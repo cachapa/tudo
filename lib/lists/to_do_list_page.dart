@@ -467,6 +467,10 @@ class _ToDoListViewState extends State<ToDoListView> {
     _deletingItemId = toDo.id;
     final listProvider = Registry.listProvider;
     listProvider.deleteItem(toDo.id);
+
+    // Hack: reset _deletingItemId after the delete animation has finished.
+    // This works around the item would remaining invisible when restored.
+    Future.delayed(Durations.long, () => _deletingItemId = null);
   }
 
   Future<void> _clearCompleted(BuildContext context) async {
