@@ -185,14 +185,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.6.3"
+  crdt:
+    dependency: transitive
+    description:
+      name: crdt
+      sha256: "9c1fef436600e80fc7e9e1668d822d0632ee3c277a49282e1eb0afb3a312f7fd"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.2"
   crdt_sync:
     dependency: "direct main"
     description:
       name: crdt_sync
-      sha256: "8b8ad3545ddc41d4b50a489517fd3cfab66b440b6a95ab596f71fd2dcd9855c9"
+      sha256: b8058163a804e42781a842503d5ad2c3d7c7ad046f908aae7660de780da56722
       url: "https://pub.dev"
     source: hosted
-    version: "0.0.8"
+    version: "1.0.1"
   cross_file:
     dependency: transitive
     description:
@@ -425,10 +433,10 @@ packages:
     dependency: "direct main"
     description:
       name: local_auth
-      sha256: "0cf238be2bfa51a6c9e7e9cfc11c05ea39f2a3a4d3e5bb255d0ebc917da24401"
+      sha256: "7e6c63082e399b61e4af71266b012e767a5d4525dd6e9ba41e174fd42d76e115"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.6"
+    version: "2.1.7"
   local_auth_android:
     dependency: transitive
     description:
@@ -561,10 +569,10 @@ packages:
     dependency: "direct main"
     description:
       name: path_provider
-      sha256: "909b84830485dbcd0308edf6f7368bc8fd76afa26a270420f34cabea2a6467a0"
+      sha256: a1aa8aaa2542a6bc57e381f132af822420216c80d4781f7aa085ca3229208aaa
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   path_provider_android:
     dependency: transitive
     description:
@@ -770,6 +778,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.10.0"
+  sprintf:
+    dependency: transitive
+    description:
+      name: sprintf
+      sha256: "1fc9ffe69d4df602376b52949af107d8f5703b77cda567c4d7d86a0693120f23"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.0.0"
   sqflite_common:
     dependency: transitive
     description:
@@ -798,10 +814,10 @@ packages:
     dependency: transitive
     description:
       name: sql_crdt
-      sha256: f64190be49a2c9e5105536e2c9d139fb40c803616639e00813dbf05b49388196
+      sha256: "6d9af96ee8a45be252ad9fbff7aed785a61ab16862a47d187ca489bdeba060d4"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1+1"
+    version: "2.0.0"
   sqlite3:
     dependency: transitive
     description:
@@ -814,26 +830,26 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite3_flutter_libs
-      sha256: fb115050b0c2589afe2085a62d77f5deda4db65db20a5c65a6e0c92fda89b45e
+      sha256: "11a41f380fbcbda5bbba03ddcdbe0545e46094ab043783c46c70e8335831df03"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.16"
+    version: "0.5.17"
   sqlite_crdt:
     dependency: "direct main"
     description:
       name: sqlite_crdt
-      sha256: "6a3436bdb4fd016ab3c72167ac4796db06b8150503188d7949c5614f2d49d017"
+      sha256: "4233fd2383271886139b73374707ea0037c9a2f32dffefec14dced4f79f00100"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.1+2"
+    version: "2.0.0"
   sqlparser:
     dependency: transitive
     description:
       name: sqlparser
-      sha256: "9611f46d30a4e8286e54d17a1b5182d132512dc6fc3da90c45ad8ec2828a58b1"
+      sha256: b3062cc9ec1151348f57af44b88d67c91b81858db3be76395cfa5ec094c59ce8
       url: "https://pub.dev"
     source: hosted
-    version: "0.30.3"
+    version: "0.31.1"
   stack_trace:
     dependency: transitive
     description:
@@ -950,10 +966,10 @@ packages:
     dependency: "direct main"
     description:
       name: url_launcher
-      sha256: "781bd58a1eb16069412365c98597726cd8810ae27435f04b3b4d3a470bacd61e"
+      sha256: "47e208a6711459d813ba18af120d9663c20bdf6985d6ad39fe165d2538378d27"
       url: "https://pub.dev"
     source: hosted
-    version: "6.1.12"
+    version: "6.1.14"
   url_launcher_android:
     dependency: transitive
     description:
@@ -1014,10 +1030,10 @@ packages:
     dependency: "direct main"
     description:
       name: uuid
-      sha256: "648e103079f7c64a36dc7d39369cabb358d377078a051d6ae2ad3aa539519313"
+      sha256: e03928880bdbcbf496fb415573f5ab7b1ea99b9b04f669c01104d085893c3134
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.7"
+    version: "4.0.0"
   vector_graphics:
     dependency: transitive
     description:

@@ -97,9 +97,7 @@ class SyncProvider {
     final start = DateTime.now().millisecondsSinceEpoch;
     final result = await _apiClient
         .get(serverUri.apply('changeset/$_userId/${_crdt.nodeId}'));
-    final changeset = (jsonDecode(result.body) as Map<String, dynamic>).map(
-        (key, value) =>
-            MapEntry(key, (value as List).cast<CrdtRecord>().toList()));
+    final changeset = parseCrdtChangeset(jsonDecode(result.body));
     await _crdt.merge(changeset);
     _store.put('need_full_sync', false);
     'Full sync done in ${DateTime.now().millisecondsSinceEpoch - start}ms'.log;
