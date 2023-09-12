@@ -190,6 +190,13 @@ class ListProvider {
     });
   }
 
+  Stream<List<ToDo>> getDeletedTodos(String listId) => _crdt.watch('''
+        SELECT * FROM todos
+        WHERE list_id = ?1 AND is_deleted = 1
+        ORDER BY hlc DESC
+        LIMIT 40
+      ''', () => [listId]).map((e) => e.map(ToDo.fromMap).toList());
+
   Future<List<Member>> _getMembers(String listId) => _crdt.query('''
         SELECT user_id AS id, name, user_lists.created_at AS joined_at FROM user_lists
           LEFT JOIN users ON user_id = id
@@ -216,7 +223,7 @@ class ListProvider {
     LEFT JOIN
       users AS created_users ON creator_id = created_users.id
     WHERE
-      list_id = ?
+      list_id = ?1
       AND todos.is_deleted = 0
     ORDER BY
       position

@@ -106,5 +106,8 @@
   "startFromCleanSlate": "Start from a clean slate",
   "or": "or",
   "linkExistingAccount": "Link existing account",
-  "scanAccountKeyExplanation": "Scan your account key from the settings page in your other device."
+  "scanAccountKeyExplanation": "Scan your account key from the settings page in your other device.",
+  "deletedItems": "Deleted items",
+  "restore": "Restore",
+  "noDeletedItems": "No deleted items"
 }

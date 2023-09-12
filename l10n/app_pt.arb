@@ -54,5 +54,8 @@
   "startFromCleanSlate": "Começar uma conta nova",
   "or": "ou",
   "linkExistingAccount": "Ligar uma conta existente",
-  "scanAccountKeyExplanation": "Ler a chave da conta a partir da página de configuração de outro aparelho."
+  "scanAccountKeyExplanation": "Ler a chave da conta a partir da página de configuração de outro aparelho.",
+  "deletedItems": "Itens apagados",
+  "restore": "Recuperar",
+  "noDeletedItems": "Não há itens apagados"
 }

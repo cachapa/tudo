@@ -68,6 +68,11 @@ class ToDoListPage extends StatelessWidget {
               list: list,
               actions: [
                 IconButton(
+                  tooltip: t.deletedItems,
+                  icon: const Icon(Icons.restore_from_trash_outlined),
+                  onPressed: () => _showDeletedItems(context),
+                ),
+                IconButton(
                   tooltip: t.editList,
                   icon: const Icon(Icons.settings_outlined),
                   onPressed: () => _editList(context),
@@ -112,11 +117,82 @@ class ToDoListPage extends StatelessWidget {
     }
   }
 
+  Future<void> _showDeletedItems(BuildContext context) => showDialog(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder: (context) => _RestoreItemsDialog(list: list),
+      );
+
   Future<void> _editList(BuildContext context) async {
     final result = await editToDoList(context, list);
+
     if (context.mounted && result == ListAction.delete) {
       context.pop(result);
     }
+  }
+}
+
+class _RestoreItemsDialog extends StatelessWidget {
+  const _RestoreItemsDialog({required this.list});
+
+  final ToDoList list;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: context.padding.add(const EdgeInsets.fromLTRB(12, 64, 12, 74)),
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
+        child: Material(
+          // color: context.theme.cardColor.withOpacity(0.3),
+          color: list.color.withOpacity(0.1),
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  context.t.deletedItems,
+                  style: context.theme.textTheme.titleLarge,
+                ),
+              ),
+              const Divider(),
+              Expanded(
+                child: ValueStreamBuilder<List<ToDo>>(
+                  stream: Registry.listProvider.getDeletedTodos(list.id),
+                  emptyBuilder: (_) =>
+                      Center(child: Text(context.t.noDeletedItems)),
+                  builder: (_, items) {
+                    return AnimatedListBuilder(
+                      items,
+                      builder: (_, i, item) => ListTile(
+                        contentPadding:
+                            const EdgeInsets.symmetric(horizontal: 16),
+                        leading: Check(
+                          checked: item.done,
+                          disabled: true,
+                        ),
+                        title: Text(item.name),
+                        trailing: IconButton(
+                          tooltip: context.t.restore,
+                          color: list.color,
+                          onPressed: () =>
+                              Registry.listProvider.undeleteItem(item.id),
+                          icon: const Icon(Icons.restore_rounded),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -324,7 +400,7 @@ class _ToDoListViewState extends State<ToDoListView> {
                         Container(
                           color: context.theme.primaryColor,
                           height: 2,
-                          margin: const EdgeInsets.only(top: 4),
+                          margin: const EdgeInsets.only(top: 8),
                         ),
                       ],
                     ),
@@ -392,14 +468,6 @@ class _ToDoListViewState extends State<ToDoListView> {
     _deletingItemId = toDo.id;
     final listProvider = Registry.listProvider;
     listProvider.deleteItem(toDo.id);
-
-    context.showSnackBar(
-      context.t.itemDeleted(toDo.name),
-      () {
-        _deletingItemId = null;
-        listProvider.undeleteItem(toDo.id);
-      },
-    );
   }
 
   Future<void> _clearCompleted(BuildContext context) async {
@@ -460,7 +528,6 @@ class _ListTile extends StatelessWidget {
           leading: Check(
             key: ValueKey('${item.id}${item.done}'),
             checked: item.done,
-            onChanged: onToggle,
           ),
           title: Text(item.name),
           trailing: item.done

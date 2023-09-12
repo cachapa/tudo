@@ -54,5 +54,8 @@
   "startFromCleanSlate": "Neues Konto erstellen",
   "or": "oder",
   "linkExistingAccount": "Mit bestehendem Konto verbinden",
-  "scanAccountKeyExplanation": "Den Kontoschlüssel aus der Einstellungsseite eines anderen Geräts scannen."
+  "scanAccountKeyExplanation": "Den Kontoschlüssel aus der Einstellungsseite eines anderen Geräts scannen.",
+  "deletedItems": "Gelöschte Einträge",
+  "restore": "Wiederherstellen",
+  "noDeletedItems": "Keine gelöschte Einträge"
 }
