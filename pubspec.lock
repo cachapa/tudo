@@ -189,18 +189,18 @@ packages:
     dependency: transitive
     description:
       name: crdt
-      sha256: "9c1fef436600e80fc7e9e1668d822d0632ee3c277a49282e1eb0afb3a312f7fd"
+      sha256: "96c19779c611ca82b1bd5bfeaca1d148e55704153dd04e606eafed25e5f925b3"
       url: "https://pub.dev"
     source: hosted
-    version: "5.0.2"
+    version: "5.1.1"
   crdt_sync:
     dependency: "direct main"
     description:
       name: crdt_sync
-      sha256: b8058163a804e42781a842503d5ad2c3d7c7ad046f908aae7660de780da56722
+      sha256: c4d2e5c05949d28184878bd32e698fc999d5474145132e11f7835acc468ee1c2
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   cross_file:
     dependency: transitive
     description:
@@ -385,10 +385,10 @@ packages:
     dependency: "direct main"
     description:
       name: in_app_update
-      sha256: fc02898f8cf45d23d731d0783171864d4765080bc8547ec517bfafe0b5c8e15b
+      sha256: "102249a7e45e3050e4bc1b236cfc8de116b27d805ba78c3c276e73f3fffbaebc"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.0"
+    version: "4.2.1"
   intl:
     dependency: "direct main"
     description:
@@ -814,10 +814,10 @@ packages:
     dependency: transitive
     description:
       name: sql_crdt
-      sha256: "6d9af96ee8a45be252ad9fbff7aed785a61ab16862a47d187ca489bdeba060d4"
+      sha256: "7a485f74f65690c07d74294a9ae39765a7279830c7cacfbd01164dc74cc45ebd"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.0"
   sqlite3:
     dependency: transitive
     description:
@@ -838,10 +838,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite_crdt
-      sha256: "4233fd2383271886139b73374707ea0037c9a2f32dffefec14dced4f79f00100"
+      sha256: "3bce32725acbc20a0d8f4d290b96b559c063e77b0ada52c857aec7160010b1fe"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.0"
+    version: "2.1.0"
   sqlparser:
     dependency: transitive
     description:
