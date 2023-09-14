@@ -35,8 +35,8 @@ class AnimatedListBuilder<T extends IdObject> extends StatelessWidget {
       controller: controller,
       items: items,
       areItemsTheSame: (a, b) => a.id == b.id,
-      insertDuration: Durations.long,
-      removeDuration: Durations.medium,
+      insertDuration: longDuration,
+      removeDuration: mediumDuration,
       itemBuilder: (context, animation, item, i) => SizeFadeTransition(
         key: ValueKey(item.id),
         sizeFraction: 0.7,
@@ -82,8 +82,8 @@ class AnimatedReorderableListBuilder<T extends IdObject>
         if (from == to) return;
         onReorder(from, to);
       },
-      insertDuration: Durations.long,
-      removeDuration: Durations.medium,
+      insertDuration: longDuration,
+      removeDuration: mediumDuration,
       itemBuilder: (context, animation, item, i) => Reorderable(
         key: ValueKey(item.id),
         child: SizeFadeTransition(

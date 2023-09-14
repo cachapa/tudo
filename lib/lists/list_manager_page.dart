@@ -191,11 +191,11 @@ class _ListManagerPageState extends State<ListManagerPage>
     final result = await editToDoList(context);
     if (result == ListAction.create) {
       // Wait for entry animation to finish
-      await Future.delayed(Durations.long);
+      await Future.delayed(longDuration);
       // Scroll to bottom of list
       await _controller.animateTo(
         _controller.position.maxScrollExtent,
-        duration: Durations.medium,
+        duration: mediumDuration,
         curve: Curves.fastOutSlowIn,
       );
     }
@@ -206,7 +206,7 @@ class _ListManagerPageState extends State<ListManagerPage>
     if (action == ListAction.delete) {
       Future.delayed(
         // Wait for pop animation to complete
-        Durations.medium,
+        mediumDuration,
         () => _deleteList(context, list),
       );
     }

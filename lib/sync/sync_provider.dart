@@ -51,7 +51,7 @@ class SyncProvider {
           _store.put('need_full_sync', true);
           // Avoid triggering full syncs on every user_lists record
           _fullSyncTimer?.cancel();
-          _fullSyncTimer = Timer(Durations.long, () => _fullSync());
+          _fullSyncTimer = Timer(longDuration, () => _fullSync());
         }
         return true;
       },

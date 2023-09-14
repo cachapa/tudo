@@ -105,13 +105,13 @@ class ToDoListPage extends StatelessWidget {
     await Registry.listProvider.createItem(list.id, name);
 
     // Wait for entry animation to finish
-    await Future.delayed(Durations.long);
+    await Future.delayed(longDuration);
     // Scroll to bottom of list
     final dividerContext = _listKey.currentContext;
     if (context.mounted && dividerContext != null) {
       await Scrollable.ensureVisible(
         dividerContext,
-        duration: Durations.medium,
+        duration: mediumDuration,
         alignmentPolicy: ScrollPositionAlignmentPolicy.keepVisibleAtEnd,
       );
     }
@@ -368,7 +368,7 @@ class _ToDoListViewState extends State<ToDoListView> {
             ),
             AnimatedSwitcher(
               key: widget.toDoListKey,
-              duration: Durations.medium,
+              duration: mediumDuration,
               transitionBuilder: (child, animation) => SizeFadeTransition(
                 animation: animation,
                 child: child,
@@ -470,7 +470,7 @@ class _ToDoListViewState extends State<ToDoListView> {
 
     // Hack: reset _deletingItemId after the delete animation has finished.
     // This works around the item would remaining invisible when restored.
-    Future.delayed(Durations.long, () => _deletingItemId = null);
+    Future.delayed(longDuration, () => _deletingItemId = null);
   }
 
   Future<void> _clearCompleted(BuildContext context) async {
