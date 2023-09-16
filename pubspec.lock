@@ -189,18 +189,18 @@ packages:
     dependency: transitive
     description:
       name: crdt
-      sha256: "96c19779c611ca82b1bd5bfeaca1d148e55704153dd04e606eafed25e5f925b3"
+      sha256: "07519c8141036fb6b724399dc62dec0ecf4987c2194aa84b9e080d3a6417251e"
       url: "https://pub.dev"
     source: hosted
-    version: "5.1.1"
+    version: "5.1.2"
   crdt_sync:
     dependency: "direct main"
     description:
       name: crdt_sync
-      sha256: c4d2e5c05949d28184878bd32e698fc999d5474145132e11f7835acc468ee1c2
+      sha256: "4d84838923037741a1c26810cd1f19953e72c8f6532e9ebbc724d5a8de597dde"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.2"
+    version: "1.0.3"
   cross_file:
     dependency: transitive
     description:
