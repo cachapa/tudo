@@ -40,13 +40,6 @@ jobs:
           flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
-#      - name: Store artifact
-#        id: store_artifact
-#        uses: actions/upload-artifact@v1
-#        with:
-#          name: Android package
-#          path: build/app/outputs/apk/release/app-release.apk
-
       - name: Archive APK
         uses: actions/upload-release-asset@v1
         env:
@@ -58,7 +51,7 @@ jobs:
           asset_content_type: application/zip
 
       - name: Publish Android
-        uses: r0adkll/upload-google-play@v1.0.15
+        uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: net.cachapa.tudo
