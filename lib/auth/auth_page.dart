@@ -2,10 +2,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
+import '../common/dialogs.dart';
+import '../common/qr_widgets.dart';
 import '../extensions.dart';
 import '../lists/list_manager_page.dart';
 import '../registry.dart';
-import '../common/qr_widgets.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -110,20 +111,25 @@ class _Foreground extends StatelessWidget {
     );
     if (!context.mounted || tokenUrl == null) return;
 
-    try {
-      final segments = Uri.parse(tokenUrl).pathSegments;
-      if (segments.length < 2 || segments[segments.length - 2] != 'key') {
-        throw 'Invalid token: $tokenUrl';
-      }
-      await Registry.authProvider.login(segments.last);
-      if (context.mounted) {
-        context
-          ..pop()
-          // ignore: unawaited_futures
-          ..push(() => const ListManagerPage());
-      }
-    } catch (e) {
-      if (context.mounted) context.showSnackBar('$e');
+    final segments = Uri.parse(tokenUrl).pathSegments;
+    if (segments.length < 2 || segments[segments.length - 2] != 'key') {
+      throw 'Invalid token: $tokenUrl';
+    }
+    if (!context.mounted) return;
+    await showIndeterminateProgressDialog(
+      context,
+      message: context.t.restoringAccount,
+      future: Registry.authProvider.login(segments.last),
+      onError: (e) {
+        '$e'.log;
+        if (context.mounted) context.showSnackBar('$e');
+      },
+    );
+    if (context.mounted) {
+      context
+        ..pop()
+        // ignore: unawaited_futures
+        ..push(() => const ListManagerPage());
     }
   }
 }

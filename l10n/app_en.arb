@@ -109,5 +109,6 @@
   "scanAccountKeyExplanation": "Scan your account key from the settings page in your other device.",
   "deletedItems": "Deleted items",
   "restore": "Restore",
-  "noDeletedItems": "No deleted items"
+  "noDeletedItems": "No deleted items",
+  "restoringAccount": "Restoring account…"
 }
