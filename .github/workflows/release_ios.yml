@@ -30,16 +30,12 @@ jobs:
 #        with:
 #          channel: 'beta'
 
-      - name: Retrieve build name from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
       - name: Load config
         run: echo "${{ secrets.CONFIG }}" > lib/config.dart
 
       - name: Build app
         env:
-          BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}
+          BUILD_NAME: ${{ github.event.release.tag_name }}
         run: flutter build ipa --export-options-plist=.github/provisioning/ExportOptions.plist --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
       - name: Upload app to App Store Connect

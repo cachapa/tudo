@@ -19,10 +19,6 @@ jobs:
 
       - uses: subosito/flutter-action@v2
 
-      - name: Retrieve build name from tag
-        id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-
       - name: Load secrets
         working-directory: android
         run: |
@@ -35,7 +31,7 @@ jobs:
 
       - name: Build app
         env:
-          BUILD_NAME: ${{ steps.get_version.outputs.VERSION }}
+          BUILD_NAME: ${{ github.event.release.tag_name }}
         run: |
           flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
