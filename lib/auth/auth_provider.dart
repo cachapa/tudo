@@ -32,13 +32,7 @@ class AuthProvider {
     final body = jsonDecode(result.body);
 
     final userId = body['user_id'] as String;
-    final changeset = (body['changeset'] as Map<String, dynamic>).map(
-        (key, value) => MapEntry(
-            key,
-            (value as List)
-                .cast<CrdtRecord>()
-                .map((e) => e..['hlc'] = (e['hlc'] as String).toHlc)
-                .toList()));
+    final changeset = parseCrdtChangeset(body['changeset']);
 
     await _crdt.merge(changeset);
     _storeCredentials(token, userId);
