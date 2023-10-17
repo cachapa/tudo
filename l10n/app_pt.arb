@@ -43,8 +43,6 @@
   "nameCaption": "Visível nas listas partilhadas",
   "copyLink": "Copiar ligação",
   "listShareMessage": "Abre a a lista \"{listName}\" no teu aparelho\n:{shareUrl}",
-  "updateRequired": "Atualização necessária",
-  "updateRequiredMessage": "Por favor actualiza a aplicação para continuar a sincronizar.",
   "clearCompleted": "Eliminar completos",
   "joiningList": "A aderir à lista…",
   "listAlreadyJoined": "Lista já aderida",
@@ -57,5 +55,6 @@
   "scanAccountKeyExplanation": "Ler a chave da conta a partir da página de configuração de outro aparelho.",
   "deletedItems": "Itens apagados",
   "restore": "Recuperar",
-  "noDeletedItems": "Não há itens apagados"
+  "noDeletedItems": "Não há itens apagados",
+  "updateApp": "Atualizar a app"
 }

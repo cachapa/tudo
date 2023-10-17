@@ -94,8 +94,6 @@
       }
     }
   },
-  "updateRequired": "Update required",
-  "updateRequiredMessage": "Please update tudo to resume synchronization.",
   "clearCompleted": "Clear completed",
   "delete": "Delete",
   "joiningList": "Joining list…",
@@ -110,5 +108,6 @@
   "deletedItems": "Deleted items",
   "restore": "Restore",
   "noDeletedItems": "No deleted items",
-  "restoringAccount": "Restoring account…"
+  "restoringAccount": "Restoring account…",
+  "updateApp": "Update app"
 }

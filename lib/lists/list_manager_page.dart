@@ -1,25 +1,22 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:in_app_update/in_app_update.dart';
 import 'package:uni_links/uni_links.dart';
-import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/dialogs.dart';
 import '../common/edit_list.dart';
 import '../common/lists.dart';
 import '../common/offline_indicator.dart';
+import '../common/qr_widgets.dart';
 import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
 import '../settings/settings_page.dart';
-import '../common/qr_widgets.dart';
+import '../util/update_util.dart';
 import 'list_provider.dart';
 import 'to_do_list_page.dart';
 import 'to_do_list_tile.dart';
@@ -46,7 +43,6 @@ class _ListManagerPageState extends State<ListManagerPage>
       _offlineIndicator = OfflineIndicator(context);
     });
     _monitorDeeplinks();
-    _checkForUpdates();
   }
 
   @override
@@ -139,6 +135,22 @@ class _ListManagerPageState extends State<ListManagerPage>
               ),
             ],
           ),
+        ),
+        bottomNavigationBar: ValueFutureBuilder(
+          future: UpdateUtil.updateAvailable,
+          builder: (context, updateAvailable) => updateAvailable
+              ? SafeArea(
+                  child: Padding(
+                    padding:
+                        const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+                    child: FilledButton.icon(
+                      icon: const Icon(Icons.system_update_rounded),
+                      label: Text(t.updateApp.toUpperCase()),
+                      onPressed: () => UpdateUtil.update(),
+                    ),
+                  ),
+                )
+              : const SizedBox(),
         ),
       ),
     );
@@ -255,52 +267,6 @@ class _ListManagerPageState extends State<ListManagerPage>
     } catch (e) {
       e.toString().log;
     }
-  }
-
-  Future<void> _checkForUpdates() async {
-    if (await Registry.syncProvider.isUpdateRequired()) {
-      final result = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog.adaptive(
-          title: Text(context.t.updateRequired),
-          content: Text(context.t.updateRequiredMessage),
-          actions: [
-            TextButton(
-              child: Text(context.t.close.toUpperCase()),
-              onPressed: () => context.pop(false),
-            ),
-            if (PlatformX.isMobile)
-              TextButton(
-                child: Text(context.t.update.toUpperCase()),
-                onPressed: () => context.pop(true),
-              ),
-          ],
-        ),
-      );
-
-      if (result == true) {
-        if (Platform.isAndroid) {
-          final result = await _attemptAppUpdate();
-          if (result == AppUpdateResult.inAppUpdateFailed) {
-            await launchUrlString(
-                'https://play.google.com/store/apps/details?id=net.cachapa.tudo',
-                mode: LaunchMode.externalApplication);
-          }
-        } else {
-          await launchUrlString(
-              'https://apps.apple.com/us/app/tudo-lists/id1550819275');
-        }
-      }
-    }
-  }
-}
-
-Future<AppUpdateResult> _attemptAppUpdate() async {
-  try {
-    await InAppUpdate.checkForUpdate();
-    return await InAppUpdate.performImmediateUpdate();
-  } on Exception {
-    return AppUpdateResult.inAppUpdateFailed;
   }
 }
 

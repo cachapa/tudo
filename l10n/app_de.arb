@@ -43,8 +43,6 @@
   "nameCaption": "In geteilten Listen sichtbar",
   "copyLink": "Link kopieren",
   "listShareMessage": "Die Liste \"{listName}\" auf deinem Gerät öffnen:\n{shareUrl}",
-  "updateRequired": "Aktualisierung nötig",
-  "updateRequiredMessage": "Bitte die App aktualisieren um weiter zu synchronisieren.",
   "clearCompleted": "Erledigte löschen",
   "joiningList": "Liste beitreten…",
   "listAlreadyJoined": "Liste bereits beigetreten",
@@ -57,5 +55,6 @@
   "scanAccountKeyExplanation": "Den Kontoschlüssel aus der Einstellungsseite eines anderen Geräts scannen.",
   "deletedItems": "Gelöschte Einträge",
   "restore": "Wiederherstellen",
-  "noDeletedItems": "Keine gelöschte Einträge"
+  "noDeletedItems": "Keine gelöschte Einträge",
+  "updateApp": "App aktualisieren"
 }
