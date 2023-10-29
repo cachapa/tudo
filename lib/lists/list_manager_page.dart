@@ -138,6 +138,7 @@ class _ListManagerPageState extends State<ListManagerPage>
         ),
         bottomNavigationBar: ValueFutureBuilder(
           future: UpdateUtil.updateAvailable,
+          errorBuilder: (context, error) => const SizedBox(),
           builder: (context, updateAvailable) => updateAvailable
               ? SafeArea(
                   child: Padding(
