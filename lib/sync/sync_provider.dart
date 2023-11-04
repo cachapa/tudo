@@ -56,8 +56,7 @@ class SyncProvider {
         return true;
       },
       onConnect: (peerId, customData) {
-        // TODO Default to false
-        if (_store.get('need_full_sync', defaultValue: true)) {
+        if (_store.get('need_full_sync', defaultValue: false)) {
           _fullSync();
         }
       },
