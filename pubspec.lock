@@ -197,10 +197,10 @@ packages:
     dependency: "direct main"
     description:
       name: crdt_sync
-      sha256: "6472a29a20fda1d43b277b162bff494ae489814be3a926eb0364831b86deea39"
+      sha256: a1d0ae47104bccdc68fdc1d2a9761848d4d1a9bb7a9073c8b115bd4c7c58a69a
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.8"
+    version: "1.0.9"
   cross_file:
     dependency: transitive
     description:
@@ -311,10 +311,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_svg
-      sha256: bfc7cc3c75fe1282e8ce2e056d8fd1533f1a6848b65c379b4a5e7a9b623d3371
+      sha256: d39e7f95621fc84376bc0f7d504f05c3a41488c562f4a8ad410569127507402c
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.8"
+    version: "2.0.9"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -513,10 +513,10 @@ packages:
     dependency: "direct main"
     description:
       name: mobile_scanner
-      sha256: c7b819851c031f73d225b1c1fc84f903b951eb6188278e63bf4e7a961cebfe99
+      sha256: cf978740676ba5b0c17399baf117984b31190bb7a6eaa43e51229ed46abc42ee
       url: "https://pub.dev"
     source: hosted
-    version: "3.5.1"
+    version: "3.5.2"
   node_preamble:
     dependency: transitive
     description:
@@ -830,10 +830,10 @@ packages:
     dependency: "direct main"
     description:
       name: sqlite3_flutter_libs
-      sha256: "11a41f380fbcbda5bbba03ddcdbe0545e46094ab043783c46c70e8335831df03"
+      sha256: "3e3583b77cf888a68eae2e49ee4f025f66b86623ef0d83c297c8d903daa14871"
       url: "https://pub.dev"
     source: hosted
-    version: "0.5.17"
+    version: "0.5.18"
   sqlite_crdt:
     dependency: "direct main"
     description:

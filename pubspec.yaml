@@ -17,7 +17,7 @@ dependencies:
   hive: ^2.2.3
   http: ^1.1.0
 
-  crdt_sync: ^1.0.8
+  crdt_sync: ^1.0.9
 #    path: ../../crdt_sync
   sqlite_crdt: ^2.1.4
 #    path: ../../crdt/sqlite_crdt
@@ -26,13 +26,13 @@ dependencies:
   rxdart: ^0.27.7
 
   # Required for Android and iOS because UPSERTs are only supported on very recent OS versions
-  sqlite3_flutter_libs: ^0.5.17
+  sqlite3_flutter_libs: ^0.5.18
 
   animated_list_plus: ^0.5.2
   clipboard: ^0.1.3
   device_info_plus: ^9.1.0
-  mobile_scanner: ^3.5.1
-  flutter_svg: ^2.0.8
+  mobile_scanner: ^3.5.2
+  flutter_svg: ^2.0.9
   local_auth: ^2.1.7
 
   in_app_update: ^4.2.2
