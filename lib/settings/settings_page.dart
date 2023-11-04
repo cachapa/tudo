@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher_string.dart';
 
 import '../common/appbars.dart';
 import '../common/dialogs.dart';
+import '../common/qr_widgets.dart';
 import '../common/segmented_control.dart';
 import '../common/value_builders.dart';
 import '../config.dart';
@@ -18,7 +19,6 @@ import '../contacts/contact_provider.dart';
 import '../extensions.dart';
 import '../registry.dart';
 import '../util/build_info.dart';
-import '../common/qr_widgets.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({Key? key}) : super(key: key);
@@ -76,11 +76,21 @@ class SettingsPage extends StatelessWidget {
                 'mailto:cachapa@gmail.com?subject=tudo%20feedback'),
           ),
           ListTile(
+            leading: const Icon(Icons.translate_rounded),
+            title: Text(t.translateApp),
+            subtitle: Text(t.translateAppDescription),
+            onTap: () => launchUrlString(
+              'https://translate.libra-app.eu/projects/tudo/app',
+              mode: LaunchMode.externalApplication,
+            ),
+          ),
+          ListTile(
             leading: const Icon(Icons.bug_report_outlined),
             title: Text(t.reportIssues),
             onTap: () =>
                 launchUrlString('https://github.com/cachapa/tudo/issues'),
           ),
+          const Divider(),
           ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(t.privacyPolicy),

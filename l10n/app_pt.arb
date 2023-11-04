@@ -116,5 +116,9 @@
   "updateApp": "Atualizar a app",
   "@updateApp": {},
   "restoringAccount": "A restaurar a conta…",
-  "@restoringAccount": {}
+  "@restoringAccount": {},
+  "translateApp": "Traduz o tudo",
+  "@translateApp": {},
+  "translateAppDescription": "Torna a app mais acessível na tua língua",
+  "@translateAppDescription": {}
 }

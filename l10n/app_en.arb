@@ -109,5 +109,7 @@
   "restore": "Restore",
   "noDeletedItems": "No deleted items",
   "restoringAccount": "Restoring account…",
-  "updateApp": "Update app"
+  "updateApp": "Update app",
+  "translateApp": "Translate tudo",
+  "translateAppDescription": "Make the app more accessible in your language"
 }
