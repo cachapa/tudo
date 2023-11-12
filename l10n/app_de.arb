@@ -1,5 +1,5 @@
 {
-  "theme": "Theme",
+  "theme": "Thema",
   "@theme": {},
   "scanQrCode": "QR code scannen",
   "@scanQrCode": {},
@@ -116,5 +116,9 @@
   "updateApp": "App aktualisieren",
   "@updateApp": {},
   "restoringAccount": "Konto wiederherstellen…",
-  "@restoringAccount": {}
+  "@restoringAccount": {},
+  "translateAppDescription": "Verbessern Sie das Nutzungserlebnis in Ihrer Sprache",
+  "@translateAppDescription": {},
+  "translateApp": "tudo übersetzen",
+  "@translateApp": {}
 }
