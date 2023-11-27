@@ -1,6 +1,6 @@
 import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:animated_list_plus/transitions.dart';
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../extensions.dart';
 import '../util/durations.dart';
@@ -84,13 +84,24 @@ class AnimatedReorderableListBuilder<T extends IdObject>
       },
       insertDuration: longDuration,
       removeDuration: mediumDuration,
-      itemBuilder: (context, animation, item, i) => Reorderable(
+      itemBuilder: (context, itemAnimation, item, i) => Reorderable(
         key: ValueKey(item.id),
-        child: SizeFadeTransition(
-          sizeFraction: 0.7,
-          curve: Curves.easeInOut,
-          animation: animation,
-          child: builder(context, i, item),
+        builder: (context, dragAnimation, inDrag) => AnimatedBuilder(
+          animation: dragAnimation,
+          builder: (context, child) => Card(
+            elevation: dragAnimation.value * 4,
+            margin: EdgeInsets.zero,
+            shape: const Border(),
+            child: SizeFadeTransition(
+              sizeFraction: 0.7,
+              curve: Curves.easeInOut,
+              animation: itemAnimation,
+              child: Handle(
+                delay: longDuration,
+                child: builder(context, i, item),
+              ),
+            ),
+          ),
         ),
       ),
     );

@@ -116,7 +116,7 @@ class _ListManagerPageState extends State<ListManagerPage>
                     key: ValueKey(item.id),
                     list: item,
                     onTap: () => _openList(context, item),
-                    onLongPress: () => _editList(context, item),
+                    onEdit: () => _editList(context, item),
                   ),
                 ),
         ),

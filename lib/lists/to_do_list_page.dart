@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'dart:ui';
 
-import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:animated_list_plus/transitions.dart';
 import 'package:flutter/material.dart';
 
@@ -379,7 +378,7 @@ class _ToDoListViewState extends State<ToDoListView> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.only(left: 16, right: 8),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -528,22 +527,21 @@ class _ListTile extends StatelessWidget {
       child: Container(
         color: context.theme.canvasColor,
         child: ListTile(
+          contentPadding: const EdgeInsets.only(left: 16, right: 8),
           leading: Check(
             key: ValueKey('${item.id}${item.done}'),
             checked: item.done,
           ),
           title: Text(item.name),
-          trailing: item.done
-              ? null
-              : Handle(
-                  vibrate: true,
-                  child: Icon(
-                    Icons.drag_indicator,
-                    color: context.theme.disabledColor,
-                  ),
-                ),
+          trailing: IconButton(
+            onPressed: onEdit,
+            icon: Icon(
+              Icons.adaptive.more_rounded,
+              color: context.theme.disabledColor,
+            ),
+          ),
           onTap: () => onToggle(),
-          onLongPress: onEdit,
+          // onLongPress: onEdit,
         ),
       ),
     );

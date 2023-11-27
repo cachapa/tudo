@@ -1,4 +1,3 @@
-import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:flutter/material.dart';
 
 import '../common/progress.dart';
@@ -8,18 +7,19 @@ import 'list_provider.dart';
 class ToDoListTile extends StatelessWidget {
   final ToDoList list;
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
+  final VoidCallback? onEdit;
 
   const ToDoListTile({
     super.key,
     required this.list,
     this.onTap,
-    this.onLongPress,
+    this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      contentPadding: const EdgeInsets.only(left: 16, right: 8),
       leading: Progress(
         color: list.color,
         progress: list.doneCount,
@@ -36,15 +36,11 @@ class ToDoListTile extends StatelessWidget {
               overflow: TextOverflow.fade,
             )
           : null,
-      trailing: Handle(
-        vibrate: true,
-        child: Icon(
-          Icons.drag_indicator,
-          color: context.theme.disabledColor,
-        ),
+      trailing: IconButton(
+        onPressed: onEdit,
+        icon: Icon(Icons.adaptive.more_rounded),
       ),
       onTap: onTap,
-      onLongPress: onLongPress,
     );
   }
 }
