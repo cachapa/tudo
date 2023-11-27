@@ -68,12 +68,12 @@ class ToDoListPage extends StatelessWidget {
               actions: [
                 IconButton(
                   tooltip: t.deletedItems,
-                  icon: const Icon(Icons.restore_from_trash_outlined),
+                  icon: const Icon(Icons.restore_rounded),
                   onPressed: () => _showDeletedItems(context),
                 ),
                 IconButton(
                   tooltip: t.editList,
-                  icon: const Icon(Icons.settings_outlined),
+                  icon: const Icon(Icons.tune_rounded),
                   onPressed: () => _editList(context),
                 ),
               ],
@@ -216,7 +216,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
             const Positioned(
               left: 8,
               child: Icon(
-                Icons.arrow_back_ios,
+                Icons.arrow_back_ios_rounded,
                 size: 16,
               ),
             ),
@@ -296,7 +296,7 @@ class _InputBarState extends State<InputBar> {
               suffixIcon: IconButton(
                 color: primaryColor,
                 padding: const EdgeInsets.only(right: 10),
-                icon: const Icon(Icons.add),
+                icon: const Icon(Icons.add_rounded),
                 onPressed: text.isEmpty ? null : () => _onSubmitted(text),
               ),
             ),
@@ -389,7 +389,7 @@ class _ToDoListViewState extends State<ToDoListView> {
                               IconButton(
                                 color: context.theme.primaryColor,
                                 onPressed: () => _clearCompleted(context),
-                                icon: const Icon(Icons.delete_sweep_outlined),
+                                icon: const Icon(Icons.delete_sweep_rounded),
                                 tooltip: context.t.clearCompleted,
                               ),
                             ],

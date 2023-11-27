@@ -84,7 +84,7 @@ class _ListManagerPageState extends State<ListManagerPage>
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.qr_code_scanner),
+              icon: const Icon(Icons.qr_code_scanner_rounded),
               tooltip: t.scanQrCode,
               onPressed: () => _launchQrScanner(context),
             ),
@@ -94,7 +94,7 @@ class _ListManagerPageState extends State<ListManagerPage>
               builder: (_, isNameSet) => IconButton(
                 icon: Badge(
                   smallSize: isNameSet ? 0 : null,
-                  child: const Icon(Icons.tune_rounded),
+                  child: const Icon(Icons.settings_rounded),
                 ),
                 tooltip: t.settings,
                 onPressed: () => context.push(() => const SettingsPage()),
