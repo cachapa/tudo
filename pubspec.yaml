@@ -1,6 +1,6 @@
 name: tudo
 description: A simple to-do app
-version: 2.3.4  # Release versions are assigned automatically on deployment
+version: 2.4.0  # Release versions are assigned automatically on deployment
 homepage: https://github.com/cachapa/tudo
 publish_to: none
 
