@@ -1,3 +1,4 @@
+import 'package:crdt_sync/crdt_sync.dart';
 import 'package:flutter/material.dart';
 
 import '../extensions.dart';
@@ -8,17 +9,29 @@ class OfflineIndicator {
   final BuildContext context;
   late final OverlayEntry _overlay;
 
-  final connectionState = Registry.syncProvider.connectionState;
-
   OfflineIndicator(this.context) {
     _overlay = OverlayEntry(
       opaque: false,
-      builder: (_) => ValueStreamBuilder<bool>(
-        stream: connectionState,
-        builder: (_, isConnected) => AnimatedOpacity(
-          duration: longDuration,
-          opacity: isConnected ? 0 : 1,
-          child: const _Indicator(),
+      builder: (_) => ValueStreamBuilder(
+        stream: Registry.syncProvider.connectionState,
+        builder: (_, state) => Align(
+          alignment: Alignment.topCenter,
+          child: AnimatedOpacity(
+            duration: longDuration,
+            opacity: state == SocketState.connected ? 0 : 0.6,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Icon(
+                switch (state) {
+                  SocketState.disconnected => Icons.cloud_off,
+                  SocketState.connecting => Icons.cloud_off,
+                  SocketState.connected => Icons.cloud_done_outlined,
+                },
+                size: 14,
+                color: context.theme.colorScheme.onBackground,
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -29,26 +42,5 @@ class OfflineIndicator {
     _overlay
       ..remove()
       ..dispose();
-  }
-}
-
-class _Indicator extends StatelessWidget {
-  const _Indicator({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(4),
-          child: Icon(
-            Icons.cloud_off,
-            size: 14,
-            color: context.theme.splashColor.withOpacity(0.7),
-          ),
-        ),
-      ),
-    );
   }
 }

@@ -22,11 +22,8 @@ class SyncProvider {
 
   late final ApiClient _apiClient;
   late final CrdtSyncClient _syncClient;
-  late final connectionState = BehaviorSubject.seeded(false)
-    ..addStream(_syncClient.watchState.map((e) {
-      // '$e'.log;
-      return e == SocketState.connected;
-    }));
+  late final connectionState = BehaviorSubject.seeded(SocketState.disconnected)
+    ..addStream(_syncClient.watchState);
 
   Timer? _fullSyncTimer;
 
