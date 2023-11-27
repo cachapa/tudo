@@ -1,7 +1,10 @@
 name: Release Android
 on:
-  release:
-    types: [ published ]
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -31,7 +34,7 @@ jobs:
 
       - name: Build app
         env:
-          BUILD_NAME: ${{ github.event.release.tag_name }}
+          BUILD_NAME: ${{ inputs.name }}
         run: |
           flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME

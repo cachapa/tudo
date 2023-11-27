@@ -1,0 +1,48 @@
+name: Release
+on:
+  workflow_dispatch:
+    inputs:
+      android:
+        description: 'Android'
+        default: 'true'
+        type: boolean
+      ios:
+        description: 'iOS'
+        default: 'true'
+        type: boolean
+
+jobs:
+  version:
+    runs-on: ubuntu-latest
+    outputs:
+      name: ${{ steps.name.outputs.name }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: read-yaml-file
+        uses: pietrobolcato/action-read-yaml@1.1.0
+        id: yaml
+        with:
+          config: pubspec.yaml
+
+      - id: name
+        run: echo "name=`echo ${{ steps.yaml.outputs['version'] }} | sed 's/[0-9]*$/${{ github.run_number }}/'`" >> $GITHUB_OUTPUT
+
+  android:
+    if: inputs.android
+    uses: ./.github/workflows/release_android.yml
+    needs: version
+    secrets: inherit
+    with:
+      name: "${{ needs.version.outputs.name }}"
+
+  ios:
+    if: inputs.ios
+    uses: ./.github/workflows/release_ios.yml
+    needs: version
+    secrets: inherit
+    with:
+      name: "${{ needs.version.outputs.name }}"

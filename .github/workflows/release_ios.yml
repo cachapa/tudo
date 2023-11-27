@@ -1,7 +1,10 @@
 name: Release iOS
 on:
-  release:
-    types: [ published ]
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -27,15 +30,13 @@ jobs:
           exec .github/scripts/import-profile.sh
 
       - uses: subosito/flutter-action@v2
-#        with:
-#          channel: 'beta'
 
       - name: Load config
         run: echo "${{ secrets.CONFIG }}" > lib/config.dart
 
       - name: Build app
         env:
-          BUILD_NAME: ${{ github.event.release.tag_name }}
+          BUILD_NAME: ${{ inputs.name }}
         run: flutter build ipa --export-options-plist=.github/provisioning/ExportOptions.plist --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
 
       - name: Upload app to App Store Connect
