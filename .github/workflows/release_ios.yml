@@ -2,7 +2,7 @@ name: Release iOS
 on:
   workflow_call:
     inputs:
-      version:
+      name:
         required: true
         type: string
 
