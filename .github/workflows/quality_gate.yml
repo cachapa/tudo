@@ -1,9 +1,12 @@
 name: Quality gate
-
 on:
   push:
     branches:
       - '**'
+
+concurrency:
+  group: "quality_gate"
+  cancel-in-progress: true
 
 jobs:
   format:
