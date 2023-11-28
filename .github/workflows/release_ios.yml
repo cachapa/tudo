@@ -6,6 +6,10 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: "release_ios"
+  cancel-in-progress: true
+
 jobs:
   build:
     timeout-minutes: 25

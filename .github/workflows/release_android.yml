@@ -6,6 +6,10 @@ on:
         required: true
         type: string
 
+concurrency:
+  group: "release_android"
+  cancel-in-progress: true
+
 jobs:
   build:
     timeout-minutes: 25
@@ -36,18 +40,17 @@ jobs:
         env:
           BUILD_NAME: ${{ inputs.name }}
         run: |
-          flutter build appbundle --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
-          flutter build apk --build-number $GITHUB_RUN_NUMBER --build-name $BUILD_NAME
+          BUILD_NUMBER=`expr $GITHUB_RUN_NUMBER + 70`
+          flutter build appbundle --build-number $BUILD_NUMBER --build-name $BUILD_NAME
+          flutter build apk --build-number $BUILD_NUMBER --build-name $BUILD_NAME
 
-      - name: Archive APK
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create release
+        uses: softprops/action-gh-release@v1
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build/app/outputs/apk/release/app-release.apk
-          asset_name: tudo.apk
-          asset_content_type: application/zip
+          tag_name: ${{ inputs.name }}
+          name: "tudo ${{ inputs.name }}"
+          generate_release_notes: true
+          files: build/app/outputs/apk/release/app-release.apk
 
       - name: Publish Android
         uses: r0adkll/upload-google-play@v1
@@ -57,13 +60,3 @@ jobs:
           releaseFiles: build/app/outputs/bundle/release/*.aab
           mappingFile: build/app/outputs/mapping/release/mapping.txt
           track: internal
-
-#      - name: Create release
-#        id: create_release
-#        uses: actions/create-release@v1
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        with:
-#          tag_name: ${{ github.ref }}
-#          release_name: ${{ github.ref }}
-#

@@ -56,7 +56,7 @@ android {
         applicationId "net.cachapa.tudo"
         minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger() + 32
+        versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
     }
