@@ -9,10 +9,6 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: "release_ios"
-  cancel-in-progress: true
-
 jobs:
   build:
     timeout-minutes: 30
@@ -50,4 +46,3 @@ jobs:
           APP_STORE_CONNECT_USERNAME: ${{ secrets.APP_STORE_CONNECT_USERNAME }}
           APP_STORE_CONNECT_PASSWORD: ${{ secrets.APP_STORE_CONNECT_PASSWORD }}
         run: xcrun altool --upload-app -t ios -f "build/ios/ipa/tudo.ipa" -u "$APP_STORE_CONNECT_USERNAME" -p "$APP_STORE_CONNECT_PASSWORD"
-

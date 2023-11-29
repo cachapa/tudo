@@ -9,10 +9,6 @@ on:
         required: true
         type: string
 
-concurrency:
-  group: "release_android"
-  cancel-in-progress: true
-
 jobs:
   build:
     timeout-minutes: 30

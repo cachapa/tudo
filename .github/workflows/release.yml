@@ -11,6 +11,10 @@ on:
         default: 'true'
         type: boolean
 
+concurrency:
+  group: "release"
+  cancel-in-progress: true
+
 jobs:
   version:
     name: Generate version
