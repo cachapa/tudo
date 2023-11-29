@@ -56,7 +56,9 @@ jobs:
           next=`expr $patch + 1`
           v=`[[ $pubspec > $release ]] && echo $pubspec || echo "$major.$minor.$next"`
           echo "name=$v" >> $GITHUB_OUTPUT
-          echo "number=`expr $GITHUB_RUN_NUMBER + 70`" >> $GITHUB_OUTPUT
+          n=`expr $GITHUB_RUN_NUMBER + 70`
+          echo "number=$n" >> $GITHUB_OUTPUT
+          echo "Version $v ($n)"
 
   Android:
     if: inputs.android
