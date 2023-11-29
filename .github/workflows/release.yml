@@ -47,14 +47,14 @@ jobs:
       - name: Generate version
         id: version
         env:
-          yaml: ${{ steps.yaml.outputs.version }}
+          pubspec: ${{ steps.pubspec.outputs.version }}
           release: ${{ steps.latest.outputs.tag }}
           major: ${{ steps.parser.outputs.major }}
           minor: ${{ steps.parser.outputs.minor }}
           patch: ${{ steps.parser.outputs.patch }}
         run: |
           next=`expr $patch + 1`
-          v=`[[ $yaml > $release ]] && echo $yaml || echo "$major.$minor.$next"`
+          v=`[[ $pubspec > $release ]] && echo $pubspec || echo "$major.$minor.$next"`
           echo "name=$v" >> $GITHUB_OUTPUT
           echo "number=`expr $GITHUB_RUN_NUMBER + 70`" >> $GITHUB_OUTPUT
 
