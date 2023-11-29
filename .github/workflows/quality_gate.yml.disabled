@@ -23,4 +23,3 @@ jobs:
       - uses: subosito/flutter-action@v1
       - run: echo "${{ secrets.CONFIG }}" > lib/config.dart
       - run: flutter analyze
-

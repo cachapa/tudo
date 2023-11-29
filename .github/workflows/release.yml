@@ -13,36 +13,61 @@ on:
 
 jobs:
   version:
+    name: Generate version
     runs-on: ubuntu-latest
     outputs:
-      name: ${{ steps.name.outputs.name }}
+      name: ${{ steps.version.outputs.name }}
+      number: ${{ steps.version.outputs.number }}
     steps:
       - name: checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: read-yaml-file
+      - name: Read version from pubspec
         uses: pietrobolcato/action-read-yaml@1.1.0
-        id: yaml
+        id: pubspec
         with:
           config: pubspec.yaml
 
-      - id: name
-        run: echo "name=`echo ${{ steps.yaml.outputs['version'] }} | sed 's/[0-9]*$/${{ github.run_number }}/'`" >> $GITHUB_OUTPUT
+      - name: Get latest version
+        id: latest
+        uses: WyriHaximus/github-action-get-previous-tag@v1
 
-  android:
+      - name: Parse latest version
+        id: parser
+        uses: booxmedialtd/ws-action-parse-semver@v1.4.7
+        with:
+          input_string: ${{ steps.latest.outputs.tag }}
+
+      - name: Generate version
+        id: version
+        env:
+          yaml: ${{ steps.yaml.outputs.version }}
+          release: ${{ steps.latest.outputs.tag }}
+          major: ${{ steps.parser.outputs.major }}
+          minor: ${{ steps.parser.outputs.minor }}
+          patch: ${{ steps.parser.outputs.patch }}
+        run: |
+          next=`expr $patch + 1`
+          v=`[[ $yaml > $release ]] && echo $yaml || echo "$major.$minor.$next"`
+          echo "name=$v" >> $GITHUB_OUTPUT
+          echo "number=`expr $GITHUB_RUN_NUMBER + 70`" >> $GITHUB_OUTPUT
+
+  Android:
     if: inputs.android
     uses: ./.github/workflows/release_android.yml
     needs: version
     secrets: inherit
     with:
       name: "${{ needs.version.outputs.name }}"
+      number: "${{ needs.version.outputs.number }}"
 
-  ios:
+  iOS:
     if: inputs.ios
     uses: ./.github/workflows/release_ios.yml
     needs: version
     secrets: inherit
     with:
       name: "${{ needs.version.outputs.name }}"
+      number: "${{ needs.version.outputs.number }}"
