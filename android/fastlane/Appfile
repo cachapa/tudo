@@ -1,0 +1,2 @@
+json_key_file("app/play-store.json")
+package_name("net.cachapa.tudo")

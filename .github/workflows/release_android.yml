@@ -8,6 +8,9 @@ on:
       number:
         required: true
         type: string
+      changelog:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -16,14 +19,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-          cache: 'gradle'
-
-      - uses: subosito/flutter-action@v2
 
       - name: Load secrets
         working-directory: android
@@ -35,6 +30,23 @@ jobs:
       - name: Load config
         run: echo "${{ secrets.CONFIG }}" > lib/config.dart
 
+      - name: Load changelog
+        env:
+          BUILD_NUMBER: ${{ inputs.number }}
+          CHANGELOG: ${{ inputs.changelog }}
+          CHANGELOG_PATH: android/fastlane/metadata/android/en-US/changelogs
+        run: echo "$CHANGELOG" > $CHANGELOG_PATH/$BUILD_NUMBER.txt
+
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          cache: true
+
       - name: Build app
         env:
           BUILD_NAME: ${{ inputs.name }}
@@ -42,6 +54,17 @@ jobs:
         run: |
           flutter build appbundle --build-number $BUILD_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $BUILD_NUMBER --build-name $BUILD_NAME
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          working-directory: android
+          ruby-version: '3.0'
+          bundler-cache: true
+
+      - uses: maierj/fastlane-action@v3.0.0
+        with:
+          lane: 'deploy'
+          subdirectory: 'android'
 
       - name: Create release
         uses: softprops/action-gh-release@v1
@@ -52,12 +75,3 @@ jobs:
           files: |
             build/app/outputs/bundle/release/app-release.aab
             build/app/outputs/apk/release/app-release.apk
-
-      - name: Publish Android
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: net.cachapa.tudo
-          releaseFiles: build/app/outputs/bundle/release/*.aab
-          mappingFile: build/app/outputs/mapping/release/mapping.txt
-          track: internal

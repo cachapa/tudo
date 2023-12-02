@@ -8,6 +8,9 @@ on:
       number:
         required: true
         type: string
+      changelog:
+        required: true
+        type: string
 
 jobs:
   build:

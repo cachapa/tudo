@@ -22,9 +22,12 @@ jobs:
   version:
     name: Generate version
     runs-on: ubuntu-latest
+
     outputs:
       name: ${{ steps.version.outputs.name }}
       number: ${{ steps.version.outputs.number }}
+      changelog: ${{ steps.changelog.outputs.changelog }}
+
     steps:
       - name: checkout
         uses: actions/checkout@v4
@@ -63,6 +66,15 @@ jobs:
           echo "number=$n" >> $GITHUB_OUTPUT
           echo "Version $v ($n)"
 
+      - name: Generate changelog
+        id: changelog
+        run: |
+          {
+            echo 'changelog<<EOF'
+            git log --format="• %s" `git describe --abbrev=0 --tags`..HEAD
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
   Android:
     if: inputs.android
     uses: ./.github/workflows/release_android.yml
@@ -71,6 +83,7 @@ jobs:
     with:
       name: "${{ needs.version.outputs.name }}"
       number: "${{ needs.version.outputs.number }}"
+      changelog: "${{ needs.version.outputs.changelog }}"
 
   iOS:
     if: inputs.ios
@@ -80,3 +93,4 @@ jobs:
     with:
       name: "${{ needs.version.outputs.name }}"
       number: "${{ needs.version.outputs.number }}"
+      changelog: "${{ needs.version.outputs.changelog }}"
