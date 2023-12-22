@@ -34,7 +34,7 @@ class ListProvider {
       await txn.execute('''
         INSERT INTO lists (id, name, color, creator_id, created_at)
         VALUES (?1, ?2, ?3, ?4, ?5)
-      ''', [listId, name, color.hexValue, userId, createdAt]);
+      ''', [listId, name.trim(), color.hexValue, userId, createdAt]);
       // Get max position
       final maxPosition = (await txn.query('''
         SELECT max(position) as max_position FROM user_lists
@@ -129,12 +129,12 @@ class ListProvider {
   Future<void> setItemName(String itemId, String name) => _crdt.execute('''
     UPDATE todos SET name = ?1
     WHERE id = ?2
-  ''', [name, itemId]);
+  ''', [name.trim(), itemId]);
 
   void setName(String listId, String name) => _crdt.execute('''
     UPDATE lists SET name = ?1
     WHERE id = ?2
-  ''', [name, listId]);
+  ''', [name.trim(), listId]);
 
   void setColor(String listId, Color color) => _crdt.execute('''
     UPDATE lists SET color = ?1
@@ -153,7 +153,7 @@ class ListProvider {
     ''', [
       id,
       listId,
-      name,
+      name.trim(),
       0,
       maxPosition + 1,
       userId,

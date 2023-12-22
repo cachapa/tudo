@@ -33,12 +33,12 @@ class ContactProvider {
       await _crdt.execute('''
         INSERT INTO users (id, name)
         VALUES (?1, ?2)
-      ''', [userId, name]);
+      ''', [userId, name.trim()]);
     } else {
       await _crdt.execute('''
         UPDATE users SET name = ?2
         WHERE id = ?1
-      ''', [userId, name]);
+      ''', [userId, name.trim()]);
     }
   }
 
