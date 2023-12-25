@@ -241,9 +241,9 @@ class SettingsPage extends StatelessWidget {
       ),
     );
 
-    if (!context.mounted) return;
-    if (result?.trim() != code) {
-      context.showSnackBar('$e');
+    if (!context.mounted || result == null) return;
+    if (result.trim() != code) {
+      context.showSnackBar(context.t.codeFailedToMatch);
     } else {
       await showIndeterminateProgressDialog(
         context,
