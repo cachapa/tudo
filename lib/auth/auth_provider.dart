@@ -5,7 +5,7 @@ import 'package:sqlite_crdt/sqlite_crdt.dart';
 import '../config.dart';
 import '../extensions.dart';
 import '../sync/api_client.dart';
-import '../util/store.dart';
+import '../util/store_provider.dart';
 import '../util/uuid.dart';
 
 class AuthProvider {
@@ -36,6 +36,10 @@ class AuthProvider {
 
     await _crdt.merge(changeset);
     _storeCredentials(token, userId);
+  }
+
+  Future<void> deleteData() async {
+    await ApiClient(token).delete(serverUri.apply('user/$userId'));
   }
 
   void _storeCredentials(String token, String userId) {

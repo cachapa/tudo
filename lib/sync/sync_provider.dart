@@ -12,7 +12,7 @@ import '../config.dart';
 import '../extensions.dart';
 import '../util/build_info.dart';
 import '../util/durations.dart';
-import '../util/store.dart';
+import '../util/store_provider.dart';
 import 'api_client.dart';
 
 class SyncProvider {

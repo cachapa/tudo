@@ -1,11 +1,11 @@
 import 'dart:io';
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:platform_info/platform_info.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
@@ -65,8 +65,8 @@ class SettingsPage extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.phonelink_lock),
-            title: Text(t.accountKey),
-            onTap: () => _showAccountKey(context),
+            title: Text(t.manageAccount),
+            onTap: () => _manageAccount(context),
           ),
           Header(t.aboutTudo),
           ListTile(
@@ -110,29 +110,6 @@ class SettingsPage extends StatelessWidget {
               applicationLegalese: '© Daniel Cachapa',
             ),
           ),
-          Header(t.otherApps),
-          ListTile(
-            leading: Image.asset(
-              'assets/images/libra_icon.png',
-              width: 32,
-            ),
-            title: const Text('Libra'),
-            subtitle: Text(t.libraDescription),
-            onTap: () => launchUrlString(platform.isIOS
-                ? 'https://apps.apple.com/us/app/libra-weight-manager/id1644353761'
-                : 'https://play.google.com/store/apps/details?id=net.cachapa.libra'),
-          ),
-          ListTile(
-            leading: Image.asset(
-              'assets/images/storyark_icon.png',
-              width: 32,
-            ),
-            title: const Text('StoryArk'),
-            subtitle: Text(t.storyArkDescription),
-            onTap: () => launchUrlString(platform.isIOS
-                ? 'https://apps.apple.com/US/app/id1558910365'
-                : 'https://play.google.com/store/apps/details?id=de.storyark.app'),
-          ),
         ],
       ),
       bottomNavigationBar: SafeArea(
@@ -166,7 +143,7 @@ class SettingsPage extends StatelessWidget {
     }
   }
 
-  Future<void> _showAccountKey(BuildContext context) async {
+  Future<void> _manageAccount(BuildContext context) async {
     final localAuth = LocalAuthentication();
     try {
       if (await localAuth.canCheckBiometrics && context.mounted) {
@@ -185,10 +162,12 @@ class SettingsPage extends StatelessWidget {
     await showModalBottomSheet(
       context: context,
       showDragHandle: true,
-      builder: (context) => SafeArea(
+      isScrollControlled: true,
+      builder: (_) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
@@ -196,20 +175,24 @@ class SettingsPage extends StatelessWidget {
                 style: context.theme.textTheme.titleSmall,
               ),
               const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(4),
-                child: RepaintBoundary(
-                  key: qrKey,
-                  child: QrView(keyUrl, size: 200),
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: RepaintBoundary(
+                    key: qrKey,
+                    child: QrView(keyUrl, size: 200),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),
-              Text(
-                context.t.accountKeyAdvice,
-                style: context.theme.textTheme.titleSmall,
+              Center(
+                child: Text(
+                  context.t.accountKeyAdvice,
+                  style: context.theme.textTheme.titleSmall,
+                ),
               ),
               const SizedBox(height: 16),
-              TextButton.icon(
+              FilledButton.icon(
                 icon: Icon(Icons.adaptive.share),
                 label: Text(context.t.share.toUpperCase()),
                 onPressed: () async {
@@ -227,12 +210,53 @@ class SettingsPage extends StatelessWidget {
                   if (context.mounted) context.pop();
                 },
               ),
+              const SizedBox(height: 40),
+              TextButton(
+                onPressed: () {
+                  context.pop();
+                  _deleteData(context);
+                },
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: Text(context.t.deleteData.toUpperCase()),
+              ),
               const SizedBox(height: 16),
             ],
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _deleteData(BuildContext context) async {
+    final r = Random();
+    final code = '${r.nextInt(10)}${r.nextInt(10)}${r.nextInt(10)}';
+    final result = await showDialog<String>(
+      context: context,
+      builder: (context) => TextInputDialog(
+        keyboardType: TextInputType.number,
+        title: context.t.deleteData,
+        info: Text(context.t.deleteDataConfirmation(code)),
+        value: '',
+        positiveLabel: context.t.delete,
+      ),
+    );
+
+    if (!context.mounted) return;
+    if (result?.trim() != code) {
+      context.showSnackBar('$e');
+    } else {
+      await showIndeterminateProgressDialog(
+        context,
+        message: '💣',
+        future: _actuallyDeleteData(context),
+        onError: (e) => context.showSnackBar('$e'),
+      );
+    }
+  }
+
+  Future<void> _actuallyDeleteData(BuildContext context) async {
+    await Registry.authProvider.deleteData();
+    if (context.mounted) context.showSnackBar(context.t.dataDeleted);
   }
 }
 

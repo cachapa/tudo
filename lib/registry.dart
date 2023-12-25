@@ -10,7 +10,7 @@ import 'crdt/tudo_crdt.dart';
 import 'lists/list_provider.dart';
 import 'settings/settings_provider.dart';
 import 'sync/sync_provider.dart';
-import 'util/store.dart';
+import 'util/store_provider.dart';
 
 export 'util/durations.dart';
 

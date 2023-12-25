@@ -47,10 +47,6 @@
   "@aboutTudo": {},
   "otherApps": "Outras apps",
   "@otherApps": {},
-  "storyArkDescription": "Rede social para a partilha de média",
-  "@storyArkDescription": {},
-  "libraDescription": "Gestor de peso com gráficos dinâmicos",
-  "@libraDescription": {},
   "today": "Hoje",
   "@today": {},
   "yesterday": "Ontem",
@@ -120,5 +116,15 @@
   "translateApp": "Traduz o tudo",
   "@translateApp": {},
   "translateAppDescription": "Torna a app mais acessível na tua língua",
-  "@translateAppDescription": {}
+  "@translateAppDescription": {},
+  "codeFailedToMatch": "Os códigos não condizem",
+  "@codeFailedToMatch": {},
+  "deleteData": "Apagar dados",
+  "@deleteData": {},
+  "manageAccount": "Gerir conta",
+  "@manageAccount": {},
+  "dataDeleted": "Dados apagados",
+  "@dataDeleted": {},
+  "deleteDataConfirmation": "Inserir \"{code}\" para cofirmar",
+  "@deleteDataConfirmation": {}
 }

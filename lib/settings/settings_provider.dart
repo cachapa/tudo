@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../util/build_info.dart';
-import '../util/store.dart';
+import '../util/store_provider.dart';
 
 class SettingsProvider {
   final Store _store;

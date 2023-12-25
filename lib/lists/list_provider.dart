@@ -6,7 +6,7 @@ import '../auth/auth_provider.dart';
 import '../common/lists.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
-import '../util/store.dart';
+import '../util/store_provider.dart';
 import '../util/uuid.dart';
 
 const listIdsKey = 'list_id_keys';
