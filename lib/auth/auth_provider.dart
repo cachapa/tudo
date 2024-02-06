@@ -2,14 +2,15 @@ import 'dart:convert';
 
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
-import '../config.dart';
 import '../extensions.dart';
+import '../settings/settings_provider.dart';
 import '../sync/api_client.dart';
 import '../util/store_provider.dart';
 import '../util/uuid.dart';
 
 class AuthProvider {
   final SqlCrdt _crdt;
+  final SettingsProvider _settingsProvider;
   final Store _store;
 
   bool get isAuthComplete => _store.contains('token');
@@ -18,7 +19,7 @@ class AuthProvider {
 
   String get userId => _store.get('user_id');
 
-  AuthProvider(StoreProvider storeProvider, this._crdt)
+  AuthProvider(this._settingsProvider, StoreProvider storeProvider, this._crdt)
       : _store = storeProvider.getStore('auth');
 
   void create() {
@@ -28,6 +29,7 @@ class AuthProvider {
   }
 
   Future<void> login(String token) async {
+    final serverUri = _settingsProvider.serverUri;
     final result = await ApiClient(token).post(serverUri.apply('auth/login'));
     final body = jsonDecode(result.body);
 
@@ -39,6 +41,7 @@ class AuthProvider {
   }
 
   Future<void> deleteData() async {
+    final serverUri = _settingsProvider.serverUri;
     await ApiClient(token).delete(serverUri.apply('user/$userId'));
   }
 

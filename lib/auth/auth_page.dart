@@ -7,6 +7,7 @@ import '../common/qr_widgets.dart';
 import '../extensions.dart';
 import '../lists/list_manager_page.dart';
 import '../registry.dart';
+import 'server_configuration_panel.dart';
 
 class AuthPage extends StatelessWidget {
   const AuthPage({super.key});
@@ -84,13 +85,14 @@ class _Foreground extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          // TextButton(
-          //   onPressed: () {},
-          //   child: Text(
-          //     'Select server'.toUpperCase(),
-          //     style: TextStyle(color: Colors.white),
-          //   ),
-          // ),
+          TextButton.icon(
+            icon: const Icon(Icons.lan_rounded, color: Colors.white70),
+            onPressed: () => showServerConfigurationPanel(context),
+            label: Text(
+              'Server configuration'.toUpperCase(),
+              style: const TextStyle(color: Colors.white70),
+            ),
+          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -111,11 +113,18 @@ class _Foreground extends StatelessWidget {
     );
     if (!context.mounted || tokenUrl == null) return;
 
-    final segments = Uri.parse(tokenUrl).pathSegments;
+    final tokenUri = Uri.parse(tokenUrl);
+    final segments = tokenUri.pathSegments;
     if (segments.length < 2 || segments[segments.length - 2] != 'key') {
       throw 'Invalid token: $tokenUrl';
     }
     if (!context.mounted) return;
+
+    // Remove /key/{uuid} from token url and store as server url
+    final serverUri =
+        tokenUri.replace(pathSegments: segments.take(segments.length - 2));
+    Registry.settingsProvider.setServerUri('$serverUri');
+
     await showIndeterminateProgressDialog(
       context,
       message: context.t.restoringAccount,

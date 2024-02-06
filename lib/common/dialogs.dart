@@ -2,6 +2,20 @@ import 'package:flutter/material.dart';
 
 import '../extensions.dart';
 
+Future<void> showMessageDialog(BuildContext context, String message) async =>
+    showAdaptiveDialog(
+      context: context,
+      builder: (context) => AlertDialog.adaptive(
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => context.pop(),
+            child: Text(context.t.close.toUpperCase()),
+          )
+        ],
+      ),
+    );
+
 Future<T?> showIndeterminateProgressDialog<T>(
   BuildContext context, {
   required String message,
@@ -53,7 +67,7 @@ class TextInputDialog extends StatelessWidget {
   String get text => _controller.text.trim();
 
   TextInputDialog({
-    Key? key,
+    super.key,
     this.title,
     this.caption,
     this.hint,
@@ -63,8 +77,7 @@ class TextInputDialog extends StatelessWidget {
     required String value,
     this.keyboardType,
     this.textCapitalization = TextCapitalization.sentences,
-  })  : _controller = TextEditingController(text: value),
-        super(key: key);
+  }) : _controller = TextEditingController(text: value);
 
   @override
   Widget build(BuildContext context) {

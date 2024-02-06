@@ -8,14 +8,15 @@ import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
 import '../auth/auth_provider.dart';
-import '../config.dart';
 import '../extensions.dart';
+import '../settings/settings_provider.dart';
 import '../util/build_info.dart';
 import '../util/durations.dart';
 import '../util/store_provider.dart';
 import 'api_client.dart';
 
 class SyncProvider {
+  final Uri _serverUri;
   final String _userId;
   final SqlCrdt _crdt;
   final Store _store;
@@ -27,15 +28,16 @@ class SyncProvider {
 
   Timer? _fullSyncTimer;
 
-  SyncProvider(
-      AuthProvider authProvider, StoreProvider storeProvider, this._crdt)
-      : _userId = authProvider.userId,
+  SyncProvider(SettingsProvider settingsProvider, AuthProvider authProvider,
+      StoreProvider storeProvider, this._crdt)
+      : _serverUri = settingsProvider.serverUri,
+        _userId = authProvider.userId,
         _store = storeProvider.getStore('sync') {
     _apiClient = ApiClient(authProvider.token);
     _syncClient = CrdtSyncClient(
       _crdt,
-      serverUri.replace(
-          scheme: serverUri.scheme.replaceFirst('http', 'ws'),
+      _serverUri.replace(
+          scheme: _serverUri.scheme.replaceFirst('http', 'ws'),
           path: 'ws/${authProvider.userId}',
           queryParameters: {
             'token': authProvider.token,
@@ -73,13 +75,13 @@ class SyncProvider {
 
   Future<void> joinList(String listId) async {
     'Joining list $listId…'.log;
-    await _apiClient.post(serverUri.apply('lists/$_userId/$listId'));
+    await _apiClient.post(_serverUri.apply('lists/$_userId/$listId'));
   }
 
   Future<bool> isUpdateRequired() async {
     try {
       final result = await head(
-        serverUri.apply('check_version'),
+        _serverUri.apply('check_version'),
         headers: {HttpHeaders.userAgentHeader: BuildInfo.userAgent},
       );
       return result.statusCode == HttpStatus.upgradeRequired;
@@ -92,7 +94,7 @@ class SyncProvider {
     'Performing full sync…'.log;
     final start = DateTime.now().millisecondsSinceEpoch;
     final result = await _apiClient
-        .get(serverUri.apply('changeset/$_userId/${_crdt.nodeId}'));
+        .get(_serverUri.apply('changeset/$_userId/${_crdt.nodeId}'));
     final changeset = parseCrdtChangeset(jsonDecode(result.body));
     await _crdt.merge(changeset);
     _store.put('need_full_sync', false);

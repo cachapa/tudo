@@ -171,5 +171,11 @@
   "deleteDataConfirmation": "Enter \"{code}\" to confirm",
   "@deleteDataConfirmation": {},
   "dataDeleted": "Data deleted",
-  "@dataDeleted": {}
+  "@dataDeleted": {},
+  "set": "Set",
+  "@set": {},
+  "test": "Test",
+  "@test": {},
+  "reset": "Reset",
+  "@reset": {}
 }

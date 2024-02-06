@@ -14,7 +14,6 @@ import '../common/dialogs.dart';
 import '../common/qr_widgets.dart';
 import '../common/segmented_control.dart';
 import '../common/value_builders.dart';
-import '../config.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
 import '../registry.dart';
@@ -156,8 +155,8 @@ class SettingsPage extends StatelessWidget {
     }
 
     if (!context.mounted) return;
-    final keyUrl =
-        serverUri.apply('key/${Registry.authProvider.token}').toString();
+    final serverUri = Registry.settingsProvider.serverUri;
+    final keyUrl = '$serverUri/key/${Registry.authProvider.token}';
     final qrKey = GlobalKey();
     await showModalBottomSheet(
       context: context,
