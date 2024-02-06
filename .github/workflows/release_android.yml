@@ -37,7 +37,7 @@ jobs:
           CHANGELOG_PATH: android/fastlane/metadata/android/en-US/changelogs
         run: echo "$CHANGELOG" > $CHANGELOG_PATH/$BUILD_NUMBER.txt
 
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
