@@ -9,15 +9,14 @@ class AnimatedRingChart extends ImplicitlyAnimatedWidget {
   final double total;
 
   const AnimatedRingChart({
-    Key? key,
+    super.key,
     required this.size,
     required this.color,
     required this.progress,
     required this.total,
   }) : super(
             duration: const Duration(milliseconds: 1000),
-            curve: Curves.fastOutSlowIn,
-            key: key);
+            curve: Curves.fastOutSlowIn);
 
   @override
   ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() =>
@@ -59,12 +58,12 @@ class RingChart extends StatelessWidget {
   final double total;
 
   const RingChart({
-    Key? key,
+    super.key,
     this.size = 100,
     this.color = Colors.blue,
     required this.progress,
     required this.total,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

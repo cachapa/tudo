@@ -22,7 +22,7 @@ import 'to_do_list_page.dart';
 import 'to_do_list_tile.dart';
 
 class ListManagerPage extends StatefulWidget {
-  const ListManagerPage({Key? key}) : super(key: key);
+  const ListManagerPage({super.key});
 
   @override
   State<ListManagerPage> createState() => _ListManagerPageState();

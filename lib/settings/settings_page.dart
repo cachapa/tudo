@@ -20,7 +20,7 @@ import '../registry.dart';
 import '../util/build_info.dart';
 
 class SettingsPage extends StatelessWidget {
-  const SettingsPage({Key? key}) : super(key: key);
+  const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +262,7 @@ class SettingsPage extends StatelessWidget {
 class Header extends StatelessWidget {
   final String title;
 
-  const Header(this.title, {Key? key}) : super(key: key);
+  const Header(this.title, {super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -28,7 +28,7 @@ void main() async {
 }
 
 class TudoApp extends StatelessWidget {
-  const TudoApp({Key? key}) : super(key: key);
+  const TudoApp({super.key});
 
   @override
   Widget build(BuildContext context) {

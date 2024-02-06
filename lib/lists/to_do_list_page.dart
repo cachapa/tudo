@@ -198,8 +198,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
   final ToDoListWithItems list;
   final List<Widget> actions;
 
-  const TitleBar({Key? key, required this.list, required this.actions})
-      : super(key: key);
+  const TitleBar({super.key, required this.list, required this.actions});
 
   @override
   Widget build(BuildContext context) {
@@ -258,7 +257,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
 class InputBar extends StatefulWidget {
   final Function(String value) onSubmitted;
 
-  const InputBar({Key? key, required this.onSubmitted}) : super(key: key);
+  const InputBar({super.key, required this.onSubmitted});
 
   @override
   State<InputBar> createState() => _InputBarState();

@@ -9,8 +9,7 @@ class Check extends StatelessWidget {
   final bool checked;
   final bool disabled;
 
-  const Check({Key? key, required this.checked, this.disabled = false})
-      : super(key: key);
+  const Check({super.key, required this.checked, this.disabled = false});
 
   @override
   Widget build(BuildContext context) {

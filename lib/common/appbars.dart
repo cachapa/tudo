@@ -55,8 +55,7 @@ class DiscreteAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize = const Size.fromHeight(kToolbarHeight);
 
-  const DiscreteAppBar({Key? key, required this.title, this.subtitle})
-      : super(key: key);
+  const DiscreteAppBar({super.key, required this.title, this.subtitle});
 
   @override
   Widget build(BuildContext context) {

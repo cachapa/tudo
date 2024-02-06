@@ -5,8 +5,8 @@ import 'package:share_plus/share_plus.dart';
 import '../extensions.dart';
 import '../lists/list_provider.dart';
 import '../registry.dart';
-import 'qr_widgets.dart';
 import 'color_selector.dart';
+import 'qr_widgets.dart';
 import 'value_builders.dart';
 
 enum ListAction { create, edit, delete }
@@ -25,7 +25,7 @@ Future<ListAction?> editToDoList(BuildContext context, [ToDoList? list]) =>
 class _EditListForm extends StatefulWidget {
   final ToDoList? list;
 
-  const _EditListForm({Key? key, this.list}) : super(key: key);
+  const _EditListForm({this.list});
 
   @override
   State<_EditListForm> createState() => _EditListFormState();

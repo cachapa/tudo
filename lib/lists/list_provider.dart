@@ -237,9 +237,8 @@ class ToDoListWithItems extends ToDoList {
       : super(list.id, list.name, list.color, list.creatorId, list.createdAt,
             list.position, list.itemCount, list.doneCount, list.members);
 
-  ToDoListWithItems.fromMap(
-      Map<String, dynamic> map, List<Member> members, this.items)
-      : super.fromMap(map, members);
+  ToDoListWithItems.fromMap(super.map, super.members, this.items)
+      : super.fromMap();
 }
 
 class ToDoList extends IdObject {
@@ -332,7 +331,7 @@ class ToDo extends IdObject {
 class Member extends User {
   final DateTime? joinedAt;
 
-  Member.fromMap(String userId, Map<String, dynamic> map)
+  Member.fromMap(super.userId, super.map)
       : joinedAt = (map['joined_at'] as String?)?.asDateTime.toLocal(),
-        super.fromMap(userId, map);
+        super.fromMap();
 }

@@ -32,10 +32,10 @@ class ColorSelector extends StatefulWidget {
   final void Function(Color color)? onColorSelected;
 
   const ColorSelector({
-    Key? key,
+    super.key,
     required this.controller,
     this.onColorSelected,
-  }) : super(key: key);
+  });
 
   @override
   State<ColorSelector> createState() => _ColorSelectorState();
@@ -81,11 +81,11 @@ class ColorButton extends StatelessWidget {
   final VoidCallback onPressed;
 
   const ColorButton({
-    Key? key,
+    super.key,
     required this.color,
     required this.selected,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -5,7 +5,7 @@ import '../extensions.dart';
 class PopupMenu extends StatelessWidget {
   final List<PopupEntry> entries;
 
-  const PopupMenu({Key? key, required this.entries}) : super(key: key);
+  const PopupMenu({super.key, required this.entries});
 
   @override
   Widget build(BuildContext context) {

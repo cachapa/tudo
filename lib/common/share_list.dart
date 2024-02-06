@@ -21,7 +21,7 @@ class _ShareListForm extends StatelessWidget {
 
   String get shareUrl => 'https://tudo.cachapa.net/list/${list.id}';
 
-  const _ShareListForm({Key? key, required this.list}) : super(key: key);
+  const _ShareListForm({required this.list});
 
   @override
   Widget build(BuildContext context) {

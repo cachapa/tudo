@@ -5,7 +5,7 @@ import '../extensions.dart';
 class Avatar extends StatelessWidget {
   final Color? color;
 
-  const Avatar({Key? key, this.color}) : super(key: key);
+  const Avatar({super.key, this.color});
 
   @override
   Widget build(BuildContext context) {

@@ -7,12 +7,12 @@ class SegmentedControl<V, T> extends StatelessWidget {
   final Widget Function(BuildContext context, T data) segmentBuilder;
 
   const SegmentedControl({
-    Key? key,
+    super.key,
     required this.value,
     required this.items,
     required this.onChanged,
     required this.segmentBuilder,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

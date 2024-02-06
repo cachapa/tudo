@@ -9,12 +9,12 @@ class Progress extends StatelessWidget {
   final Color color;
 
   const Progress({
-    Key? key,
+    super.key,
     this.size = 30,
     required this.progress,
     required this.total,
     required this.color,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,8 +40,7 @@ class AnimatedCounter extends StatefulWidget {
   final int value;
   final double size;
 
-  const AnimatedCounter({Key? key, required this.value, required this.size})
-      : super(key: key);
+  const AnimatedCounter({super.key, required this.value, required this.size});
 
   @override
   State<AnimatedCounter> createState() => _AnimatedCounterState();
