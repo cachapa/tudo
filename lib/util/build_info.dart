@@ -47,7 +47,7 @@ class BuildInfo {
     else if (_p.isLinux) {
       final info = await DeviceInfoPlugin().linuxInfo;
       deviceModel = info.name;
-      platformVersion = info.versionId!;
+      platformVersion = info.versionId ?? _p.version;
     } else if (_p.isMacOS) {
       final info = await DeviceInfoPlugin().macOsInfo;
       deviceModel = info.model;
