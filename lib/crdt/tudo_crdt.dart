@@ -17,7 +17,7 @@ class TudoCrdt {
         onUpgrade: _onUpgrade,
       );
 
-  static FutureOr<void> _onCreate(BaseCrdt crdt, int version) async {
+  static FutureOr<void> _onCreate(CrdtTableExecutor crdt, int version) async {
     'Creating database…'.log;
     await crdt.execute('''
       CREATE TABLE users (
@@ -62,7 +62,7 @@ class TudoCrdt {
   }
 
   static FutureOr<void> _onUpgrade(
-      BaseCrdt crdt, int oldVersion, int newVersion) async {
+      CrdtTableExecutor crdt, int oldVersion, int newVersion) async {
     'Upgrading database from $oldVersion to $newVersion…'.log;
     if (oldVersion < 4) {
       await _upgradeFromCrdt(crdt, 'users', ['id']);
@@ -82,10 +82,10 @@ class TudoCrdt {
   }
 
   static Future<void> _upgradeFromCrdt(
-      BaseCrdt crdt, String table, List<String> ids) async {
+      CrdtTableExecutor crdt, String table, List<String> ids) async {
     await crdt.execute('ALTER TABLE $table ADD COLUMN hlc TEXT');
     await crdt.execute('ALTER TABLE $table ADD COLUMN modified TEXT');
-    await crdt.execute('''        
+    await crdt.execute('''
       UPDATE $table SET
         hlc = c.hlc,
         modified = c.modified
