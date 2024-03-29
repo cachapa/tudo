@@ -6,12 +6,14 @@ import 'list_provider.dart';
 
 class ToDoListTile extends StatelessWidget {
   final ToDoList list;
+  final bool isSelected;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
 
   const ToDoListTile({
     super.key,
     required this.list,
+    required this.isSelected,
     this.onTap,
     this.onEdit,
   });
@@ -19,6 +21,8 @@ class ToDoListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
+      selected: isSelected,
+      selectedTileColor: list.color.withOpacity(0.1),
       contentPadding: const EdgeInsets.only(left: 16, right: 8),
       leading: Progress(
         color: list.color,

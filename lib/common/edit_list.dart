@@ -9,10 +9,8 @@ import 'color_selector.dart';
 import 'qr_widgets.dart';
 import 'value_builders.dart';
 
-enum ListAction { create, edit, delete }
-
-Future<ListAction?> editToDoList(BuildContext context, [ToDoList? list]) =>
-    showModalBottomSheet<ListAction>(
+Future<void> editToDoList(BuildContext context, [ToDoList? list]) =>
+    showModalBottomSheet(
       enableDrag: true,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
@@ -142,10 +140,21 @@ class _EditListFormState extends State<_EditListForm> {
       Registry.listProvider.createList(name, color);
     }
 
-    context.pop(editMode ? ListAction.edit : ListAction.create);
+    context.pop();
   }
 
-  void _removeList(BuildContext context) => context.pop(ListAction.delete);
+  void _removeList(BuildContext context) async {
+    final listManager = Registry.listProvider;
+    await listManager.removeList(list!.id);
+    if (context.mounted) {
+      context
+        ..showSnackBar(
+          context.t.listDeleted(list!.name),
+          () => listManager.undoRemoveList(list!.id),
+        )
+        ..pop();
+    }
+  }
 }
 
 class _MemberList extends StatelessWidget {

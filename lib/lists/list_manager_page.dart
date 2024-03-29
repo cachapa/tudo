@@ -18,11 +18,17 @@ import '../registry.dart';
 import '../settings/settings_page.dart';
 import '../util/update_util.dart';
 import 'list_provider.dart';
-import 'to_do_list_page.dart';
 import 'to_do_list_tile.dart';
 
 class ListManagerPage extends StatefulWidget {
-  const ListManagerPage({super.key});
+  final String? selectedId;
+  final void Function(ToDoList? list) onListSelected;
+
+  const ListManagerPage({
+    super.key,
+    required this.selectedId,
+    required this.onListSelected,
+  });
 
   @override
   State<ListManagerPage> createState() => _ListManagerPageState();
@@ -114,6 +120,7 @@ class _ListManagerPageState extends State<ListManagerPage>
                   onReorder: (from, to) => _swap(lists, from, to),
                   builder: (context, i, item) => ToDoListTile(
                     key: ValueKey(item.id),
+                    isSelected: item.id == widget.selectedId,
                     list: item,
                     onTap: () => _openList(context, item),
                     onEdit: () => _editList(context, item),
@@ -201,47 +208,22 @@ class _ListManagerPageState extends State<ListManagerPage>
   }
 
   Future<void> _createList() async {
-    final result = await editToDoList(context);
-    if (result == ListAction.create) {
-      // Wait for entry animation to finish
-      await Future.delayed(longDuration);
-      // Scroll to bottom of list
-      await _controller.animateTo(
-        _controller.position.maxScrollExtent,
-        duration: mediumDuration,
-        curve: Curves.fastOutSlowIn,
-      );
-    }
+    await editToDoList(context);
+    // Wait for entry animation to finish
+    await Future.delayed(longDuration);
+    // Scroll to bottom of list
+    await _controller.animateTo(
+      _controller.position.maxScrollExtent,
+      duration: mediumDuration,
+      curve: Curves.fastOutSlowIn,
+    );
   }
 
-  void _openList(BuildContext context, ToDoList list) async {
-    final action = await context.push(() => ToDoListPage(list: list));
-    if (action == ListAction.delete) {
-      Future.delayed(
-        // Wait for pop animation to complete
-        mediumDuration,
-        () => _deleteList(context, list),
-      );
-    }
-  }
+  void _openList(BuildContext context, ToDoList list) =>
+      widget.onListSelected(list);
 
-  Future<void> _editList(BuildContext context, ToDoList list) async {
-    final action = await editToDoList(context, list);
-    if (action == ListAction.delete) {
-      await _deleteList(context, list);
-    }
-  }
-
-  Future<void> _deleteList(BuildContext context, ToDoList list) async {
-    final listManager = Registry.listProvider;
-    await listManager.removeList(list.id);
-    if (context.mounted) {
-      context.showSnackBar(
-        context.t.listDeleted(list.name),
-        () => listManager.undoRemoveList(list.id),
-      );
-    }
-  }
+  Future<void> _editList(BuildContext context, ToDoList list) =>
+      editToDoList(context, list);
 
   void _swap(List<ToDoList> lists, int from, int to) {
     final item = lists.removeAt(from);

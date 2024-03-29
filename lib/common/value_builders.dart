@@ -64,7 +64,7 @@ class _ValueStreamBuilderState<T> extends State<ValueStreamBuilder<T>> {
 
   @override
   Widget build(BuildContext context) {
-    if (_error != null) '$_error'.log;
+    if (_error != null) '$runtimeType: $_error'.log;
 
     return _error != null
         ? widget.errorBuilder?.call(context, _error!) ??

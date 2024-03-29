@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import '../common/dialogs.dart';
 import '../common/qr_widgets.dart';
 import '../extensions.dart';
-import '../lists/list_manager_page.dart';
 import '../registry.dart';
 import 'server_configuration_panel.dart';
 
@@ -101,9 +100,9 @@ class _Foreground extends StatelessWidget {
 
   void _createProfile(BuildContext context) {
     Registry.authProvider.create();
-    context
-      ..pop()
-      ..push(() => const ListManagerPage());
+    // context
+    //   ..pop()
+    //   ..push(() => const ListManagerPage());
   }
 
   Future<void> _loadProfile(BuildContext context) async {
@@ -135,10 +134,10 @@ class _Foreground extends StatelessWidget {
       },
     );
     if (context.mounted) {
-      context
-        ..pop()
-        // ignore: unawaited_futures
-        ..push(() => const ListManagerPage());
+      // context
+      //   ..pop()
+      //   // ignore: unawaited_futures
+      //   ..push(() => const ListManagerPage());
     }
   }
 }

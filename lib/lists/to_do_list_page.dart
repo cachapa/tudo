@@ -17,12 +17,13 @@ import '../registry.dart';
 import 'list_provider.dart';
 
 class ToDoListPage extends StatelessWidget {
+  final Function() onClose;
   final ToDoList list;
   final _listKey = GlobalKey();
 
   late final _stream = Registry.listProvider.getList(list.id);
 
-  ToDoListPage({super.key, required this.list});
+  ToDoListPage({super.key, required this.onClose, required this.list});
 
   @override
   Widget build(BuildContext context) {
@@ -36,22 +37,7 @@ class ToDoListPage extends StatelessWidget {
       child: ValueStreamBuilder<ToDoListWithItems>(
         stream: _stream,
         initialValue: ToDoListWithItems.fromList(list, []),
-        errorBuilder: (context, error) => Material(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                t.listUnavailable,
-                style: context.theme.textTheme.titleLarge,
-              ),
-              const SizedBox(height: 16),
-              MaterialButton(
-                child: Text(t.close),
-                onPressed: () => context.pop(),
-              ),
-            ],
-          ),
-        ),
+        errorBuilder: (_, __) => const SizedBox(),
         builder: (_, list) => Theme(
           data: context.theme.copyWith(
             colorScheme:
@@ -64,6 +50,7 @@ class ToDoListPage extends StatelessWidget {
             extendBodyBehindAppBar: true,
             extendBody: true,
             appBar: TitleBar(
+              onClose: onClose,
               list: list,
               actions: [
                 IconButton(
@@ -122,13 +109,7 @@ class ToDoListPage extends StatelessWidget {
         builder: (context) => _RestoreItemsDialog(list: list),
       );
 
-  Future<void> _editList(BuildContext context) async {
-    final result = await editToDoList(context, list);
-
-    if (context.mounted && result == ListAction.delete) {
-      context.pop(result);
-    }
-  }
+  Future<void> _editList(BuildContext context) => editToDoList(context, list);
 }
 
 class _RestoreItemsDialog extends StatelessWidget {
@@ -197,8 +178,13 @@ class _RestoreItemsDialog extends StatelessWidget {
 class TitleBar extends StatelessWidget implements PreferredSizeWidget {
   final ToDoListWithItems list;
   final List<Widget> actions;
+  final VoidCallback onClose;
 
-  const TitleBar({super.key, required this.list, required this.actions});
+  const TitleBar(
+      {super.key,
+      required this.list,
+      required this.actions,
+      required this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +194,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
       foregroundColor: primaryColor,
       backgroundColor: primaryColor.withAlpha(20),
       leading: InkResponse(
-        onTap: () => context.pop(),
+        onTap: onClose,
         child: Stack(
           alignment: Alignment.center,
           children: [

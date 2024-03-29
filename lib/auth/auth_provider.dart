@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
 import '../extensions.dart';
@@ -14,6 +15,9 @@ class AuthProvider {
   final Store _store;
 
   bool get isAuthComplete => _store.contains('token');
+
+  Stream<bool> get isAuthCompleteSteam => BehaviorSubject.seeded(isAuthComplete)
+    ..addStream(_store.watch(key: 'token').map((e) => e.value != null));
 
   String get token => _store.get('token');
 

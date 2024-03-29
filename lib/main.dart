@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'auth/auth_page.dart';
 import 'common/value_builders.dart';
 import 'extensions.dart';
-import 'lists/list_manager_page.dart';
+import 'lists/home_page.dart';
 import 'registry.dart';
 import 'util/build_info.dart';
 import 'util/themes.dart';
@@ -42,9 +42,11 @@ class TudoApp extends StatelessWidget {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: theme,
-        home: !Registry.authProvider.isAuthComplete
-            ? const AuthPage()
-            : const ListManagerPage(),
+        home: ValueStreamBuilder(
+          stream: Registry.authProvider.isAuthCompleteSteam,
+          builder: (context, isAuthComplete) =>
+              !isAuthComplete ? const AuthPage() : const HomePage(),
+        ),
       ),
     );
   }
