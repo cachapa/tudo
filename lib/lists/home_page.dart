@@ -22,7 +22,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
 
     Registry.listProvider.lists.listen((lists) {
-      if (_list != null && !lists.contains(_list)) {
+      if (_list != null && !lists.map((e) => e.id).contains(_list!.id)) {
         setState(() => _list = null);
       }
     });
