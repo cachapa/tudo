@@ -30,23 +30,29 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: MasterDetail(
-        masterWidth: 400,
-        thresholdWidth: 800,
-        masterBuilder: (_, __) => ListManagerPage(
-          selectedId: _list?.id,
-          onListSelected: (list) => setState(() => _list = list),
+    return PopScope(
+      canPop: _list == null,
+      onPopInvoked: (_) {
+        if (_list != null) _list = null;
+      },
+      child: Scaffold(
+        body: MasterDetail(
+          masterWidth: 400,
+          thresholdWidth: 800,
+          masterBuilder: (_, __) => ListManagerPage(
+            selectedId: _list?.id,
+            onListSelected: (list) => setState(() => _list = list),
+          ),
+          detailBuilder: (_, __) => _list == null
+              ? null
+              : ToDoListPage(
+                  key: ValueKey(_list!.id),
+                  onClose: onListClose,
+                  list: _list!,
+                ),
+          emptyBuilder: (_) => const EmptyList(),
+          onPopDetail: onListClose,
         ),
-        detailBuilder: (_, __) => _list == null
-            ? null
-            : ToDoListPage(
-                key: ValueKey(_list!.id),
-                onClose: onListClose,
-                list: _list!,
-              ),
-        emptyBuilder: (_) => const EmptyList(),
-        onPopDetail: onListClose,
       ),
     );
   }
