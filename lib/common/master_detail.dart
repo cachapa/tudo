@@ -36,15 +36,21 @@ class MasterDetail extends StatelessWidget {
   }
 
   Widget _buildSmall(BuildContext context, Widget master, Widget? detail) {
-    return Navigator(
-      pages: [
-        MaterialPage(child: master),
-        if (detail != null) MaterialPage(child: detail),
-      ],
-      onPopPage: (route, result) {
-        onPopDetail();
-        return false;
+    return PopScope(
+      canPop: detail == null,
+      onPopInvoked: (didPop) {
+        if (detail != null) onPopDetail();
       },
+      child: Navigator(
+        pages: [
+          MaterialPage(child: master),
+          if (detail != null) MaterialPage(child: detail),
+        ],
+        onPopPage: (route, result) {
+          onPopDetail();
+          return false;
+        },
+      ),
     );
   }
 
