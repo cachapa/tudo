@@ -138,8 +138,6 @@
   "@accountKey": {},
   "accountKeyExplanation": "You can use this key to recover your account, or open it in another device.",
   "@accountKeyExplanation": {},
-  "accountKeyAdvice": "Store it in a safe place.",
-  "@accountKeyAdvice": {},
   "startFromCleanSlate": "Start from a clean slate",
   "@startFromCleanSlate": {},
   "or": "or",
@@ -177,5 +175,9 @@
   "test": "Test",
   "@test": {},
   "reset": "Reset",
-  "@reset": {}
+  "@reset": {},
+  "pasteAccountKeyExplanation": "Paste your account key from the settings page in your other device.",
+  "@pasteAccountKeyExplanation": {},
+  "tudoAccountKey": "tudo account key",
+  "@tudoAccountKey": {}
 }

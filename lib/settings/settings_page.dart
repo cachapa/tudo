@@ -185,30 +185,34 @@ class SettingsPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Center(
-                child: Text(
-                  context.t.accountKeyAdvice,
-                  style: context.theme.textTheme.titleSmall,
+                child: TextField(
+                  controller: TextEditingController(text: keyUrl),
+                  readOnly: true,
                 ),
               ),
               const SizedBox(height: 16),
-              FilledButton.icon(
-                icon: Icon(Icons.adaptive.share),
-                label: Text(context.t.share.toUpperCase()),
-                onPressed: () async {
-                  final boundary = qrKey.currentContext!.findRenderObject()
-                      as RenderRepaintBoundary;
-                  ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-                  final byteData =
-                      await image.toByteData(format: ui.ImageByteFormat.png);
-                  var pngBytes = byteData!.buffer.asUint8List();
-                  final path =
-                      '${(await getApplicationCacheDirectory()).path}/tudo_account_key.png';
-                  await File(path).writeAsBytes(pngBytes, flush: true);
-                  await Share.shareXFiles([XFile(path)],
-                      subject: 'tudo account key');
-                  if (context.mounted) context.pop();
-                },
-              ),
+              if (PlatformX.isMobile)
+                FilledButton.icon(
+                  icon: Icon(Icons.adaptive.share),
+                  label: Text(context.t.share.toUpperCase()),
+                  onPressed: () async {
+                    final boundary = qrKey.currentContext!.findRenderObject()
+                        as RenderRepaintBoundary;
+                    ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+                    final byteData =
+                        await image.toByteData(format: ui.ImageByteFormat.png);
+                    var pngBytes = byteData!.buffer.asUint8List();
+                    final path =
+                        '${(await getApplicationCacheDirectory()).path}/tudo_account_key.png';
+                    await File(path).writeAsBytes(pngBytes, flush: true);
+                    await Share.shareXFiles(
+                      [XFile(path)],
+                      subject: context.t.tudoAccountKey,
+                      text: keyUrl,
+                    );
+                    if (context.mounted) context.pop();
+                  },
+                ),
               const SizedBox(height: 40),
               TextButton(
                 onPressed: () {

@@ -93,8 +93,6 @@
   "@accountKey": {},
   "accountKeyExplanation": "Esta chave pode ser usada para recuperar a conta, ou para a abrir noutro aparelho.",
   "@accountKeyExplanation": {},
-  "accountKeyAdvice": "Deve ser guardada num sítio seguro.",
-  "@accountKeyAdvice": {},
   "startFromCleanSlate": "Começar uma conta nova",
   "@startFromCleanSlate": {},
   "or": "ou",
@@ -126,5 +124,15 @@
   "dataDeleted": "Dados apagados",
   "@dataDeleted": {},
   "deleteDataConfirmation": "Inserir \"{code}\" para cofirmar",
-  "@deleteDataConfirmation": {}
+  "@deleteDataConfirmation": {},
+  "pasteAccountKeyExplanation": "Cola a chave da conta da página de configuração de outro aparelho.",
+  "@pasteAccountKeyExplanation": {},
+  "reset": "Recolocar",
+  "@reset": {},
+  "tudoAccountKey": "Chave da conta",
+  "@tudoAccountKey": {},
+  "set": "Aceitar",
+  "@set": {},
+  "test": "Testar",
+  "@test": {}
 }

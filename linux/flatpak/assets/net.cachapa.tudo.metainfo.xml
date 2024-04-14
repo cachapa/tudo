@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>net.cachapa.tudo</id>
+  
+  <name>tudo</name>
+  <summary>A simple to-do app</summary>
+  
+  <metadata_license>CC-BY-SA-4.0</metadata_license>
+  <project_license>Apache-2.0</project_license>
+  
+  <supports>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+  </supports>
+  
+  <description>
+    <p>
+      tudo is an experiment on simple, private, synchronized to-do lists.
+    </p>
+    <p>
+      It uses sqlite_crdt and is a useful demonstration of the realtime, offline-first capabilities powering Libra and StoryArk app.
+    </p>
+  </description>
+  
+  <launchable type="desktop-id">net.cachapa.tudo.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://raw.githubusercontent.com/cachapa/tudo/master/screenshots/a.jpg</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/cachapa/tudo/master/screenshots/b.jpg</image>
+    </screenshot>
+    <screenshot>
+      <image>https://raw.githubusercontent.com/cachapa/tudo/master/screenshots/c.jpg</image>
+    </screenshot>
+  </screenshots>
+</component>

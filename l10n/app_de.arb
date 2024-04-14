@@ -93,8 +93,6 @@
   "@accountKey": {},
   "accountKeyExplanation": "Der Kontoschlüssel kann dieses Konto wiederherstellen oder auf einem anderen Gerät öffnen.",
   "@accountKeyExplanation": {},
-  "accountKeyAdvice": "An einem sicheren Ort speichern.",
-  "@accountKeyAdvice": {},
   "startFromCleanSlate": "Neues Konto erstellen",
   "@startFromCleanSlate": {},
   "or": "oder",

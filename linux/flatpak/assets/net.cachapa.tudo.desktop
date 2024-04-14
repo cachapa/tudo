@@ -1,0 +1,12 @@
+[Desktop Entry]
+#Version=1.0
+Type=Application
+
+Name=tudo
+Comment= A simple to-do app
+Categories=Utility;
+
+Icon=net.cachapa.tudo.svg
+Exec=tudo
+Terminal=false
+StartupWMClass=tudo

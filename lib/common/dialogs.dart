@@ -52,6 +52,19 @@ Future<T?> showIndeterminateProgressDialog<T>(
   }
 }
 
+Future<String?> showTextInputDialog(
+  BuildContext context, {
+  String? hint,
+  String? caption,
+}) =>
+    showAdaptiveDialog<String>(
+      context: context,
+      builder: (context) => TextInputDialog(
+        hint: hint,
+        caption: caption,
+      ),
+    );
+
 class TextInputDialog extends StatelessWidget {
   final String? title;
   final String? caption;
@@ -74,7 +87,7 @@ class TextInputDialog extends StatelessWidget {
     this.showClearButton = false,
     this.info,
     this.positiveLabel = 'Set',
-    required String value,
+    String value = '',
     this.keyboardType,
     this.textCapitalization = TextCapitalization.sentences,
   }) : _controller = TextEditingController(text: value);

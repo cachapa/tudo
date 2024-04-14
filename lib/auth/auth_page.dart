@@ -98,46 +98,47 @@ class _Foreground extends StatelessWidget {
     );
   }
 
-  void _createProfile(BuildContext context) {
-    Registry.authProvider.create();
-    // context
-    //   ..pop()
-    //   ..push(() => const ListManagerPage());
-  }
+  void _createProfile(BuildContext context) => Registry.authProvider.create();
 
   Future<void> _loadProfile(BuildContext context) async {
-    final tokenUrl = await scanQrCode(
-      context,
-      message: context.t.scanAccountKeyExplanation,
-    );
-    if (!context.mounted || tokenUrl == null) return;
+    try {
+      final tokenUrl = await (PlatformX.isMobile
+          ? scanQrCode(
+              context,
+              message: context.t.scanAccountKeyExplanation,
+            )
+          : showTextInputDialog(
+              context,
+              hint: context.t.accountKey,
+              caption: context.t.pasteAccountKeyExplanation,
+            ));
+      if (!context.mounted || tokenUrl == null || tokenUrl.isEmpty) return;
 
-    final tokenUri = Uri.parse(tokenUrl);
-    final segments = tokenUri.pathSegments;
-    if (segments.length < 2 || segments[segments.length - 2] != 'key') {
-      throw 'Invalid token: $tokenUrl';
-    }
-    if (!context.mounted) return;
+      final tokenUri = Uri.parse(tokenUrl);
+      final segments = tokenUri.pathSegments;
+      if (segments.length < 2 || segments[segments.length - 2] != 'key') {
+        throw 'Invalid token: $tokenUrl';
+      }
+      if (!context.mounted) return;
 
-    // Remove /key/{uuid} from token url and store as server url
-    final serverUri =
-        tokenUri.replace(pathSegments: segments.take(segments.length - 2));
-    Registry.settingsProvider.setServerUri('$serverUri');
+      // Remove /key/{uuid} from token url and store as server url
+      final serverUri =
+          tokenUri.replace(pathSegments: segments.take(segments.length - 2));
 
-    await showIndeterminateProgressDialog(
-      context,
-      message: context.t.restoringAccount,
-      future: Registry.authProvider.login(segments.last),
-      onError: (e) {
-        '$e'.log;
-        if (context.mounted) context.showSnackBar('$e');
-      },
-    );
-    if (context.mounted) {
-      // context
-      //   ..pop()
-      //   // ignore: unawaited_futures
-      //   ..push(() => const ListManagerPage());
+      final token = segments.last;
+      Registry.settingsProvider.setServerUri('$serverUri');
+
+      await showIndeterminateProgressDialog(
+        context,
+        message: context.t.restoringAccount,
+        future: Registry.authProvider.login(token),
+        onError: (e) {
+          '$e'.log;
+          if (context.mounted) context.showSnackBar('$e');
+        },
+      );
+    } catch (e) {
+      if (context.mounted) context.showSnackBar('$e');
     }
   }
 }
