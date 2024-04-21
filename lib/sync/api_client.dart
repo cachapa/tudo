@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:http/http.dart';
 
+import '../config.dart';
 import '../util/build_info.dart';
 
 class ApiClient extends BaseClient {
@@ -19,6 +20,12 @@ class ApiClient extends BaseClient {
           HttpHeaders.userAgentHeader: _userAgent,
           HttpHeaders.acceptLanguageHeader: BuildInfo.locale,
           if (_token != null) HttpHeaders.authorizationHeader: 'bearer $_token',
+          if (BuildInfo.isWeb)
+            HttpHeaders.accessControlAllowOriginHeader: '$defaultUri',
+          if (BuildInfo.isWeb)
+            HttpHeaders.accessControlAllowCredentialsHeader: 'true',
+          if (BuildInfo.isWeb)
+            HttpHeaders.accessControlAllowHeadersHeader: 'Authorization',
         }),
     );
 

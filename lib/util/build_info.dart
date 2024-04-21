@@ -15,6 +15,8 @@ class BuildInfo {
 
   static String get platform => _p.operatingSystem.name;
 
+  static bool get isWeb => _p.isWeb;
+
   static String get locale => _p.locale;
 
   static bool get isDebug => _p.buildMode.isDebug;

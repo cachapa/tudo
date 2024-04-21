@@ -16,6 +16,7 @@ import '../common/value_builders.dart';
 import '../extensions.dart';
 import '../registry.dart';
 import '../settings/settings_page.dart';
+import '../util/build_info.dart';
 import '../util/update_util.dart';
 import 'list_provider.dart';
 import 'to_do_list_tile.dart';
@@ -143,23 +144,25 @@ class _ListManagerPageState extends State<ListManagerPage>
             ],
           ),
         ),
-        bottomNavigationBar: ValueFutureBuilder(
-          future: UpdateUtil.updateAvailable,
-          errorBuilder: (context, error) => const SizedBox(),
-          builder: (context, updateAvailable) => updateAvailable
-              ? SafeArea(
-                  child: Padding(
-                    padding:
-                        const EdgeInsets.only(left: 16, right: 16, bottom: 16),
-                    child: FilledButton.icon(
-                      icon: const Icon(Icons.system_update_rounded),
-                      label: Text(t.updateApp.toUpperCase()),
-                      onPressed: () => UpdateUtil.update(),
-                    ),
-                  ),
-                )
-              : const SizedBox(),
-        ),
+        bottomNavigationBar: BuildInfo.isWeb
+            ? const SizedBox()
+            : ValueFutureBuilder(
+                future: UpdateUtil.updateAvailable,
+                errorBuilder: (context, error) => const SizedBox(),
+                builder: (context, updateAvailable) => updateAvailable
+                    ? SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16, right: 16, bottom: 16),
+                          child: FilledButton.icon(
+                            icon: const Icon(Icons.system_update_rounded),
+                            label: Text(t.updateApp.toUpperCase()),
+                            onPressed: () => UpdateUtil.update(),
+                          ),
+                        ),
+                      )
+                    : const SizedBox(),
+              ),
       ),
     );
   }

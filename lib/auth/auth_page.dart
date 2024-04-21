@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 
 import '../common/dialogs.dart';
 import '../common/qr_widgets.dart';
+import '../config.dart';
 import '../extensions.dart';
 import '../registry.dart';
+import '../util/build_info.dart';
 import 'server_configuration_panel.dart';
 
 class AuthPage extends StatelessWidget {
@@ -84,14 +86,15 @@ class _Foreground extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          TextButton.icon(
-            icon: const Icon(Icons.lan_rounded, color: Colors.white70),
-            onPressed: () => showServerConfigurationPanel(context),
-            label: Text(
-              'Server configuration'.toUpperCase(),
-              style: const TextStyle(color: Colors.white70),
+          if (!BuildInfo.isWeb)
+            TextButton.icon(
+              icon: const Icon(Icons.lan_rounded, color: Colors.white70),
+              onPressed: () => showServerConfigurationPanel(context),
+              label: Text(
+                'Server configuration'.toUpperCase(),
+                style: const TextStyle(color: Colors.white70),
+              ),
             ),
-          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -113,6 +116,10 @@ class _Foreground extends StatelessWidget {
               caption: context.t.pasteAccountKeyExplanation,
             ));
       if (!context.mounted || tokenUrl == null || tokenUrl.isEmpty) return;
+
+      if (BuildInfo.isWeb && !tokenUrl.startsWith('$defaultUri')) {
+        throw 'This instance only supports accounts hosted in $defaultUri';
+      }
 
       final tokenUri = Uri.parse(tokenUrl);
       final segments = tokenUri.pathSegments;
