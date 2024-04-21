@@ -1,4 +1,4 @@
-name: Release iOS
+name: iOS
 on:
   workflow_call:
     inputs:
@@ -44,8 +44,18 @@ jobs:
           BUILD_NUMBER: ${{ inputs.number }}
         run: flutter build ipa --export-options-plist=.github/provisioning/ExportOptions.plist --build-number $BUILD_NUMBER --build-name $BUILD_NAME
 
+      - name: Rename build artifact
+        working-directory: build/ios/ipa
+        run: mv tudo.ipa tudo_ios.ipa
+
       - name: Upload app to App Store Connect
         env:
           APP_STORE_CONNECT_USERNAME: ${{ secrets.APP_STORE_CONNECT_USERNAME }}
           APP_STORE_CONNECT_PASSWORD: ${{ secrets.APP_STORE_CONNECT_PASSWORD }}
-        run: xcrun altool --upload-app -t ios -f "build/ios/ipa/tudo.ipa" -u "$APP_STORE_CONNECT_USERNAME" -p "$APP_STORE_CONNECT_PASSWORD"
+        run: xcrun altool --upload-app -t ios -f "build/ios/ipa/tudo_ios.ipa" -u "$APP_STORE_CONNECT_USERNAME" -p "$APP_STORE_CONNECT_PASSWORD"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios
+          path: build/ios/ipa/tudo_ios.ipa

@@ -1,15 +1,5 @@
 name: Release
-on:
-  workflow_dispatch:
-    inputs:
-      android:
-        description: 'Android'
-        default: 'true'
-        type: boolean
-      ios:
-        description: 'iOS'
-        default: 'true'
-        type: boolean
+on: workflow_dispatch
 
 permissions:
   contents: write
@@ -75,9 +65,9 @@ jobs:
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
-  Android:
-    if: inputs.android
-    uses: ./.github/workflows/release_android.yml
+  android:
+    name: Android
+    uses: ./.github/workflows/android.yml
     needs: version
     secrets: inherit
     with:
@@ -85,12 +75,48 @@ jobs:
       number: "${{ needs.version.outputs.number }}"
       changelog: "${{ needs.version.outputs.changelog }}"
 
-  iOS:
-    if: inputs.ios
-    uses: ./.github/workflows/release_ios.yml
+  ios:
+    name: iOS
+    uses: ./.github/workflows/ios.yml
     needs: version
     secrets: inherit
     with:
       name: "${{ needs.version.outputs.name }}"
       number: "${{ needs.version.outputs.number }}"
       changelog: "${{ needs.version.outputs.changelog }}"
+
+  linux_x86_64:
+    name: Linux x86-64
+    uses: ./.github/workflows/linux_x86_64.yml
+    needs: version
+    secrets: inherit
+    with:
+      name: "${{ needs.version.outputs.name }}"
+
+  web:
+    name: Web
+    uses: ./.github/workflows/web.yml
+    needs: version
+    secrets: inherit
+    with:
+      name: "${{ needs.version.outputs.name }}"
+
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    needs: [ version, android, ios, linux_x86_64, web ]
+    steps:
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v4
+
+      - uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.version.outputs.name }}
+          name: "tudo ${{ needs.version.outputs.name }}"
+          generate_release_notes: true
+          files: |
+            android/bundle/release/tudo_android.aab
+            android/apk/release/tudo_android.apk
+            ios/tudo_ios.ipa
+            linux_x86_64/tudo_linux_x86_64.tar.gz
+            web/tudo_web.zip

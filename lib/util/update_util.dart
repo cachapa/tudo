@@ -4,7 +4,6 @@ import 'package:in_app_update/in_app_update.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 
 import '../registry.dart';
-import 'build_info.dart';
 
 class UpdateUtil {
   static final Future<bool> updateAvailable = Platform.isAndroid

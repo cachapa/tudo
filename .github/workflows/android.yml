@@ -1,4 +1,4 @@
-name: Release Android
+name: Android
 on:
   workflow_call:
     inputs:
@@ -56,6 +56,12 @@ jobs:
           flutter build appbundle --build-number $BUILD_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $BUILD_NUMBER --build-name $BUILD_NAME
 
+      - name: Rename build artifacts
+        working-directory: build/app/outputs
+        run: |
+          mv bundle/release/app-release.aab bundle/release/tudo_android.aab
+          mv apk/release/app-release.apk apk/release/tudo_android.apk
+
       - uses: ruby/setup-ruby@v1
         with:
           working-directory: android
@@ -67,12 +73,10 @@ jobs:
           lane: 'deploy'
           subdirectory: 'android'
 
-      - name: Create release
-        uses: softprops/action-gh-release@v1
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
         with:
-          tag_name: ${{ inputs.name }}
-          name: "tudo ${{ inputs.name }}"
-          generate_release_notes: true
-          files: |
-            build/app/outputs/bundle/release/app-release.aab
-            build/app/outputs/apk/release/app-release.apk
+          name: android
+          path: |
+            build/app/outputs/bundle/release/tudo_android.aab
+            build/app/outputs/apk/release/tudo_android.apk
