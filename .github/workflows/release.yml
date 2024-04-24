@@ -118,5 +118,5 @@ jobs:
             android/bundle/release/tudo_android.aab
             android/apk/release/tudo_android.apk
             ios/tudo_ios.ipa
-            linux_x86_64/tudo_linux_x86_64.tar.gz
+            linux_x86_64/tudo_linux_x86_64.zip
             web/tudo_web.zip

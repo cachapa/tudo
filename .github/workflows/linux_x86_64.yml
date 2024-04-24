@@ -30,10 +30,10 @@ jobs:
 
       - name: Create archive
         working-directory: build/linux/x64/release/bundle
-        run: tar -acf tudo_linux_x86_64.tar.gz *
+        run: zip -r tudo_linux_x86_64.zip *
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: linux_x86_64
-          path: build/linux/x64/release/bundle/tudo_linux_x86_64.tar.gz
+          path: build/linux/x64/release/bundle/tudo_linux_x86_64.zip
