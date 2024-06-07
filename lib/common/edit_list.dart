@@ -210,7 +210,7 @@ class _MemberList extends StatelessWidget {
 
   void _inviteMember(BuildContext context) {
     final t = context.t;
-    final shareUrl = 'https://tudo.cachapa.net/list/${list.id}';
+    final shareUrl = '${Registry.settingsProvider.serverUri}/list/${list.id}';
 
     showDialog(
       context: context,
