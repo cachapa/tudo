@@ -5,6 +5,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../extensions.dart';
 import '../lists/list_provider.dart';
+import '../registry.dart';
 
 void shareToDoList(BuildContext context, ToDoList list) {
   showModalBottomSheet<String>(
@@ -19,7 +20,7 @@ void shareToDoList(BuildContext context, ToDoList list) {
 class _ShareListForm extends StatelessWidget {
   final ToDoList list;
 
-  String get shareUrl => 'https://tudo.cachapa.net/list/${list.id}';
+  String get shareUrl => '${Registry.settingsProvider.serverUri}/list/${list.id}';
 
   const _ShareListForm({required this.list});
 
