@@ -20,7 +20,8 @@ void shareToDoList(BuildContext context, ToDoList list) {
 class _ShareListForm extends StatelessWidget {
   final ToDoList list;
 
-  String get shareUrl => '${Registry.settingsProvider.serverUri}/list/${list.id}';
+  String get shareUrl =>
+      '${Registry.settingsProvider.serverUri}/list/${list.id}';
 
   const _ShareListForm({required this.list});
 
@@ -56,8 +57,7 @@ class _ShareListForm extends StatelessWidget {
               alignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton.icon(
-                  style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all(list.color)),
+                  style: TextButton.styleFrom(foregroundColor: list.color),
                   icon: const Icon(Icons.copy),
                   label: Text(t.copyLink.toUpperCase()),
                   onPressed: () {
@@ -67,8 +67,7 @@ class _ShareListForm extends StatelessWidget {
                 ),
                 const SizedBox(width: 16),
                 TextButton.icon(
-                  style: ButtonStyle(
-                      foregroundColor: MaterialStateProperty.all(list.color)),
+                  style: TextButton.styleFrom(foregroundColor: list.color),
                   icon: Icon(Icons.adaptive.share),
                   label: Text(context.t.share.toUpperCase()),
                   onPressed: () {

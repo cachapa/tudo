@@ -224,8 +224,7 @@ class _MemberList extends StatelessWidget {
         ),
         actions: [
           TextButton.icon(
-            style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all(list.color)),
+            style: TextButton.styleFrom(foregroundColor: list.color),
             icon: const Icon(Icons.copy),
             label: Text(t.copyLink.toUpperCase()),
             onPressed: () {
@@ -234,8 +233,7 @@ class _MemberList extends StatelessWidget {
             },
           ),
           TextButton.icon(
-            style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.all(list.color)),
+            style: TextButton.styleFrom(foregroundColor: list.color),
             icon: Icon(Icons.adaptive.share),
             label: Text(context.t.share.toUpperCase()),
             onPressed: () {

@@ -1,10 +1,8 @@
-// ignore_for_file: use_build_context_synchronously
-
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:uni_links/uni_links.dart';
 
 import '../common/appbars.dart';
 import '../common/dialogs.dart';
@@ -93,7 +91,7 @@ class _ListManagerPageState extends State<ListManagerPage>
             IconButton(
               icon: const Icon(Icons.qr_code_scanner_rounded),
               tooltip: t.scanQrCode,
-              onPressed: () => _launchQrScanner(context),
+              onPressed: _launchQrScanner,
             ),
             ValueStreamBuilder<bool>(
               stream: Registry.contactProvider.isNameSet,
@@ -179,7 +177,7 @@ class _ListManagerPageState extends State<ListManagerPage>
     }
   }
 
-  Future<void> _launchQrScanner(BuildContext context) async {
+  Future<void> _launchQrScanner() async {
     final code = await scanQrCode(context);
 
     if (code == null) return;
@@ -190,7 +188,7 @@ class _ListManagerPageState extends State<ListManagerPage>
       await _joinList(uri.pathSegments.last);
     } catch (e) {
       '$e'.log;
-      context.showSnackBar('$e');
+      if (mounted) context.showSnackBar('$e');
     }
   }
 
@@ -206,7 +204,7 @@ class _ListManagerPageState extends State<ListManagerPage>
         context.showSnackBar(context.t.listAlreadyJoined);
       }
     } catch (e) {
-      if (context.mounted) context.showSnackBar('$e');
+      if (mounted) context.showSnackBar('$e');
     }
   }
 
@@ -237,17 +235,15 @@ class _ListManagerPageState extends State<ListManagerPage>
   void _monitorDeeplinks() {
     try {
       if (PlatformX.isMobile) {
-        getInitialUri().then((uri) async {
+        AppLinks().getInitialLink().then((uri) async {
           if (uri != null) {
             'Initial link: $uri'.log;
             await _joinList(uri.pathSegments.last);
           }
         });
-        uriLinkStream.where((e) => e != null).listen((uri) async {
-          if (uri != null) {
-            'Stream link: $uri'.log;
-            await _joinList(uri.pathSegments.last);
-          }
+        AppLinks().uriLinkStream.listen((uri) async {
+          'Stream link: $uri'.log;
+          await _joinList(uri.pathSegments.last);
         }).onError((e) => e.log);
       }
     } catch (e) {

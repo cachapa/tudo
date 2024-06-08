@@ -132,7 +132,7 @@ class TextInputDialog extends StatelessWidget {
           child: Text(context.t.cancel.toUpperCase()),
         ),
         ElevatedButton(
-          style: ButtonStyle(elevation: MaterialStateProperty.all(0)),
+          style: ElevatedButton.styleFrom(elevation: 0),
           onPressed: () => context.pop(text),
           child: Text(positiveLabel.toUpperCase()),
         ),
