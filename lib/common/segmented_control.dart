@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
-class SegmentedControl<V, T> extends StatelessWidget {
+class SegmentedControl<V extends Object, T> extends StatelessWidget {
   final V value;
   final Map<V, T> items;
   final ValueChanged<V> onChanged;

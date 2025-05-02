@@ -1,12 +1,12 @@
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:platform_info/platform_info.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
 
 import 'auth/auth_provider.dart';
 import 'contacts/contact_provider.dart';
 import 'crdt/hive_adapters.dart';
 import 'crdt/tudo_crdt.dart';
+import 'extensions.dart';
 import 'lists/list_provider.dart';
 import 'settings/settings_provider.dart';
 import 'sync/sync_provider.dart';
@@ -29,7 +29,7 @@ class Registry {
   Registry._();
 
   static Future<void> init() async {
-    final dir = platform.isAndroid || platform.isIOS
+    final dir = PlatformX.isMobile
         ? (await getApplicationDocumentsDirectory()).path
         : 'store';
     Hive.init(dir);

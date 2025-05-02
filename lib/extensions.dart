@@ -127,12 +127,12 @@ extension UriX on Uri {
 }
 
 class PlatformX {
-  static bool get isAndroid => platform.isAndroid;
+  static bool get isAndroid => platform.android;
 
-  static bool get isMobile => isAndroid || platform.isIOS;
+  static bool get isMobile => isAndroid || platform.iOS;
 
   static bool get isDesktop =>
-      platform.isLinux || platform.isMacOS || platform.isWindows;
+      platform.linux || platform.macOS || platform.windows;
 
-  static bool get isApple => platform.isMacOS || platform.isIOS;
+  static bool get isApple => platform.macOS || platform.iOS;
 }

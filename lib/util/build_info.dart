@@ -15,11 +15,11 @@ class BuildInfo {
 
   static String get platform => _p.operatingSystem.name;
 
-  static bool get isWeb => _p.isWeb;
+  static bool get isWeb => _p.js;
 
   static String get locale => _p.locale;
 
-  static bool get isDebug => _p.buildMode.isDebug;
+  static bool get isDebug => _p.buildMode.debug;
 
   static String get userAgent =>
       'tudo/$version $platform/$platformVersion ($deviceModel)';
@@ -30,27 +30,27 @@ class BuildInfo {
     _packageInfo = await PackageInfo.fromPlatform();
 
     // Web
-    if (_p.isWeb) {
+    if (_p.js) {
       final info = await DeviceInfoPlugin().webBrowserInfo;
       deviceModel = info.browserName.name;
       platformVersion = info.appVersion ?? '';
     }
     // Mobile
-    else if (_p.isAndroid) {
+    else if (_p.android) {
       final info = await DeviceInfoPlugin().androidInfo;
       deviceModel = info.model;
       platformVersion = info.version.release;
-    } else if (_p.isIOS) {
+    } else if (_p.iOS) {
       final info = await DeviceInfoPlugin().iosInfo;
       deviceModel = info.model;
       platformVersion = info.systemVersion;
     }
     // Desktop
-    else if (_p.isLinux) {
+    else if (_p.linux) {
       final info = await DeviceInfoPlugin().linuxInfo;
       deviceModel = info.name;
       platformVersion = info.versionId ?? _p.version;
-    } else if (_p.isMacOS) {
+    } else if (_p.macOS) {
       final info = await DeviceInfoPlugin().macOsInfo;
       deviceModel = info.model;
       platformVersion = info.osRelease;
