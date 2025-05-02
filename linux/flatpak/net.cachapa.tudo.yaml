@@ -16,9 +16,12 @@ modules:
     only-arches:
       - x86_64
     build-commands:
-      - ./build-flatpak.sh
+#      - ./build-flatpak.sh
+      - ls
     sources:
-      - type: dir
-        path: ../../build/linux/x64/release/bundle/
+      - type: archive
+        path: https://github.com/ferraridamiano/ConverterNOW/releases/download/v3.1.1/converternow-linux.tar.gz
+        dest: tudo
+        sha256: cf00cca5a35ae6decbfb5fb5490fbf98c2af48bd1a845a7f9f18c8fae9f977e4
       - type: dir
         path: assets
