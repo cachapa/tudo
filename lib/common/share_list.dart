@@ -52,8 +52,7 @@ class _ShareListForm extends StatelessWidget {
               backgroundColor: ThemeData.light().canvasColor,
             ),
             const SizedBox(height: 20),
-            ButtonBar(
-              mainAxisSize: MainAxisSize.max,
+            OverflowBar(
               alignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton.icon(
@@ -71,7 +70,8 @@ class _ShareListForm extends StatelessWidget {
                   icon: Icon(Icons.adaptive.share),
                   label: Text(context.t.share.toUpperCase()),
                   onPressed: () {
-                    Share.share(t.listShareMessage(list.name, shareUrl));
+                    SharePlus.instance.share(ShareParams(
+                        text: t.listShareMessage(list.name, shareUrl)));
                     Navigator.pop(context);
                   },
                 ),

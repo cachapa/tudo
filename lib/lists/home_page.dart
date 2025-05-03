@@ -79,7 +79,7 @@ class EmptyList extends StatelessWidget {
     return Center(
       child: Icon(
         Icons.list_alt_rounded,
-        color: context.theme.dividerColor.withOpacity(0.2),
+        color: context.theme.dividerColor.withAlpha(50),
         size: 100,
       ),
     );

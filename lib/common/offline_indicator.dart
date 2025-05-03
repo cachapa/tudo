@@ -25,8 +25,8 @@ class OfflineIndicator {
                 : LinearProgressIndicator(
                     key: const ValueKey('visible'),
                     minHeight: 4,
-                    color: Colors.amber.withOpacity(0.4),
-                    backgroundColor: Colors.amber.withOpacity(0.2),
+                    color: Colors.amber.withAlpha(100),
+                    backgroundColor: Colors.amber.withAlpha(50),
                   ),
           ),
         ),

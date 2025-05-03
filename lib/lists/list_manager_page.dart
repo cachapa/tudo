@@ -102,7 +102,7 @@ class _ListManagerPageState extends State<ListManagerPage>
                   child: const Icon(Icons.settings_rounded),
                 ),
                 tooltip: t.settings,
-                onPressed: () => context.push(() => const SettingsPage()),
+                onPressed: _showSettingsPage,
               ),
             ),
           ],
@@ -249,6 +249,10 @@ class _ListManagerPageState extends State<ListManagerPage>
     } catch (e) {
       e.toString().log;
     }
+  }
+
+  void _showSettingsPage() {
+    context.push(() => const SettingsPage());
   }
 }
 

@@ -22,7 +22,7 @@ class ToDoListTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       selected: isSelected,
-      selectedTileColor: list.color.withOpacity(0.1),
+      selectedTileColor: list.color.withAlpha(25),
       tileColor: context.theme.canvasColor,
       contentPadding: const EdgeInsets.only(left: 16, right: 8),
       leading: Progress(

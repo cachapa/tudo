@@ -48,7 +48,7 @@ class _ColorSelectorState extends State<ColorSelector> {
       (color) => Expanded(
         child: ColorButton(
           color: color,
-          selected: color.value == widget.controller.color.value,
+          selected: color.toARGB32() == widget.controller.color.toARGB32(),
           onPressed: () => _setColor(color),
         ),
       ),

@@ -128,7 +128,7 @@ class _RestoreItemsDialog extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: Material(
-          color: list.color.withOpacity(0.1),
+          color: list.color.withAlpha(25),
           child: Column(
             children: [
               Padding(

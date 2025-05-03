@@ -56,10 +56,10 @@ extension ListX<T> on List<T> {
 
 extension ColorX on Color {
   String get hexValue =>
-      '#${(value & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
+      '#${(toARGB32() & 0xFFFFFF).toRadixString(16).padLeft(6, '0')}';
 
   Color blend(Color color, double strength) =>
-      Color.alphaBlend(color.withOpacity(strength), this);
+      Color.alphaBlend(color.withAlpha((strength * 256).round()), this);
 
   Color lighten(double strength) => blend(Colors.white, strength);
 

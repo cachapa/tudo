@@ -206,11 +206,11 @@ class SettingsPage extends StatelessWidget {
                         '${(await getApplicationCacheDirectory()).path}/tudo_account_key.png';
                     await File(path).writeAsBytes(pngBytes, flush: true);
                     if (!context.mounted) return;
-                    await Share.shareXFiles(
-                      [XFile(path)],
+                    await SharePlus.instance.share(ShareParams(
+                      files: [XFile(path)],
                       subject: context.t.tudoAccountKey,
                       text: keyUrl,
-                    );
+                    ));
                     if (context.mounted) context.pop();
                   },
                 ),

@@ -183,7 +183,7 @@ class _MemberList extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(24)),
                         backgroundColor: context.theme.primaryColor
-                            .withOpacity(e.isCurrentUser ? 0.2 : 0.1),
+                            .withAlpha(e.isCurrentUser ? 50 : 25),
                         label: Text(e.nameOr(context)),
                         onPressed: e.isCurrentUser ? () {} : null,
                         onDeleted: e.isCurrentUser
@@ -237,7 +237,8 @@ class _MemberList extends StatelessWidget {
             icon: Icon(Icons.adaptive.share),
             label: Text(context.t.share.toUpperCase()),
             onPressed: () {
-              Share.share(t.listShareMessage(list.name, shareUrl));
+              SharePlus.instance.share(
+                  ShareParams(text: t.listShareMessage(list.name, shareUrl)));
               Navigator.pop(context);
             },
           ),

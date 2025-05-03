@@ -41,7 +41,9 @@ Future<T?> showIndeterminateProgressDialog<T>(
   );
 
   try {
-    return await future.whenComplete(() => context.pop());
+    return await future.whenComplete(() {
+      if (context.mounted) context.pop();
+    });
   } catch (e) {
     if (context.mounted) {
       context.pop();
