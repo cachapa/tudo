@@ -51,5 +51,16 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
     <string>Authenticate to show account key</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+      <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>tudo</string>
+        </array>
+        <key>CFBundleURLName</key>
+        <string>net.cachapa.tudo</string>
+      </dict>
+    </array>
 </dict>
 </plist>

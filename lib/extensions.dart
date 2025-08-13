@@ -2,11 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:intl/intl.dart';
 import 'package:platform_info/platform_info.dart';
 
-export 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'l10n/app_localizations.dart';
+
+export 'l10n/app_localizations.dart';
 
 extension BoolX on bool {
   int get toInt => this ? 1 : 0;

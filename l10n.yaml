@@ -1,6 +1,5 @@
 arb-dir: l10n
-template-arb-file: app_en.arb
-output-localization-file: app_localizations.dart
+output-dir: lib/l10n
 preferred-supported-locales: [en]
 nullable-getter: false
 untranslated-messages-file: missing_translations.txt

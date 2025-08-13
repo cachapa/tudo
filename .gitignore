@@ -40,9 +40,11 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
+# Generated files
+lib/l10n
+
 # Store
 store
 
 # Secrets
 release_config.dart
-
