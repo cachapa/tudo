@@ -8,7 +8,8 @@ import '../registry.dart';
 class UpdateUtil {
   static final Future<bool> updateAvailable = Platform.isAndroid
       ? (InAppUpdate.checkForUpdate().then(
-          (v) => v.updateAvailability == UpdateAvailability.updateAvailable))
+          (v) => v.updateAvailability == UpdateAvailability.updateAvailable,
+        ))
       : Registry.syncProvider.isUpdateRequired();
 
   UpdateUtil._();

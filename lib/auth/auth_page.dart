@@ -39,17 +39,15 @@ class _Foreground extends StatelessWidget {
           Text(
             'tudo',
             style: context.theme.textTheme.displayLarge!.apply(
-                fontFamily: 'WaitingfortheSunrise',
-                fontSizeFactor: 1.5,
-                color: Colors.white),
+              fontFamily: 'WaitingfortheSunrise',
+              fontSizeFactor: 1.5,
+              color: Colors.white,
+            ),
           ),
           // Spacer(),
           const SizedBox(height: 80),
           TextButton.icon(
-            icon: const Icon(
-              Icons.auto_awesome,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.auto_awesome, color: Colors.white),
             label: Text(
               context.t.startFromCleanSlate.toUpperCase(),
               style: const TextStyle(color: Colors.white),
@@ -77,8 +75,10 @@ class _Foreground extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           TextButton.icon(
-            icon:
-                const Icon(Icons.qr_code_scanner_rounded, color: Colors.white),
+            icon: const Icon(
+              Icons.qr_code_scanner_rounded,
+              color: Colors.white,
+            ),
             onPressed: () => _loadProfile(context),
             label: Text(
               context.t.linkExistingAccount.toUpperCase(),
@@ -106,10 +106,7 @@ class _Foreground extends StatelessWidget {
   Future<void> _loadProfile(BuildContext context) async {
     try {
       final tokenUrl = await (PlatformX.isMobile
-          ? scanQrCode(
-              context,
-              message: context.t.scanAccountKeyExplanation,
-            )
+          ? scanQrCode(context, message: context.t.scanAccountKeyExplanation)
           : showTextInputDialog(
               context,
               hint: context.t.accountKey,
@@ -129,8 +126,9 @@ class _Foreground extends StatelessWidget {
       if (!context.mounted) return;
 
       // Remove /key/{uuid} from token url and store as server url
-      final serverUri =
-          tokenUri.replace(pathSegments: segments.take(segments.length - 2));
+      final serverUri = tokenUri.replace(
+        pathSegments: segments.take(segments.length - 2),
+      );
 
       final token = segments.last;
       Registry.settingsProvider.setServerUri('$serverUri');

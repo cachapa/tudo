@@ -28,7 +28,7 @@ class SettingsProvider {
   void setTheme(ThemeMode value) => _store.put('theme', value.index);
 
   SettingsProvider(StoreProvider storeProvider)
-      : _store = storeProvider.getStore('settings') {
+    : _store = storeProvider.getStore('settings') {
     _prevVersion = _store.get('version');
     _store.put('version', BuildInfo.version);
   }

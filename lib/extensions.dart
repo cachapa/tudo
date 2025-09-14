@@ -95,14 +95,12 @@ extension ContextExtensions on BuildContext {
                 height: 24,
                 child: IconButton(
                   padding: EdgeInsets.zero,
-                  icon: Icon(
-                    Icons.undo,
-                    color: theme.primaryColor,
-                  ),
+                  icon: Icon(Icons.undo, color: theme.primaryColor),
                   onPressed: () {
                     onUndo();
                     scaffold.hideCurrentSnackBar(
-                        reason: SnackBarClosedReason.action);
+                      reason: SnackBarClosedReason.action,
+                    );
                   },
                 ),
               ),
@@ -116,15 +114,15 @@ extension ContextExtensions on BuildContext {
 }
 
 extension UriX on Uri {
-  Uri apply(String path,
-          {String? scheme, Map<String, String>? queryParameters}) =>
-      replace(
-        scheme: scheme,
-        path: '${this.path}/$path',
-        queryParameters: {
-          ...?queryParameters,
-        },
-      );
+  Uri apply(
+    String path, {
+    String? scheme,
+    Map<String, String>? queryParameters,
+  }) => replace(
+    scheme: scheme,
+    path: '${this.path}/$path',
+    queryParameters: {...?queryParameters},
+  );
 }
 
 class PlatformX {

@@ -19,10 +19,7 @@ class PopupMenu extends StatelessWidget {
               value: e,
               child: Row(
                 children: [
-                  Icon(
-                    e.icon,
-                    color: e.color ?? context.theme.hintColor,
-                  ),
+                  Icon(e.icon, color: e.color ?? context.theme.hintColor),
                   const SizedBox(width: 16),
                   Text(e.title),
                 ],

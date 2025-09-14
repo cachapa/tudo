@@ -28,8 +28,10 @@ class ToDoListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.t;
-    final bottom = max(MediaQuery.of(context).viewInsets.bottom,
-        MediaQuery.of(context).viewPadding.bottom);
+    final bottom = max(
+      MediaQuery.of(context).viewInsets.bottom,
+      MediaQuery.of(context).viewPadding.bottom,
+    );
 
     return GestureDetector(
       // Close keyboard when tapping a non-focusable area
@@ -40,11 +42,13 @@ class ToDoListPage extends StatelessWidget {
         errorBuilder: (_, __) => const SizedBox(),
         builder: (_, list) => Theme(
           data: context.theme.copyWith(
-            colorScheme:
-                context.theme.colorScheme.copyWith(primary: list.color),
+            colorScheme: context.theme.colorScheme.copyWith(
+              primary: list.color,
+            ),
             primaryColor: list.color,
-            primaryTextTheme:
-                TextTheme(titleLarge: TextStyle(color: list.color)),
+            primaryTextTheme: TextTheme(
+              titleLarge: TextStyle(color: list.color),
+            ),
           ),
           child: Scaffold(
             extendBodyBehindAppBar: true,
@@ -69,10 +73,7 @@ class ToDoListPage extends StatelessWidget {
               duration: const Duration(milliseconds: 400),
               child: list.items.isEmpty
                   ? _EmptyPage()
-                  : ToDoListView(
-                      list: list,
-                      toDoListKey: _listKey,
-                    ),
+                  : ToDoListView(list: list, toDoListKey: _listKey),
             ),
             bottomNavigationBar: Padding(
               padding: EdgeInsets.only(bottom: bottom),
@@ -87,7 +88,10 @@ class ToDoListPage extends StatelessWidget {
   }
 
   Future<void> _addItem(
-      BuildContext context, String listID, String name) async {
+    BuildContext context,
+    String listID,
+    String name,
+  ) async {
     await Registry.listProvider.createItem(list.id, name);
 
     // Wait for entry animation to finish
@@ -104,10 +108,10 @@ class ToDoListPage extends StatelessWidget {
   }
 
   Future<void> _showDeletedItems(BuildContext context) => showDialog(
-        context: context,
-        barrierColor: Colors.transparent,
-        builder: (context) => _RestoreItemsDialog(list: list),
-      );
+    context: context,
+    barrierColor: Colors.transparent,
+    builder: (context) => _RestoreItemsDialog(list: list),
+  );
 
   Future<void> _editList(BuildContext context) => editToDoList(context, list);
 }
@@ -122,9 +126,7 @@ class _RestoreItemsDialog extends StatelessWidget {
     return Container(
       margin: context.padding.add(const EdgeInsets.fromLTRB(12, 64, 12, 80)),
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(24)),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: Material(
@@ -148,12 +150,10 @@ class _RestoreItemsDialog extends StatelessWidget {
                     return AnimatedListBuilder(
                       items,
                       builder: (_, i, item) => ListTile(
-                        contentPadding:
-                            const EdgeInsets.symmetric(horizontal: 16),
-                        leading: Check(
-                          checked: item.done,
-                          disabled: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
                         ),
+                        leading: Check(checked: item.done, disabled: true),
                         title: Text(item.name),
                         trailing: IconButton(
                           tooltip: context.t.restore,
@@ -180,11 +180,12 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
   final List<Widget> actions;
   final VoidCallback onClose;
 
-  const TitleBar(
-      {super.key,
-      required this.list,
-      required this.actions,
-      required this.onClose});
+  const TitleBar({
+    super.key,
+    required this.list,
+    required this.actions,
+    required this.onClose,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -200,10 +201,7 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
           children: [
             const Positioned(
               left: 8,
-              child: Icon(
-                Icons.arrow_back_ios_rounded,
-                size: 16,
-              ),
+              child: Icon(Icons.arrow_back_ios_rounded, size: 16),
             ),
             Positioned(
               right: 4,
@@ -218,17 +216,15 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       title: Column(
         children: [
-          Text(
-            list.name,
-            style: context.theme.textTheme.titleLarge,
-          ),
+          Text(list.name, style: context.theme.textTheme.titleLarge),
           if (list.isShared)
             Text(
               list.memberNames(context),
               softWrap: false,
               overflow: TextOverflow.fade,
-              style: context.theme.textTheme.bodyMedium!
-                  .copyWith(color: context.theme.textTheme.bodySmall!.color),
+              style: context.theme.textTheme.bodyMedium!.copyWith(
+                color: context.theme.textTheme.bodySmall!.color,
+              ),
             ),
         ],
       ),
@@ -270,8 +266,9 @@ class _InputBarState extends State<InputBar> {
             focusNode: _focusNode,
             textCapitalization: TextCapitalization.sentences,
             cursorColor: primaryColor,
-            style: context.theme.textTheme.titleMedium!
-                .copyWith(color: primaryColor),
+            style: context.theme.textTheme.titleMedium!.copyWith(
+              color: primaryColor,
+            ),
             decoration: InputDecoration(
               filled: true,
               fillColor: primaryColor.withAlpha(30),
@@ -327,9 +324,11 @@ class _ToDoListViewState extends State<ToDoListView> {
   Widget build(BuildContext context) {
     toDoItems = widget.list.items.where((e) => !e.done).toList();
     doneItems = widget.list.items.where((e) => e.done).toList()
-      ..sort((a, b) => a.doneAt != null && b.doneAt != null
-          ? b.doneAt!.compareTo(a.doneAt!)
-          : a.position.compareTo(b.position));
+      ..sort(
+        (a, b) => a.doneAt != null && b.doneAt != null
+            ? b.doneAt!.compareTo(a.doneAt!)
+            : a.position.compareTo(b.position),
+      );
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -353,10 +352,8 @@ class _ToDoListViewState extends State<ToDoListView> {
             AnimatedSwitcher(
               key: widget.toDoListKey,
               duration: mediumDuration,
-              transitionBuilder: (child, animation) => SizeFadeTransition(
-                animation: animation,
-                child: child,
-              ),
+              transitionBuilder: (child, animation) =>
+                  SizeFadeTransition(animation: animation, child: child),
               child: widget.list.doneCount == 0
                   ? const SizedBox.shrink()
                   : Column(
@@ -367,10 +364,13 @@ class _ToDoListViewState extends State<ToDoListView> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(context.t.completed,
-                                  style: context.theme.textTheme.titleMedium!
-                                      .copyWith(
-                                          color: context.theme.primaryColor)),
+                              Text(
+                                context.t.completed,
+                                style: context.theme.textTheme.titleMedium!
+                                    .copyWith(
+                                      color: context.theme.primaryColor,
+                                    ),
+                              ),
                               IconButton(
                                 color: context.theme.primaryColor,
                                 onPressed: () => _clearCompleted(context),
@@ -554,7 +554,7 @@ class _EmptyPage extends StatelessWidget {
             Icons.check_rounded,
             size: size,
             color: context.theme.primaryColor,
-          )
+          ),
         ],
       ),
     );

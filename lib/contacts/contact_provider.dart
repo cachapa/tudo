@@ -17,28 +17,36 @@ class ContactProvider {
   Stream<User> get currentUser => getUser(userId);
 
   ContactProvider(AuthProvider authProvider, this._crdt)
-      : userId = authProvider.userId {
-    _contacts.addStream(_crdt
-        .watch('''
+    : userId = authProvider.userId {
+    _contacts.addStream(
+      _crdt
+          .watch('''
           SELECT * FROM users
           WHERE is_deleted = 0
         ''')
-        .map((l) => l.map((m) => User.fromMap(userId, m)))
-        .map((l) => {for (final u in l) u.id: u}));
+          .map((l) => l.map((m) => User.fromMap(userId, m)))
+          .map((l) => {for (final u in l) u.id: u}),
+    );
   }
 
   Future<void> setName(String name) async {
     final userExists = (await _contacts.first).containsKey(userId);
     if (!userExists) {
-      await _crdt.execute('''
+      await _crdt.execute(
+        '''
         INSERT INTO users (id, name)
         VALUES (?1, ?2)
-      ''', [userId, name.trim()]);
+      ''',
+        [userId, name.trim()],
+      );
     } else {
-      await _crdt.execute('''
+      await _crdt.execute(
+        '''
         UPDATE users SET name = ?2
         WHERE id = ?1
-      ''', [userId, name.trim()]);
+      ''',
+        [userId, name.trim()],
+      );
     }
   }
 
@@ -51,11 +59,11 @@ class User extends IdObject {
   final bool isCurrentUser;
 
   User(String currentUserId, super.id, String? name)
-      : name = name ?? '',
-        isCurrentUser = currentUserId == id;
+    : name = name ?? '',
+      isCurrentUser = currentUserId == id;
 
   User.fromMap(String userId, Map<String, dynamic> map)
-      : this(userId, map['id'], map['name']);
+    : this(userId, map['id'], map['name']);
 
   String nameOr(BuildContext context) =>
       name.isEmpty ? context.t.anonymous : name;

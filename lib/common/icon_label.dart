@@ -16,15 +16,12 @@ class IconLabel extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(
-          icon,
-          size: 14,
-          color: color,
-        ),
+        Icon(icon, size: 14, color: color),
         const SizedBox(width: 4),
         Text(
           label,
-          style: style ??
+          style:
+              style ??
               context.theme.textTheme.bodyMedium!.copyWith(color: color),
           softWrap: false,
           overflow: TextOverflow.ellipsis,

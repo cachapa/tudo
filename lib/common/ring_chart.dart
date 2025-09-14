@@ -15,8 +15,9 @@ class AnimatedRingChart extends ImplicitlyAnimatedWidget {
     required this.progress,
     required this.total,
   }) : super(
-            duration: const Duration(milliseconds: 1000),
-            curve: Curves.fastOutSlowIn);
+         duration: const Duration(milliseconds: 1000),
+         curve: Curves.fastOutSlowIn,
+       );
 
   @override
   ImplicitlyAnimatedWidgetState<ImplicitlyAnimatedWidget> createState() =>
@@ -31,13 +32,27 @@ class _AnimatedRingChartState
 
   @override
   void forEachTween(TweenVisitor<dynamic> visitor) {
-    _color = visitor(
-            _color, widget.color, (dynamic value) => ColorTween(begin: value))
-        as ColorTween;
-    _progress = visitor(_progress, widget.progress,
-        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
-    _total = visitor(_total, widget.total,
-        (dynamic value) => Tween<double>(begin: value)) as Tween<double>;
+    _color =
+        visitor(
+              _color,
+              widget.color,
+              (dynamic value) => ColorTween(begin: value),
+            )
+            as ColorTween;
+    _progress =
+        visitor(
+              _progress,
+              widget.progress,
+              (dynamic value) => Tween<double>(begin: value),
+            )
+            as Tween<double>;
+    _total =
+        visitor(
+              _total,
+              widget.total,
+              (dynamic value) => Tween<double>(begin: value),
+            )
+            as Tween<double>;
   }
 
   @override
@@ -69,11 +84,7 @@ class RingChart extends StatelessWidget {
   Widget build(BuildContext context) {
     return CustomPaint(
       size: Size.square(size),
-      painter: _ChartPainter(
-        color: color,
-        progress: progress,
-        total: total,
-      ),
+      painter: _ChartPainter(color: color, progress: progress, total: total),
     );
   }
 }
@@ -91,10 +102,12 @@ class _ChartPainter extends CustomPainter {
 
   double get ratio => total == 0 ? 0 : progress / total;
 
-  _ChartPainter(
-      {required this.color, required this.progress, required this.total})
-      : _backgroundColor = color.withAlpha(100),
-        _fillPaint = Paint()..color = color;
+  _ChartPainter({
+    required this.color,
+    required this.progress,
+    required this.total,
+  }) : _backgroundColor = color.withAlpha(100),
+       _fillPaint = Paint()..color = color;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -112,8 +125,13 @@ class _ChartPainter extends CustomPainter {
     _ringPaint.color = color;
     const startAngle = -pi / 2;
     final endAngle = 2 * pi * ratio;
-    canvas.drawArc(Rect.fromCircle(center: center, radius: radius), startAngle,
-        endAngle, false, _ringPaint);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      startAngle,
+      endAngle,
+      false,
+      _ringPaint,
+    );
   }
 
   @override

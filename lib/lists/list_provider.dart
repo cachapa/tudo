@@ -16,14 +16,24 @@ class ListProvider {
   final SqlCrdt _crdt;
 
   late final lists = BehaviorSubject<List<ToDoList>>()
-    ..addStream(_queryLists()
-        .asyncMap((l) => Future.wait(l.map((map) async =>
-            ToDoList.fromMap(map, await _getMembers(map['id'])))))
-        .doOnError((p0, p1) => '$p0\n$p1'.log));
+    ..addStream(
+      _queryLists()
+          .asyncMap(
+            (l) => Future.wait(
+              l.map(
+                (map) async =>
+                    ToDoList.fromMap(map, await _getMembers(map['id'])),
+              ),
+            ),
+          )
+          .doOnError((p0, p1) => '$p0\n$p1'.log),
+    );
 
   ListProvider(
-      AuthProvider authProvider, StoreProvider storeProvider, this._crdt)
-      : userId = authProvider.userId;
+    AuthProvider authProvider,
+    StoreProvider storeProvider,
+    this._crdt,
+  ) : userId = authProvider.userId;
 
   Future<void> createList(String name, Color color) async {
     final listId = uuid();
@@ -31,20 +41,32 @@ class ListProvider {
     await _crdt.transaction((txn) async {
       final createdAt = DateTime.now().toUtcString;
       // Create list
-      await txn.execute('''
+      await txn.execute(
+        '''
         INSERT INTO lists (id, name, color, creator_id, created_at)
         VALUES (?1, ?2, ?3, ?4, ?5)
-      ''', [listId, name.trim(), color.hexValue, userId, createdAt]);
+      ''',
+        [listId, name.trim(), color.hexValue, userId, createdAt],
+      );
       // Get max position
-      final maxPosition = (await txn.query('''
+      final maxPosition =
+          (await txn.query(
+                '''
         SELECT max(position) as max_position FROM user_lists
         WHERE user_id = ?1 AND is_deleted = 0
-      ''', [userId])).first['max_position'] as int? ?? -1;
+      ''',
+                [userId],
+              )).first['max_position']
+              as int? ??
+          -1;
       // Associate list to user
-      await txn.execute('''
+      await txn.execute(
+        '''
         INSERT INTO user_lists (user_id, list_id, created_at, position)
         VALUES (?1, ?2, ?3, ?4)
-      ''', [userId, listId, createdAt, maxPosition + 1]);
+      ''',
+        [userId, listId, createdAt, maxPosition + 1],
+      );
     });
   }
 
@@ -69,34 +91,48 @@ class ListProvider {
 
   Stream<ToDoListWithItems> getList(String listId) => lists
       .map((e) => e.firstWhere((e) => e.id == listId))
-      .asyncMap((list) async =>
-          ToDoListWithItems.fromList(list, await _getToDos(listId)));
+      .asyncMap(
+        (list) async =>
+            ToDoListWithItems.fromList(list, await _getToDos(listId)),
+      );
 
   /// Removes the list from the user's references
   /// Does not actually delete the list, since it could be used by others
   Future<void> removeList(String listId) => removeUser(userId, listId);
 
-  Future<void> removeUser(String userId, String listId) => _crdt.execute('''
+  Future<void> removeUser(String userId, String listId) => _crdt.execute(
+    '''
     UPDATE user_lists SET is_deleted = 1
     WHERE user_id = ?1 AND list_id = ?2
-  ''', [userId, listId]);
+  ''',
+    [userId, listId],
+  );
 
   Future<void> undoRemoveList(String listId) => undoRemoveUser(userId, listId);
 
-  Future<void> undoRemoveUser(String userId, String listId) => _crdt.execute('''
+  Future<void> undoRemoveUser(String userId, String listId) => _crdt.execute(
+    '''
     UPDATE user_lists SET is_deleted = 0
     WHERE user_id = ?1 AND list_id = ?2
-  ''', [userId, listId]);
+  ''',
+    [userId, listId],
+  );
 
-  Future<void> deleteCompleted(String listId) => _crdt.execute('''
+  Future<void> deleteCompleted(String listId) => _crdt.execute(
+    '''
     UPDATE todos SET is_deleted = 1
     WHERE list_id = ?1 AND done = 1
-  ''', [listId]);
+  ''',
+    [listId],
+  );
 
-  Future<void> deleteItem(String id) => _crdt.execute('''
+  Future<void> deleteItem(String id) => _crdt.execute(
+    '''
     UPDATE todos SET is_deleted = 1
     WHERE id = ?1
-  ''', [id]);
+  ''',
+    [id],
+  );
 
   Future<void> undeleteItem(String id) => undeleteItems([id]);
 
@@ -105,60 +141,84 @@ class ListProvider {
 
     await _crdt.transaction((txn) async {
       for (final id in ids) {
-        await txn.execute('''
+        await txn.execute(
+          '''
           UPDATE todos SET is_deleted = 0
           WHERE id = ?1
-        ''', [id]);
+        ''',
+          [id],
+        );
       }
     });
   }
 
-  Future<void> setDone(String itemId, bool isDone) => _crdt.execute('''
+  Future<void> setDone(String itemId, bool isDone) => _crdt.execute(
+    '''
     UPDATE todos SET
       done = ?1,
       done_at = ?2,
       done_by = ?3
     WHERE id = ?4
-  ''', [
-        isDone.toInt,
-        isDone ? DateTime.now().toUtcString : null,
-        isDone ? userId : null,
-        itemId
-      ]);
+  ''',
+    [
+      isDone.toInt,
+      isDone ? DateTime.now().toUtcString : null,
+      isDone ? userId : null,
+      itemId,
+    ],
+  );
 
-  Future<void> setItemName(String itemId, String name) => _crdt.execute('''
+  Future<void> setItemName(String itemId, String name) => _crdt.execute(
+    '''
     UPDATE todos SET name = ?1
     WHERE id = ?2
-  ''', [name.trim(), itemId]);
+  ''',
+    [name.trim(), itemId],
+  );
 
-  void setName(String listId, String name) => _crdt.execute('''
+  void setName(String listId, String name) => _crdt.execute(
+    '''
     UPDATE lists SET name = ?1
     WHERE id = ?2
-  ''', [name.trim(), listId]);
+  ''',
+    [name.trim(), listId],
+  );
 
-  void setColor(String listId, Color color) => _crdt.execute('''
+  void setColor(String listId, Color color) => _crdt.execute(
+    '''
     UPDATE lists SET color = ?1
     WHERE id = ?2
-  ''', [color.hexValue, listId]);
+  ''',
+    [color.hexValue, listId],
+  );
 
   Future<String> createItem(String listId, String name) async {
     final id = uuid();
-    final maxPosition = (await _crdt.query('''
+    final maxPosition =
+        (await _crdt.query(
+              '''
       SELECT max(position) AS max_position FROM todos
       WHERE list_id = ? AND is_deleted = 0
-    ''', [listId])).first['max_position'] as int? ?? -1;
-    await _crdt.execute('''
+    ''',
+              [listId],
+            )).first['max_position']
+            as int? ??
+        -1;
+    await _crdt.execute(
+      '''
       INSERT INTO todos (id, list_id, name, done, position, creator_id, created_at)
       VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-    ''', [
-      id,
-      listId,
-      name.trim(),
-      0,
-      maxPosition + 1,
-      userId,
-      DateTime.now().toUtcString,
-    ]);
+    ''',
+      [
+        id,
+        listId,
+        name.trim(),
+        0,
+        maxPosition + 1,
+        userId,
+        DateTime.now().toUtcString,
+      ],
+    );
     return id;
   }
 
@@ -167,10 +227,13 @@ class ListProvider {
       for (int i = 0; i < lists.length; i++) {
         final list = lists[i];
         if (list.position != i) {
-          await txn.execute('''
+          await txn.execute(
+            '''
             UPDATE user_lists SET position = ?1
             WHERE user_id = ?2 AND list_id = ?3
-          ''', [i, userId, list.id]);
+          ''',
+            [i, userId, list.id],
+          );
         }
       }
     });
@@ -181,31 +244,42 @@ class ListProvider {
       for (int i = 0; i < items.length; i++) {
         final item = items[i];
         if (item.position != i) {
-          await txn.execute('''
+          await txn.execute(
+            '''
             UPDATE todos SET position = ?1
             WHERE id = ?2
-          ''', [i, item.id]);
+          ''',
+            [i, item.id],
+          );
         }
       }
     });
   }
 
-  Stream<List<ToDo>> getDeletedTodos(String listId) => _crdt.watch('''
+  Stream<List<ToDo>> getDeletedTodos(String listId) => _crdt
+      .watch('''
         SELECT * FROM todos
         WHERE list_id = ?1 AND is_deleted = 1
         ORDER BY hlc DESC
         LIMIT 40
-      ''', () => [listId]).map((e) => e.map(ToDo.fromMap).toList());
+      ''', () => [listId])
+      .map((e) => e.map(ToDo.fromMap).toList());
 
-  Future<List<Member>> _getMembers(String listId) => _crdt.query('''
+  Future<List<Member>> _getMembers(String listId) => _crdt
+      .query(
+        '''
         SELECT user_id AS id, name, user_lists.created_at AS joined_at FROM user_lists
           LEFT JOIN users ON user_id = id
         WHERE list_id = ?1
           AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
       ''',
-      [listId]).then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
+        [listId],
+      )
+      .then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
 
-  Future<List<ToDo>> _getToDos(String listId) => _crdt.query('''
+  Future<List<ToDo>> _getToDos(String listId) => _crdt
+      .query(
+        '''
     SELECT
       todos.id,
       todos.name,
@@ -227,18 +301,30 @@ class ListProvider {
       AND todos.is_deleted = 0
     ORDER BY
       position
-  ''', [listId]).then((l) => l.map(ToDo.fromMap).toList());
+  ''',
+        [listId],
+      )
+      .then((l) => l.map(ToDo.fromMap).toList());
 }
 
 class ToDoListWithItems extends ToDoList {
   final List<ToDo> items;
 
   ToDoListWithItems.fromList(ToDoList list, this.items)
-      : super(list.id, list.name, list.color, list.creatorId, list.createdAt,
-            list.position, list.itemCount, list.doneCount, list.members);
+    : super(
+        list.id,
+        list.name,
+        list.color,
+        list.creatorId,
+        list.createdAt,
+        list.position,
+        list.itemCount,
+        list.doneCount,
+        list.members,
+      );
 
   ToDoListWithItems.fromMap(super.map, super.members, this.items)
-      : super.fromMap();
+    : super.fromMap();
 }
 
 class ToDoList extends IdObject {
@@ -258,28 +344,29 @@ class ToDoList extends IdObject {
   bool get isEmpty => itemCount == 0;
 
   const ToDoList(
-      super.id,
-      this.name,
-      this.color,
-      this.creatorId,
-      this.createdAt,
-      this.position,
-      this.itemCount,
-      this.doneCount,
-      this.members);
+    super.id,
+    this.name,
+    this.color,
+    this.creatorId,
+    this.createdAt,
+    this.position,
+    this.itemCount,
+    this.doneCount,
+    this.members,
+  );
 
   ToDoList.fromMap(Map<String, dynamic> map, List<Member> members)
-      : this(
-          map['id'],
-          map['name'],
-          (map['color'] as String).asColor,
-          map['creator_id'],
-          (map['created_at'] as String?)?.asDateTime,
-          map['position'],
-          map['item_count'] ?? 0,
-          map['done_count'] ?? 0,
-          members,
-        );
+    : this(
+        map['id'],
+        map['name'],
+        (map['color'] as String).asColor,
+        map['creator_id'],
+        (map['created_at'] as String?)?.asDateTime,
+        map['position'],
+        map['item_count'] ?? 0,
+        map['done_count'] ?? 0,
+        members,
+      );
 
   String memberNames(BuildContext context) => shareCount < 4
       ? members.map((e) => e.nameOr(context)).join(' • ')
@@ -299,20 +386,29 @@ class ToDo extends IdObject {
   final String? createdBy;
   final DateTime? createdAt;
 
-  ToDo(super.id, this.name, this.done, this.doneAt, this.doneBy, this.position,
-      this.creatorId, this.createdBy, this.createdAt);
+  ToDo(
+    super.id,
+    this.name,
+    this.done,
+    this.doneAt,
+    this.doneBy,
+    this.position,
+    this.creatorId,
+    this.createdBy,
+    this.createdAt,
+  );
 
   factory ToDo.fromMap(Map<String, dynamic> map) => ToDo(
-        map['id'],
-        map['name'],
-        map['done'] == 1,
-        (map['done_at'] as String?)?.asDateTime.toLocal(),
-        map['done_by'],
-        map['position'],
-        map['creator_id'],
-        map['created_by'],
-        (map['created_at'] as String?)?.asDateTime.toLocal(),
-      );
+    map['id'],
+    map['name'],
+    map['done'] == 1,
+    (map['done_at'] as String?)?.asDateTime.toLocal(),
+    map['done_by'],
+    map['position'],
+    map['creator_id'],
+    map['created_by'],
+    (map['created_at'] as String?)?.asDateTime.toLocal(),
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -332,6 +428,6 @@ class Member extends User {
   final DateTime? joinedAt;
 
   Member.fromMap(super.userId, super.map)
-      : joinedAt = (map['joined_at'] as String?)?.asDateTime.toLocal(),
-        super.fromMap();
+    : joinedAt = (map['joined_at'] as String?)?.asDateTime.toLocal(),
+      super.fromMap();
 }

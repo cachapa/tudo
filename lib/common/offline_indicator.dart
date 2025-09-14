@@ -18,10 +18,7 @@ class OfflineIndicator {
           child: AnimatedSwitcher(
             duration: longDuration,
             child: state == SocketState.connected
-                ? const SizedBox(
-                    key: ValueKey('gone'),
-                    height: 4,
-                  )
+                ? const SizedBox(key: ValueKey('gone'), height: 4)
                 : LinearProgressIndicator(
                     key: const ValueKey('visible'),
                     minHeight: 4,

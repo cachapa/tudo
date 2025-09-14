@@ -55,14 +55,17 @@ class TudoApp extends StatelessWidget {
 // Hack around a bug on earlier Android versions
 // https://github.com/flutter/flutter/issues/90098
 Future<void> _setSystemColors() async {
-  final navigationBarColor = !PlatformX.isAndroid ||
+  final navigationBarColor =
+      !PlatformX.isAndroid ||
           ((await DeviceInfoPlugin().androidInfo).version.sdkInt) >= 29
       ? Colors.transparent
       : Colors.black38;
 
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    systemNavigationBarColor: navigationBarColor,
-  ));
+  SystemChrome.setSystemUIOverlayStyle(
+    SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: navigationBarColor,
+    ),
+  );
 }

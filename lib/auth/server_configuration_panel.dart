@@ -7,10 +7,10 @@ import '../extensions.dart';
 import '../registry.dart';
 
 void showServerConfigurationPanel(BuildContext context) => showModalBottomSheet(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => const ServerConfigurationPanel(),
-    );
+  context: context,
+  showDragHandle: true,
+  builder: (context) => const ServerConfigurationPanel(),
+);
 
 class ServerConfigurationPanel extends StatefulWidget {
   const ServerConfigurationPanel({super.key});
@@ -22,7 +22,8 @@ class ServerConfigurationPanel extends StatefulWidget {
 
 class _ServerConfigurationPanelState extends State<ServerConfigurationPanel> {
   final _controller = TextEditingController(
-      text: Registry.settingsProvider.serverUri.toString());
+    text: Registry.settingsProvider.serverUri.toString(),
+  );
 
   var _testing = false;
 

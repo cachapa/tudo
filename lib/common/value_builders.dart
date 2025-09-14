@@ -49,11 +49,12 @@ class _ValueStreamBuilderState<T> extends State<ValueStreamBuilder<T>> {
   @override
   void initState() {
     super.initState();
-    _subscription = widget.stream.listen((e) => setState(() {
-          _hasData = true;
-          _value = e;
-        }))
-      ..onError((e) => setState(() => _error = e));
+    _subscription = widget.stream.listen(
+      (e) => setState(() {
+        _hasData = true;
+        _value = e;
+      }),
+    )..onError((e) => setState(() => _error = e));
   }
 
   @override
@@ -68,13 +69,12 @@ class _ValueStreamBuilderState<T> extends State<ValueStreamBuilder<T>> {
 
     return _error != null
         ? widget.errorBuilder?.call(context, _error!) ??
-            _defaultErrorBuilder(context, _error!)
+              _defaultErrorBuilder(context, _error!)
         : _hasData
-            ? widget.builder(context, _value)
-            : _initialValue != null
-                ? widget.builder(context, _initialValue as T)
-                : widget.emptyBuilder?.call(context) ??
-                    _defaultEmptyBuilder(context);
+        ? widget.builder(context, _value)
+        : _initialValue != null
+        ? widget.builder(context, _initialValue as T)
+        : widget.emptyBuilder?.call(context) ?? _defaultEmptyBuilder(context);
   }
 }
 
@@ -106,30 +106,31 @@ class _ValueFutureBuilderState<T> extends State<ValueFutureBuilder<T>> {
   @override
   void initState() {
     super.initState();
-    widget.future.then((e) {
-      if (mounted) {
-        setState(() {
-          _hasData = true;
-          _value = e;
+    widget.future
+        .then((e) {
+          if (mounted) {
+            setState(() {
+              _hasData = true;
+              _value = e;
+            });
+          }
+        })
+        .catchError((e) {
+          if (mounted) {
+            setState(() => _error = e);
+          }
         });
-      }
-    }).catchError((e) {
-      if (mounted) {
-        setState(() => _error = e);
-      }
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return _error != null
         ? widget.errorBuilder?.call(context, _error!) ??
-            _defaultErrorBuilder(context, _error!)
+              _defaultErrorBuilder(context, _error!)
         : _hasData
-            ? widget.builder(context, _value)
-            : widget.initialValue != null
-                ? widget.builder(context, widget.initialValue as T)
-                : widget.emptyBuilder?.call(context) ??
-                    _defaultEmptyBuilder(context);
+        ? widget.builder(context, _value)
+        : widget.initialValue != null
+        ? widget.builder(context, widget.initialValue as T)
+        : widget.emptyBuilder?.call(context) ?? _defaultEmptyBuilder(context);
   }
 }

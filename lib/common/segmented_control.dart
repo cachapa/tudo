@@ -18,8 +18,9 @@ class SegmentedControl<V extends Object, T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return CupertinoSlidingSegmentedControl<V>(
       groupValue: value,
-      children: items
-          .map((key, value) => MapEntry(key, segmentBuilder(context, value))),
+      children: items.map(
+        (key, value) => MapEntry(key, segmentBuilder(context, value)),
+      ),
       onValueChanged: (value) => onChanged(value as V),
     );
   }

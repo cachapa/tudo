@@ -36,10 +36,17 @@ class _HomePageState extends State<HomePage> {
       }
 
       // Populate quick actions menu
-      _quickActions.setShortcutItems(lists
-          .map((list) => ShortcutItem(
-              type: list.id, localizedTitle: list.name, icon: 'list_shortcut'))
-          .toList());
+      _quickActions.setShortcutItems(
+        lists
+            .map(
+              (list) => ShortcutItem(
+                type: list.id,
+                localizedTitle: list.name,
+                icon: 'list_shortcut',
+              ),
+            )
+            .toList(),
+      );
     });
   }
 

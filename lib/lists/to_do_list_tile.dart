@@ -30,10 +30,7 @@ class ToDoListTile extends StatelessWidget {
         progress: list.doneCount,
         total: list.itemCount,
       ),
-      title: Text(
-        list.name,
-        style: context.theme.textTheme.titleLarge,
-      ),
+      title: Text(list.name, style: context.theme.textTheme.titleLarge),
       subtitle: list.isShared
           ? Text(
               list.memberNames(context),

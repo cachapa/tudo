@@ -33,7 +33,8 @@ class BlurredAppBar extends StatelessWidget implements PreferredSizeWidget {
         filter: ImageFilter.blur(sigmaX: blurSigma, sigmaY: blurSigma),
         child: AppBar(
           systemOverlayStyle: SystemUiOverlayStyle(
-              statusBarIconBrightness: context.theme.brightness.invert),
+            statusBarIconBrightness: context.theme.brightness.invert,
+          ),
           centerTitle: true,
           foregroundColor: foregroundColor,
           backgroundColor:
@@ -70,8 +71,9 @@ class DiscreteAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (subtitle != null)
             Text(
               subtitle!,
-              style: context.theme.textTheme.bodySmall!
-                  .copyWith(color: context.theme.primaryColor),
+              style: context.theme.textTheme.bodySmall!.copyWith(
+                color: context.theme.primaryColor,
+              ),
             ),
         ],
       ),

@@ -28,20 +28,22 @@ class SyncProvider {
 
   Timer? _fullSyncTimer;
 
-  SyncProvider(SettingsProvider settingsProvider, AuthProvider authProvider,
-      StoreProvider storeProvider, this._crdt)
-      : _serverUri = settingsProvider.serverUri,
-        _userId = authProvider.userId,
-        _store = storeProvider.getStore('sync') {
+  SyncProvider(
+    SettingsProvider settingsProvider,
+    AuthProvider authProvider,
+    StoreProvider storeProvider,
+    this._crdt,
+  ) : _serverUri = settingsProvider.serverUri,
+      _userId = authProvider.userId,
+      _store = storeProvider.getStore('sync') {
     _apiClient = ApiClient(authProvider.token);
     _syncClient = CrdtSyncClient(
       _crdt,
       _serverUri.replace(
-          scheme: _serverUri.scheme.replaceFirst('http', 'ws'),
-          path: 'ws/${authProvider.userId}',
-          queryParameters: {
-            'token': authProvider.token,
-          }),
+        scheme: _serverUri.scheme.replaceFirst('http', 'ws'),
+        path: 'ws/${authProvider.userId}',
+        queryParameters: {'token': authProvider.token},
+      ),
       validateRecord: (table, record) {
         // Perform full sync whenever user_lists is changed remotely.
         // Makes sure this node gets all relevant records even if they were
@@ -93,8 +95,9 @@ class SyncProvider {
   Future<void> _fullSync() async {
     'Performing full sync…'.log;
     final start = DateTime.now().millisecondsSinceEpoch;
-    final result = await _apiClient
-        .get(_serverUri.apply('changeset/$_userId/${_crdt.nodeId}'));
+    final result = await _apiClient.get(
+      _serverUri.apply('changeset/$_userId/${_crdt.nodeId}'),
+    );
     final changeset = parseCrdtChangeset(jsonDecode(result.body));
     await _crdt.merge(changeset);
     _store.put('need_full_sync', false);

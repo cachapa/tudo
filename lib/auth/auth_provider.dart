@@ -16,15 +16,16 @@ class AuthProvider {
 
   bool get isAuthComplete => _store.contains('token');
 
-  Stream<bool> get isAuthCompleteSteam => BehaviorSubject.seeded(isAuthComplete)
-    ..addStream(_store.watch(key: 'token').map((e) => e.value != null));
+  Stream<bool> get isAuthCompleteSteam =>
+      BehaviorSubject.seeded(isAuthComplete)
+        ..addStream(_store.watch(key: 'token').map((e) => e.value != null));
 
   String get token => _store.get('token');
 
   String get userId => _store.get('user_id');
 
   AuthProvider(this._settingsProvider, StoreProvider storeProvider, this._crdt)
-      : _store = storeProvider.getStore('auth');
+    : _store = storeProvider.getStore('auth');
 
   void create() {
     final token = uuid().replaceAll('-', '');

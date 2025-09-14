@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-typedef MasterBuilder = Widget Function(
-    BuildContext context, bool isMasterDetail);
-typedef DetailBuilder = Widget? Function(
-    BuildContext context, bool isMasterDetail);
+typedef MasterBuilder =
+    Widget Function(BuildContext context, bool isMasterDetail);
+typedef DetailBuilder =
+    Widget? Function(BuildContext context, bool isMasterDetail);
 typedef EmptyBuilder = Widget Function(BuildContext context);
 
 class MasterDetail extends StatelessWidget {
@@ -54,10 +54,7 @@ class MasterDetail extends StatelessWidget {
   Widget _buildLarge(BuildContext context, Widget master, Widget? detail) {
     return Row(
       children: [
-        SizedBox(
-          width: masterWidth,
-          child: master,
-        ),
+        SizedBox(width: masterWidth, child: master),
         Expanded(
           child: AnimatedSwitcher(
             duration: Durations.medium2,

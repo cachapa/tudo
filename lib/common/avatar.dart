@@ -11,10 +11,7 @@ class Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       backgroundColor: color ?? context.theme.primaryColor,
-      child: Icon(
-        Icons.person,
-        color: context.theme.canvasColor,
-      ),
+      child: Icon(Icons.person, color: context.theme.canvasColor),
     );
   }
 }

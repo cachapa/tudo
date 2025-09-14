@@ -72,7 +72,8 @@ class SettingsPage extends StatelessWidget {
             leading: const Icon(Icons.mail_outline),
             title: Text(t.sendFeedback),
             onTap: () => launchUrlString(
-                'mailto:cachapa@gmail.com?subject=tudo%20feedback'),
+              'mailto:cachapa@gmail.com?subject=tudo%20feedback',
+            ),
           ),
           ListTile(
             leading: const Icon(Icons.translate_rounded),
@@ -146,8 +147,9 @@ class SettingsPage extends StatelessWidget {
     final localAuth = LocalAuthentication();
     try {
       if (await localAuth.canCheckBiometrics && context.mounted) {
-        final isAuthenticated =
-            await localAuth.authenticate(localizedReason: context.t.accountKey);
+        final isAuthenticated = await localAuth.authenticate(
+          localizedReason: context.t.accountKey,
+        );
         if (!isAuthenticated) return;
       }
     } catch (e) {
@@ -196,21 +198,25 @@ class SettingsPage extends StatelessWidget {
                   icon: Icon(Icons.adaptive.share),
                   label: Text(context.t.share.toUpperCase()),
                   onPressed: () async {
-                    final boundary = qrKey.currentContext!.findRenderObject()
-                        as RenderRepaintBoundary;
+                    final boundary =
+                        qrKey.currentContext!.findRenderObject()
+                            as RenderRepaintBoundary;
                     ui.Image image = await boundary.toImage(pixelRatio: 3.0);
-                    final byteData =
-                        await image.toByteData(format: ui.ImageByteFormat.png);
+                    final byteData = await image.toByteData(
+                      format: ui.ImageByteFormat.png,
+                    );
                     var pngBytes = byteData!.buffer.asUint8List();
                     final path =
                         '${(await getApplicationCacheDirectory()).path}/tudo_account_key.png';
                     await File(path).writeAsBytes(pngBytes, flush: true);
                     if (!context.mounted) return;
-                    await SharePlus.instance.share(ShareParams(
-                      files: [XFile(path)],
-                      subject: context.t.tudoAccountKey,
-                      text: keyUrl,
-                    ));
+                    await SharePlus.instance.share(
+                      ShareParams(
+                        files: [XFile(path)],
+                        subject: context.t.tudoAccountKey,
+                        text: keyUrl,
+                      ),
+                    );
                     if (context.mounted) context.pop();
                   },
                 ),

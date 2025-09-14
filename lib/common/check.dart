@@ -13,8 +13,9 @@ class Check extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color =
-        disabled ? context.theme.disabledColor : context.theme.primaryColor;
+    final color = disabled
+        ? context.theme.disabledColor
+        : context.theme.primaryColor;
     return Padding(
       padding: const EdgeInsets.only(left: 8, right: 8, top: 2),
       child: SizedBox(
@@ -26,11 +27,7 @@ class Check extends StatelessWidget {
           color: checked ? color : null,
           shape: SquircleBorder(side: BorderSide(color: color, width: 2)),
           child: checked
-              ? Icon(
-                  Icons.check,
-                  color: context.theme.canvasColor,
-                  size: 14,
-                )
+              ? Icon(Icons.check, color: context.theme.canvasColor, size: 14)
               : null,
         ),
       ),

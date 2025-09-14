@@ -11,7 +11,7 @@ Future<void> showMessageDialog(BuildContext context, String message) async =>
           TextButton(
             onPressed: () => context.pop(),
             child: Text(context.t.close.toUpperCase()),
-          )
+          ),
         ],
       ),
     );
@@ -58,14 +58,10 @@ Future<String?> showTextInputDialog(
   BuildContext context, {
   String? hint,
   String? caption,
-}) =>
-    showAdaptiveDialog<String>(
-      context: context,
-      builder: (context) => TextInputDialog(
-        hint: hint,
-        caption: caption,
-      ),
-    );
+}) => showAdaptiveDialog<String>(
+  context: context,
+  builder: (context) => TextInputDialog(hint: hint, caption: caption),
+);
 
 class TextInputDialog extends StatelessWidget {
   final String? title;
@@ -121,10 +117,7 @@ class TextInputDialog extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           if (caption != null)
-            Text(
-              caption!,
-              style: context.theme.textTheme.bodySmall,
-            ),
+            Text(caption!, style: context.theme.textTheme.bodySmall),
           if (info != null) info!,
         ],
       ),

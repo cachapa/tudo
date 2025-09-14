@@ -27,10 +27,7 @@ class Progress extends StatelessWidget {
           total: total.toDouble(),
           color: color,
         ),
-        AnimatedCounter(
-          value: total,
-          size: size * 0.4,
-        ),
+        AnimatedCounter(value: total, size: size * 0.4),
       ],
     );
   }
@@ -56,8 +53,8 @@ class _AnimatedCounterState extends State<AnimatedCounter> {
     direction = oldWidget.value < widget.value
         ? 1
         : oldWidget.value > widget.value
-            ? -1
-            : direction;
+        ? -1
+        : direction;
   }
 
   @override
@@ -67,23 +64,20 @@ class _AnimatedCounterState extends State<AnimatedCounter> {
       transitionBuilder: (child, animation) {
         final d = (child.key as ValueKey<int>).value == widget.value ? 1 : -1;
         final offsetAnimation = Tween<Offset>(
-                begin: Offset(0.0, direction * d * 0.5), end: Offset.zero)
-            .animate(animation);
+          begin: Offset(0.0, direction * d * 0.5),
+          end: Offset.zero,
+        ).animate(animation);
         return SlideTransition(
           position: offsetAnimation,
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
+          child: FadeTransition(opacity: animation, child: child),
         );
       },
       child: Text(
         widget.value.toString(),
         key: ValueKey(widget.value),
-        style: Theme.of(context)
-            .primaryTextTheme
-            .bodyMedium!
-            .copyWith(fontSize: widget.size),
+        style: Theme.of(
+          context,
+        ).primaryTextTheme.bodyMedium!.copyWith(fontSize: widget.size),
       ),
     );
   }

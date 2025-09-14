@@ -15,9 +15,7 @@ Future<void> editToDoList(BuildContext context, [ToDoList? list]) =>
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       context: context,
-      builder: (context) => _EditListForm(
-        list: list,
-      ),
+      builder: (context) => _EditListForm(list: list),
     );
 
 class _EditListForm extends StatefulWidget {
@@ -65,16 +63,22 @@ class _EditListFormState extends State<_EditListForm> {
           children: [
             if (editMode)
               ValueStreamBuilder<ToDoList>(
-                  stream: Registry.listProvider.getList(list!.id),
-                  initialValue: list!,
-                  builder: (context, list) => _MemberList(list)),
+                stream: Registry.listProvider.getList(list!.id),
+                initialValue: list!,
+                builder: (context, list) => _MemberList(list),
+              ),
             const SizedBox(height: 20),
             Material(
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28)),
+                borderRadius: BorderRadius.circular(28),
+              ),
               child: Padding(
                 padding: const EdgeInsets.only(
-                    left: 24, right: 24, top: 24, bottom: 16),
+                  left: 24,
+                  right: 24,
+                  top: 24,
+                  bottom: 16,
+                ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -83,9 +87,7 @@ class _EditListFormState extends State<_EditListForm> {
                       controller: _textController,
                       textCapitalization: TextCapitalization.sentences,
                       autofocus: !editMode,
-                      decoration: InputDecoration(
-                        hintText: t.name,
-                      ),
+                      decoration: InputDecoration(hintText: t.name),
                       onChanged: (_) => setState(() {}),
                       onSubmitted: (_) => _create(context),
                     ),
@@ -107,8 +109,9 @@ class _EditListFormState extends State<_EditListForm> {
                     SizedBox(height: editMode ? 16 : 8),
                     if (editMode)
                       TextButton(
-                        style:
-                            FilledButton.styleFrom(foregroundColor: Colors.red),
+                        style: FilledButton.styleFrom(
+                          foregroundColor: Colors.red,
+                        ),
                         onPressed: () => _removeList(context),
                         child: Text(
                           (widget.list!.isShared ? t.leaveList : t.removeList)
@@ -178,12 +181,16 @@ class _MemberList extends StatelessWidget {
                   ...list.members.map(
                     (e) => Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 4, vertical: 8),
+                        horizontal: 4,
+                        vertical: 8,
+                      ),
                       child: InputChip(
                         shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(24)),
-                        backgroundColor: context.theme.primaryColor
-                            .withAlpha(e.isCurrentUser ? 50 : 25),
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        backgroundColor: context.theme.primaryColor.withAlpha(
+                          e.isCurrentUser ? 50 : 25,
+                        ),
                         label: Text(e.nameOr(context)),
                         onPressed: e.isCurrentUser ? () {} : null,
                         onDeleted: e.isCurrentUser
@@ -217,10 +224,7 @@ class _MemberList extends StatelessWidget {
       builder: (context) => AlertDialog.adaptive(
         content: ClipRRect(
           borderRadius: BorderRadius.circular(8),
-          child: AspectRatio(
-            aspectRatio: 1,
-            child: QrView(shareUrl),
-          ),
+          child: AspectRatio(aspectRatio: 1, child: QrView(shareUrl)),
         ),
         actions: [
           TextButton.icon(
@@ -238,7 +242,8 @@ class _MemberList extends StatelessWidget {
             label: Text(context.t.share.toUpperCase()),
             onPressed: () {
               SharePlus.instance.share(
-                  ShareParams(text: t.listShareMessage(list.name, shareUrl)));
+                ShareParams(text: t.listShareMessage(list.name, shareUrl)),
+              );
               Navigator.pop(context);
             },
           ),

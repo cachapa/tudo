@@ -10,7 +10,8 @@ import '../registry.dart';
 void shareToDoList(BuildContext context, ToDoList list) {
   showModalBottomSheet<String>(
     shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(14))),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(14)),
+    ),
     isScrollControlled: true,
     context: context,
     builder: (context) => _ShareListForm(list: list),
@@ -32,17 +33,20 @@ class _ShareListForm extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding:
-            const EdgeInsets.only(left: 24, right: 24, top: 24, bottom: 12),
+        padding: const EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 24,
+          bottom: 12,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
               list.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge!
-                  .copyWith(color: list.color),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge!.copyWith(color: list.color),
             ),
             const SizedBox(height: 20),
             QrImageView(
@@ -70,8 +74,11 @@ class _ShareListForm extends StatelessWidget {
                   icon: Icon(Icons.adaptive.share),
                   label: Text(context.t.share.toUpperCase()),
                   onPressed: () {
-                    SharePlus.instance.share(ShareParams(
-                        text: t.listShareMessage(list.name, shareUrl)));
+                    SharePlus.instance.share(
+                      ShareParams(
+                        text: t.listShareMessage(list.name, shareUrl),
+                      ),
+                    );
                     Navigator.pop(context);
                   },
                 ),
