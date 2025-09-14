@@ -401,10 +401,10 @@ packages:
     dependency: "direct main"
     description:
       name: in_app_update
-      sha256: "1d80b558597cc7c84f4a1ec91fbc5022facd6d1d0a198fdfe1a5c444ce43859c"
+      sha256: "9924a3efe592e1c0ec89dda3683b3cfec3d4cd02d908e6de00c24b759038ddb1"
       url: "https://pub.dev"
     source: hosted
-    version: "4.2.4"
+    version: "4.2.5"
   intl:
     dependency: "direct main"
     description:

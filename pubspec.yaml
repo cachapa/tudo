@@ -38,7 +38,7 @@ dependencies:
   flutter_svg: ^2.2.1
   local_auth: ^2.3.0
 
-  in_app_update: ^4.2.4
+  in_app_update: ^4.2.5
   package_info_plus: ^9.0.0
   platform_info: ^5.0.0
   path_provider: ^2.1.5
