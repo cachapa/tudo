@@ -56,11 +56,11 @@ class _HomePageState extends State<HomePage> {
       body: MasterDetail(
         masterWidth: 400,
         thresholdWidth: 800,
-        masterBuilder: (_, __) => ListManagerPage(
+        masterBuilder: (_, _) => ListManagerPage(
           selectedId: _list?.id,
           onListSelected: (list) => setState(() => _list = list),
         ),
-        detailBuilder: (_, __) => _list == null
+        detailBuilder: (_, _) => _list == null
             ? null
             : ToDoListPage(
                 key: ValueKey(_list!.id),
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  onListClose() {
+  void onListClose() {
     setState(() => _list = null);
   }
 }

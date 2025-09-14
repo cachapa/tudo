@@ -28,5 +28,5 @@ class Store {
       .watch(key: key != null ? _key(key) : null)
       .where((event) => (event.key as String).startsWith('$namespace::'));
 
-  String _key(key) => '$namespace::$key';
+  String _key(String key) => '$namespace::$key';
 }

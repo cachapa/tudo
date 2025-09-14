@@ -39,7 +39,7 @@ class ToDoListPage extends StatelessWidget {
       child: ValueStreamBuilder<ToDoListWithItems>(
         stream: _stream,
         initialValue: ToDoListWithItems.fromList(list, []),
-        errorBuilder: (_, __) => const SizedBox(),
+        errorBuilder: (_, _) => const SizedBox(),
         builder: (_, list) => Theme(
           data: context.theme.copyWith(
             colorScheme: context.theme.colorScheme.copyWith(
