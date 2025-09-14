@@ -53,6 +53,7 @@ jobs:
           BUILD_NAME: ${{ inputs.name }}
           BUILD_NUMBER: ${{ inputs.number }}
         run: |
+          flutter gen-l10n
           flutter build appbundle --build-number $BUILD_NUMBER --build-name $BUILD_NAME
           flutter build apk --build-number $BUILD_NUMBER --build-name $BUILD_NAME
 

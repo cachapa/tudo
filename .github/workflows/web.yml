@@ -23,7 +23,9 @@ jobs:
           cache: true
 
       - name: Build app
-        run: flutter build web
+        run: |
+          flutter gen-l10n
+          flutter build web
 
       - name: Create archive
         working-directory: build/web

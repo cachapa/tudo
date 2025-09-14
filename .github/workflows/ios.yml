@@ -42,7 +42,9 @@ jobs:
         env:
           BUILD_NAME: ${{ inputs.name }}
           BUILD_NUMBER: ${{ inputs.number }}
-        run: flutter build ipa --export-options-plist=.github/provisioning/ExportOptions.plist --build-number $BUILD_NUMBER --build-name $BUILD_NAME
+        run: |
+          flutter gen-l10n
+          flutter build ipa --export-options-plist=.github/provisioning/ExportOptions.plist --build-number $BUILD_NUMBER --build-name $BUILD_NAME
 
       - name: Rename build artifact
         working-directory: build/ios/ipa
