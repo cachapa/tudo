@@ -46,13 +46,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
     }
 
-    lintOptions {
-        disable 'InvalidPackage'
-    }
 
     defaultConfig {
         applicationId "net.cachapa.tudo"
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -73,9 +70,9 @@ android {
             applicationIdSuffix ".beta"
         }
 
-        profile {
-            applicationIdSuffix ".profile"
-        }
+//        profile {
+//            applicationIdSuffix ".profile"
+//        }
 
         release {
             signingConfig signingConfigs.release
@@ -86,6 +83,9 @@ android {
                     'proguard-android-optimize.txt'),
                     'proguard-rules.pro'
         }
+    }
+    lint {
+        disable 'InvalidPackage'
     }
 }
 

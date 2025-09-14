@@ -13,21 +13,20 @@ Future<String?> scanQrCode(BuildContext context, {String? message}) async {
       contentPadding: EdgeInsets.zero,
       titlePadding: const EdgeInsets.all(24),
       title: message != null
-          ? Text(
-              message,
-              style: context.theme.primaryTextTheme.titleMedium,
-            )
+          ? Text(message, style: context.theme.primaryTextTheme.titleMedium)
           : null,
       content: AspectRatio(
         aspectRatio: 1,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: MobileScanner(
-            placeholderBuilder: (p0, p1) => Container(
+            placeholderBuilder: (_) => Container(
               color: Colors.black,
               alignment: Alignment.center,
-              child: const Icon(Icons.qr_code_scanner_rounded,
-                  color: Colors.white),
+              child: const Icon(
+                Icons.qr_code_scanner_rounded,
+                color: Colors.white,
+              ),
             ),
             fit: BoxFit.cover,
             onDetect: (barcodes) {

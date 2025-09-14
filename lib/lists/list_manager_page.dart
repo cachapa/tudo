@@ -76,10 +76,7 @@ class _ListManagerPageState extends State<ListManagerPage>
           title: Stack(
             alignment: Alignment.center,
             children: [
-              Image.asset(
-                'assets/images/tudo_rainbow_bold.png',
-                height: 40,
-              ),
+              Image.asset('assets/images/tudo_rainbow_bold.png', height: 40),
               Image.asset(
                 'assets/images/tudo.png',
                 height: 40,
@@ -114,8 +111,9 @@ class _ListManagerPageState extends State<ListManagerPage>
               : AnimatedReorderableListBuilder(
                   lists,
                   controller: _controller,
-                  padding:
-                      context.padding.add(const EdgeInsets.only(bottom: 80)),
+                  padding: context.padding.add(
+                    const EdgeInsets.only(bottom: 80),
+                  ),
                   onReorder: (from, to) => _swap(lists, from, to),
                   builder: (context, i, item) => ToDoListTile(
                     key: ValueKey(item.id),
@@ -151,7 +149,10 @@ class _ListManagerPageState extends State<ListManagerPage>
                     ? SafeArea(
                         child: Padding(
                           padding: const EdgeInsets.only(
-                              left: 16, right: 16, bottom: 16),
+                            left: 16,
+                            right: 16,
+                            bottom: 16,
+                          ),
                           child: FilledButton.icon(
                             icon: const Icon(Icons.system_update_rounded),
                             label: Text(t.updateApp.toUpperCase()),
@@ -241,10 +242,12 @@ class _ListManagerPageState extends State<ListManagerPage>
             await _joinList(uri.pathSegments.last);
           }
         });
-        AppLinks().uriLinkStream.listen((uri) async {
-          'Stream link: $uri'.log;
-          await _joinList(uri.pathSegments.last);
-        }).onError((e) => e.log);
+        AppLinks().uriLinkStream
+            .listen((uri) async {
+              'Stream link: $uri'.log;
+              await _joinList(uri.pathSegments.last);
+            })
+            .onError((e) => e.log);
       }
     } catch (e) {
       e.toString().log;
@@ -262,8 +265,10 @@ class _EmptyPage extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomRight,
       child: Padding(
-        padding:
-            EdgeInsets.only(bottom: context.padding.bottom + 72, right: 80),
+        padding: EdgeInsets.only(
+          bottom: context.padding.bottom + 72,
+          right: 80,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -271,8 +276,9 @@ class _EmptyPage extends StatelessWidget {
               angle: -0.2,
               child: Text(
                 context.t.createAList,
-                style: context.theme.textTheme.displaySmall!
-                    .apply(fontFamily: 'WaitingfortheSunrise'),
+                style: context.theme.textTheme.displaySmall!.apply(
+                  fontFamily: 'WaitingfortheSunrise',
+                ),
               ),
             ),
             Padding(
