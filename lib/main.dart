@@ -36,7 +36,7 @@ class TudoApp extends StatelessWidget {
       stream: Registry.settingsProvider.theme,
       builder: (_, theme) => MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'tudo',
+        title: 'Tudo',
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         theme: lightTheme,

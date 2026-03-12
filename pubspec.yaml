@@ -1,4 +1,4 @@
-name: tudo
+name: Tudo
 description: A simple to-do app
 version: 2.7.0  # The patch number is generated on deployment
 homepage: https://github.com/cachapa/tudo
