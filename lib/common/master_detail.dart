@@ -55,6 +55,7 @@ class MasterDetail extends StatelessWidget {
     return Row(
       children: [
         SizedBox(width: masterWidth, child: master),
+        Container(color: Colors.grey.withAlpha(50), width: 1),
         Expanded(
           child: AnimatedSwitcher(
             duration: Durations.medium2,

@@ -83,11 +83,14 @@ class EmptyList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Icon(
-        Icons.list_alt_rounded,
-        color: context.theme.dividerColor.withAlpha(50),
-        size: 100,
+    return Container(
+      color: Colors.grey.withAlpha(10),
+      child: Center(
+        child: Icon(
+          Icons.list_rounded,
+          color: context.theme.dividerColor.withAlpha(50),
+          size: 100,
+        ),
       ),
     );
   }

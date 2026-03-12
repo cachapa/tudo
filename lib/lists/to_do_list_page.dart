@@ -32,6 +32,7 @@ class ToDoListPage extends StatelessWidget {
       MediaQuery.of(context).viewInsets.bottom,
       MediaQuery.of(context).viewPadding.bottom,
     );
+    final bgColor = context.theme.canvasColor.blend(list.color, 0.04);
 
     return GestureDetector(
       // Close keyboard when tapping a non-focusable area
@@ -49,6 +50,8 @@ class ToDoListPage extends StatelessWidget {
             primaryTextTheme: TextTheme(
               titleLarge: TextStyle(color: list.color),
             ),
+            scaffoldBackgroundColor: bgColor,
+            listTileTheme: ListTileThemeData(tileColor: bgColor),
           ),
           child: Scaffold(
             extendBodyBehindAppBar: true,
@@ -254,6 +257,14 @@ class _InputBarState extends State<InputBar> {
   @override
   Widget build(BuildContext context) {
     final primaryColor = context.theme.primaryColor;
+    final inputBorder = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(100),
+      borderSide: BorderSide(
+        color: primaryColor,
+        width: 2,
+        style: BorderStyle.solid,
+      ),
+    );
 
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -274,7 +285,9 @@ class _InputBarState extends State<InputBar> {
               fillColor: primaryColor.withAlpha(30),
               contentPadding: const EdgeInsets.all(20),
               hintText: context.t.addItem,
-              border: InputBorder.none,
+              border: inputBorder,
+              enabledBorder: inputBorder,
+              focusedBorder: inputBorder,
               suffixIcon: IconButton(
                 color: primaryColor,
                 padding: const EdgeInsets.only(right: 10),
@@ -509,25 +522,22 @@ class _ListTile extends StatelessWidget {
         ),
       ),
       onDismissed: (direction) => onDelete(),
-      child: Container(
-        color: context.theme.canvasColor,
-        child: ListTile(
-          contentPadding: const EdgeInsets.only(left: 16, right: 8),
-          leading: Check(
-            key: ValueKey('${item.id}${item.done}'),
-            checked: item.done,
-          ),
-          title: Text(item.name),
-          trailing: IconButton(
-            onPressed: onEdit,
-            icon: Icon(
-              Icons.adaptive.more_rounded,
-              color: context.theme.disabledColor,
-            ),
-          ),
-          onTap: () => onToggle(),
-          // onLongPress: onEdit,
+      child: ListTile(
+        contentPadding: const EdgeInsets.only(left: 16, right: 8),
+        leading: Check(
+          key: ValueKey('${item.id}${item.done}'),
+          checked: item.done,
         ),
+        title: Text(item.name),
+        trailing: IconButton(
+          onPressed: onEdit,
+          icon: Icon(
+            Icons.adaptive.more_rounded,
+            color: context.theme.disabledColor,
+          ),
+        ),
+        onTap: () => onToggle(),
+        // onLongPress: onEdit,
       ),
     );
   }
