@@ -1,53 +1,86 @@
 import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:flutter/material.dart';
 
-import '../common/progress.dart';
+import '../common/check.dart';
 import '../extensions.dart';
 import 'list_provider.dart';
 
 class ToDoListTile extends StatelessWidget {
-  final ToDoList list;
-  final bool isSelected;
-  final VoidCallback? onTap;
-  final VoidCallback? onEdit;
+  final ToDo item;
+  final Function() onToggle;
+  final Function() onEdit;
+  final Function() onDelete;
 
   const ToDoListTile({
     super.key,
-    required this.list,
-    required this.isSelected,
-    this.onTap,
-    this.onEdit,
+    required this.item,
+    required this.onToggle,
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Dismissible(
+      key: Key(item.id),
+      background: _DeletePlaceholder(alignment: Alignment.centerLeft),
+      secondaryBackground: _DeletePlaceholder(alignment: Alignment.centerRight),
+      onDismissed: (direction) => onDelete(),
+      child: _ToDoListTile(item: item, onToggle: onToggle, onEdit: onEdit),
+    );
+  }
+}
+
+class _ToDoListTile extends StatelessWidget {
+  final ToDo item;
+  final Function() onToggle;
+  final Function() onEdit;
+
+  const _ToDoListTile({
+    required this.item,
+    required this.onToggle,
+    required this.onEdit,
   });
 
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      selected: isSelected,
-      selectedTileColor: list.color.withAlpha(25),
-      tileColor: context.theme.scaffoldBackgroundColor,
-      contentPadding: const EdgeInsets.only(left: 16, right: 8),
-      leading: Progress(
-        color: list.color,
-        progress: list.doneCount,
-        total: list.itemCount,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16),
+      leading: Check(
+        key: ValueKey('${item.id}${item.done}'),
+        checked: item.done,
       ),
-      title: Text(list.name, style: context.theme.textTheme.titleLarge),
-      subtitle: list.isShared
-          ? Text(
-              list.memberNames(context),
-              softWrap: false,
-              overflow: TextOverflow.fade,
-            )
-          : null,
-      trailing: Handle(
-        vibrate: true,
-        child: Icon(
-          Icons.drag_handle_rounded,
-          color: context.theme.colorScheme.outlineVariant,
-        ),
-      ),
-      onTap: onTap,
+      title: Text(item.name),
+      trailing: item.done
+          ? null
+          : Handle(
+              vibrate: true,
+              child: Icon(
+                Icons.drag_handle_rounded,
+                color: context.theme.colorScheme.outlineVariant,
+              ),
+            ),
+      onTap: onToggle,
       onLongPress: onEdit,
+    );
+  }
+}
+
+class _DeletePlaceholder extends StatelessWidget {
+  final Alignment alignment;
+
+  const _DeletePlaceholder({required this.alignment});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: context.theme.colorScheme.error,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      alignment: alignment,
+      child: Icon(
+        Icons.delete_outline_rounded,
+        color: context.theme.colorScheme.onError,
+      ),
     );
   }
 }

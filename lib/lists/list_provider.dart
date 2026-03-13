@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sqlite_crdt/sqlite_crdt.dart';
@@ -14,6 +16,8 @@ const listIdsKey = 'list_id_keys';
 class ListProvider {
   final String userId;
   final SqlCrdt _crdt;
+
+  final _undoItems = <String, Queue<Iterable<ToDo>>>{};
 
   late final lists = BehaviorSubject<List<ToDoList>>()
     ..addStream(
@@ -118,38 +122,32 @@ class ListProvider {
     [userId, listId],
   );
 
-  Future<void> deleteCompleted(String listId) => _crdt.execute(
-    '''
-    UPDATE todos SET is_deleted = 1
-    WHERE list_id = ?1 AND done = 1
-  ''',
-    [listId],
-  );
+  Future<void> deleteItems(Iterable<ToDo> todos) async {
+    // Ensure all items belong to the same list
+    assert(todos.map((e) => e.listId).toSet().length == 1);
+    final placeholders = List.generate(
+      todos.length,
+      (i) => '?${i + 1}',
+    ).join(', ');
+    await _crdt.execute(
+      'DELETE FROM todos WHERE id IN ($placeholders)',
+      todos.map((e) => e.id).toList(),
+    );
+    (_undoItems[todos.first.listId] ??= Queue()).addLast(todos);
+  }
 
-  Future<void> deleteItem(String id) => _crdt.execute(
-    '''
-    UPDATE todos SET is_deleted = 1
-    WHERE id = ?1
-  ''',
-    [id],
-  );
+  bool hasUndoItems(String listId) => _undoItems[listId]?.isNotEmpty ?? false;
 
-  Future<void> undeleteItem(String id) => undeleteItems([id]);
-
-  Future<void> undeleteItems(Iterable<String> ids) async {
-    if (ids.isEmpty) return;
-
-    await _crdt.transaction((txn) async {
-      for (final id in ids) {
-        await txn.execute(
-          '''
-          UPDATE todos SET is_deleted = 0
-          WHERE id = ?1
-        ''',
-          [id],
-        );
-      }
-    });
+  Future<void> undoDelete(String listId) async {
+    final items = _undoItems[listId]!.removeLast();
+    final placeholders = List.generate(
+      items.length,
+      (i) => '?${i + 1}',
+    ).join(', ');
+    await _crdt.execute(
+      'UPDATE todos SET is_deleted = 0 WHERE id IN ($placeholders)',
+      items.map((e) => e.id).toList(),
+    );
   }
 
   Future<void> setDone(String itemId, bool isDone) => _crdt.execute(
@@ -197,29 +195,53 @@ class ListProvider {
     final maxPosition =
         (await _crdt.query(
               '''
-      SELECT max(position) AS max_position FROM todos
-      WHERE list_id = ? AND is_deleted = 0
-    ''',
+                SELECT max(position) AS max_position FROM todos
+                WHERE list_id = ? AND is_deleted = 0
+              ''',
               [listId],
             )).first['max_position']
             as int? ??
         -1;
-    await _crdt.execute(
-      '''
-      INSERT INTO todos (id, list_id, name, done, position, creator_id, created_at)
-      VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)
-    ''',
-      [
+    await _createItems([
+      ToDo(
         id,
         listId,
         name.trim(),
-        0,
+        false,
+        null,
+        null,
+        null,
         maxPosition + 1,
         userId,
-        DateTime.now().toUtcString,
-      ],
-    );
+        null,
+        DateTime.now(),
+      ),
+    ]);
     return id;
+  }
+
+  Future<void> _createItems(Iterable<ToDo> items) async {
+    await _crdt.transaction((txn) async {
+      for (final item in items) {
+        await txn.execute(
+          '''
+            INSERT INTO todos (id, list_id, name, done, done_at, done_by, position, creator_id, created_at)
+            VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
+          ''',
+          [
+            item.id,
+            item.listId,
+            item.name,
+            item.done ? 1 : 0,
+            item.doneAt?.toUtcString,
+            item.doneBy,
+            item.position,
+            item.creatorId,
+            item.createdAt?.toUtcString,
+          ],
+        );
+      }
+    });
   }
 
   Future<void> setListOrder(List<ToDoList> lists) async {
@@ -256,15 +278,6 @@ class ListProvider {
     });
   }
 
-  Stream<List<ToDo>> getDeletedTodos(String listId) => _crdt
-      .watch('''
-        SELECT * FROM todos
-        WHERE list_id = ?1 AND is_deleted = 1
-        ORDER BY hlc DESC
-        LIMIT 40
-      ''', () => [listId])
-      .map((e) => e.map(ToDo.fromMap).toList());
-
   Future<List<Member>> _getMembers(String listId) => _crdt
       .query(
         '''
@@ -282,13 +295,15 @@ class ListProvider {
         '''
     SELECT
       todos.id,
+      todos.list_id,
       todos.name,
       todos.done,
       todos.done_at,
-      done_users.name AS done_by,
+      todos.done_by,
+      done_users.name AS done_name,
       todos.position,
       todos.creator_id,
-      created_users.name AS created_by,
+      created_users.name AS creator_name,
       todos.created_at
     FROM
       todos
@@ -377,36 +392,47 @@ class ToDoList extends IdObject {
 }
 
 class ToDo extends IdObject {
+  final String listId;
   final String name;
   final bool done;
   final DateTime? doneAt;
   final String? doneBy;
+  final String? doneName;
   final int position;
   final String? creatorId;
-  final String? createdBy;
+  final String? creatorName;
   final DateTime? createdAt;
 
   ToDo(
     super.id,
+    this.listId,
     this.name,
     this.done,
     this.doneAt,
     this.doneBy,
+    this.doneName,
     this.position,
     this.creatorId,
-    this.createdBy,
+    this.creatorName,
     this.createdAt,
-  );
+  ) : assert(
+        (doneAt == null) == (doneBy == null),
+        '$id doneAt $doneAt doneBy $doneBy',
+      ),
+      assert((doneAt != null) == done),
+      assert((doneBy != null) == done);
 
   factory ToDo.fromMap(Map<String, dynamic> map) => ToDo(
     map['id'],
+    map['list_id'],
     map['name'],
     map['done'] == 1,
     (map['done_at'] as String?)?.asDateTime.toLocal(),
     map['done_by'],
+    map['done_name'],
     map['position'],
     map['creator_id'],
-    map['created_by'],
+    map['creator_name'],
     (map['created_at'] as String?)?.asDateTime.toLocal(),
   );
 

@@ -16,8 +16,8 @@ import '../registry.dart';
 import '../settings/settings_page.dart';
 import '../util/build_info.dart';
 import '../util/update_util.dart';
+import 'list_manager_tile.dart';
 import 'list_provider.dart';
-import 'to_do_list_tile.dart';
 
 class ListManagerPage extends StatefulWidget {
   final String? selectedId;
@@ -115,7 +115,7 @@ class _ListManagerPageState extends State<ListManagerPage>
                     const EdgeInsets.only(bottom: 80),
                   ),
                   onReorder: (from, to) => _swap(lists, from, to),
-                  builder: (context, i, item) => ToDoListTile(
+                  builder: (context, i, item) => ListManagerTile(
                     key: ValueKey(item.id),
                     isSelected: item.id == widget.selectedId,
                     list: item,
