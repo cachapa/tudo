@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:animated_list_plus/transitions.dart';
 import 'package:flutter/material.dart';
 
@@ -67,7 +68,7 @@ class ToDoListPage extends StatelessWidget {
                 ),
                 IconButton(
                   tooltip: t.editList,
-                  icon: const Icon(Icons.tune_rounded),
+                  icon: const Icon(Icons.edit_rounded),
                   onPressed: () => _editList(context),
                 ),
               ],
@@ -257,14 +258,6 @@ class _InputBarState extends State<InputBar> {
   @override
   Widget build(BuildContext context) {
     final primaryColor = context.theme.primaryColor;
-    final inputBorder = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(100),
-      borderSide: BorderSide(
-        color: primaryColor,
-        width: 2,
-        style: BorderStyle.solid,
-      ),
-    );
 
     return Padding(
       padding: const EdgeInsets.all(10),
@@ -285,9 +278,6 @@ class _InputBarState extends State<InputBar> {
               fillColor: primaryColor.withAlpha(30),
               contentPadding: const EdgeInsets.all(20),
               hintText: context.t.addItem,
-              border: inputBorder,
-              enabledBorder: inputBorder,
-              focusedBorder: inputBorder,
               suffixIcon: IconButton(
                 color: primaryColor,
                 padding: const EdgeInsets.only(right: 10),
@@ -523,21 +513,23 @@ class _ListTile extends StatelessWidget {
       ),
       onDismissed: (direction) => onDelete(),
       child: ListTile(
-        contentPadding: const EdgeInsets.only(left: 16, right: 8),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16),
         leading: Check(
           key: ValueKey('${item.id}${item.done}'),
           checked: item.done,
         ),
         title: Text(item.name),
-        trailing: IconButton(
-          onPressed: onEdit,
-          icon: Icon(
-            Icons.adaptive.more_rounded,
-            color: context.theme.disabledColor,
-          ),
-        ),
-        onTap: () => onToggle(),
-        // onLongPress: onEdit,
+        trailing: item.done
+            ? null
+            : Handle(
+                vibrate: true,
+                child: Icon(
+                  Icons.drag_handle_rounded,
+                  color: context.theme.colorScheme.outlineVariant,
+                ),
+              ),
+        onTap: onToggle,
+        onLongPress: onEdit,
       ),
     );
   }

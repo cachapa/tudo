@@ -96,10 +96,7 @@ class AnimatedReorderableListBuilder<T extends IdObject>
               sizeFraction: 0.7,
               curve: Curves.easeInOut,
               animation: itemAnimation,
-              child: Handle(
-                delay: longDuration,
-                child: builder(context, i, item),
-              ),
+              child: builder(context, i, item),
             ),
           ),
         ),

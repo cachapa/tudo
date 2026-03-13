@@ -1,3 +1,4 @@
+import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:flutter/material.dart';
 
 import '../common/progress.dart';
@@ -38,11 +39,15 @@ class ToDoListTile extends StatelessWidget {
               overflow: TextOverflow.fade,
             )
           : null,
-      trailing: IconButton(
-        onPressed: onEdit,
-        icon: Icon(Icons.adaptive.more_rounded),
+      trailing: Handle(
+        vibrate: true,
+        child: Icon(
+          Icons.drag_handle_rounded,
+          color: context.theme.colorScheme.outlineVariant,
+        ),
       ),
       onTap: onTap,
+      onLongPress: onEdit,
     );
   }
 }
