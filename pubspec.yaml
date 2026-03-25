@@ -1,6 +1,6 @@
 name: Tudo
 description: A simple to-do app
-version: 3.0.0  # The patch number is generated on deployment
+version: 6.0.0  # The patch number is generated on deployment
 homepage: https://github.com/cachapa/tudo
 publish_to: none
 
@@ -21,10 +21,16 @@ dependencies:
   hive: ^2.2.3
   http: ^1.6.0
 
-  crdt_sync: ^1.0.10
-#    path: ../../crdt_sync
-  sqlite_crdt: ^3.0.4
+  crdt_sync: #^1.0.10
+#    path: ../../crdt/crdt_sync
+    git:
+      url: https://github.com/cachapa/crdt_sync.git
+      ref: v6
+  sqlite_crdt: #^6.0.0
 #    path: ../../crdt/sqlite_crdt
+    git:
+      url: https://github.com/cachapa/sqlite_crdt.git
+      ref: v6
 
   rxdart: ^0.28.0
 
