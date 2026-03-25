@@ -149,14 +149,6 @@ class _EditListFormState extends State<_EditListForm> {
   void _removeList(BuildContext context) async {
     final listManager = Registry.listProvider;
     await listManager.removeList(list!.id);
-    if (context.mounted) {
-      context
-        ..showSnackBar(
-          context.t.listDeleted(list!.name),
-          () => listManager.undoRemoveList(list!.id),
-        )
-        ..pop();
-    }
   }
 }
 
@@ -175,39 +167,43 @@ class _MemberList extends StatelessWidget {
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  const SizedBox(width: 4),
-                  ...list.members.map(
-                    (e) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 4,
-                        vertical: 8,
-                      ),
-                      child: InputChip(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(24),
+              child: ValueStreamBuilder(
+                stream: list.members,
+                builder: (context, members) {
+                  return Row(
+                    children: [
+                      const SizedBox(width: 4),
+                      ...members.map(
+                        (e) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 8,
+                          ),
+                          child: InputChip(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            backgroundColor: context.theme.primaryColor
+                                .withAlpha(e.isCurrentUser ? 50 : 25),
+                            label: Text(e.nameOr(context)),
+                            onPressed: e.isCurrentUser ? () {} : null,
+                            onDeleted: e.isCurrentUser
+                                ? null
+                                : () => _removeMember(context, e),
+                          ),
                         ),
-                        backgroundColor: context.theme.primaryColor.withAlpha(
-                          e.isCurrentUser ? 50 : 25,
-                        ),
-                        label: Text(e.nameOr(context)),
-                        onPressed: e.isCurrentUser ? () {} : null,
-                        onDeleted: e.isCurrentUser
-                            ? null
-                            : () => _removeMember(context, e),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                ],
+                      const SizedBox(width: 8),
+                    ],
+                  );
+                },
               ),
             ),
           ),
           IconButton(
             onPressed: () => _inviteMember(context),
             color: context.theme.primaryColor,
-            icon: const Icon(Icons.person_add_alt_1_rounded),
+            icon: Icon(Icons.adaptive.share_rounded),
           ),
           const SizedBox(width: 8),
         ],

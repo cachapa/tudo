@@ -159,13 +159,18 @@ class TitleBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           Text(list.name, style: context.theme.textTheme.titleLarge),
           if (list.isShared)
-            Text(
-              list.memberNames(context),
-              softWrap: false,
-              overflow: TextOverflow.fade,
-              style: context.theme.textTheme.bodyMedium!.copyWith(
-                color: context.theme.textTheme.bodySmall!.color,
-              ),
+            ValueStreamBuilder(
+              stream: list.members,
+              builder: (context, members) {
+                return Text(
+                  members.toNames(context),
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  style: context.theme.textTheme.bodyMedium!.copyWith(
+                    color: context.theme.textTheme.bodySmall!.color,
+                  ),
+                );
+              },
             ),
         ],
       ),
@@ -351,6 +356,14 @@ class _ToDoListViewState extends State<ToDoListView> {
       Registry.listProvider.setDone(toDo.id, !toDo.done);
 
   Future<void> _editItem(BuildContext context, ToDo toDo) async {
+    final creator = toDo.creatorId == null
+        ? null
+        : await Registry.contactProvider.getUser(toDo.creatorId!).first;
+    final completer = toDo.doneBy == null
+        ? null
+        : await Registry.contactProvider.getUser(toDo.doneBy!).first;
+    if (!context.mounted) return;
+
     final title = await showDialog<String>(
       context: context,
       builder: (context) => TextInputDialog(
@@ -359,16 +372,16 @@ class _ToDoListViewState extends State<ToDoListView> {
         info: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (toDo.creatorId != null)
+            if (creator != null)
               IconLabel(
                 Icons.create_rounded,
-                toDo.creatorId!,
+                creator.nameOr(context),
                 style: context.theme.textTheme.bodySmall,
               ),
-            if (toDo.doneBy != null)
+            if (completer != null)
               IconLabel(
                 Icons.check_box_rounded,
-                toDo.doneBy!,
+                completer.nameOr(context),
                 style: context.theme.textTheme.bodySmall,
               ),
           ],

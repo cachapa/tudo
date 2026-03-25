@@ -2,6 +2,7 @@ import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:flutter/material.dart';
 
 import '../common/progress.dart';
+import '../common/value_builders.dart';
 import '../extensions.dart';
 import 'list_provider.dart';
 
@@ -33,10 +34,15 @@ class ListManagerTile extends StatelessWidget {
       ),
       title: Text(list.name, style: context.theme.textTheme.titleLarge),
       subtitle: list.isShared
-          ? Text(
-              list.memberNames(context),
-              softWrap: false,
-              overflow: TextOverflow.fade,
+          ? ValueStreamBuilder(
+              stream: list.members,
+              builder: (context, members) {
+                return Text(
+                  members.toNames(context),
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                );
+              },
             )
           : null,
       trailing: Handle(
