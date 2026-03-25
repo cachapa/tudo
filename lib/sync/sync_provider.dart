@@ -17,7 +17,6 @@ class SyncProvider {
   final Uri _serverUri;
   final String _userId;
   final SqliteCrdt _crdt;
-  final Store _store;
 
   late final ApiClient _apiClient;
   late final CrdtSyncClient _syncClient;
@@ -30,8 +29,7 @@ class SyncProvider {
     StoreProvider storeProvider,
     this._crdt,
   ) : _serverUri = settingsProvider.serverUri,
-      _userId = authProvider.userId,
-      _store = storeProvider.getStore('sync') {
+      _userId = authProvider.userId {
     _apiClient = ApiClient(authProvider.token);
     _syncClient = CrdtSyncClient(
       _crdt,

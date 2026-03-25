@@ -113,7 +113,7 @@ class TextInputDialog extends StatelessWidget {
           const SizedBox(height: 16),
           if (caption != null)
             Text(caption!, style: context.theme.textTheme.bodySmall),
-          if (info != null) info!,
+          ?info,
         ],
       ),
       actions: <Widget>[

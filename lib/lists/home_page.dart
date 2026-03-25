@@ -18,13 +18,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   ToDoList? _list;
 
-  final _quickActions = const QuickActions();
+  final _quickActions = PlatformX.isMobile ? const QuickActions() : null;
 
   @override
   void initState() {
     super.initState();
 
-    _quickActions.initialize((listId) async {
+    _quickActions?.initialize((listId) async {
       final list = await Registry.listProvider.getList(listId).first;
       setState(() => _list = list);
     });
@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
       }
 
       // Populate quick actions menu
-      _quickActions.setShortcutItems(
+      _quickActions?.setShortcutItems(
         lists
             .map(
               (list) => ShortcutItem(

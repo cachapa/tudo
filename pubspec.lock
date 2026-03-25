@@ -204,16 +204,20 @@ packages:
   crdt:
     dependency: transitive
     description:
-      path: "../../crdt/crdt"
-      relative: true
-    source: path
+      path: "."
+      ref: v6
+      resolved-ref: f1da1ab806d4b958070e81d039361eade520aa2b
+      url: "https://github.com/cachapa/crdt.git"
+    source: git
     version: "6.0.0"
   crdt_sync:
     dependency: "direct main"
     description:
-      path: "../../crdt/crdt_sync"
-      relative: true
-    source: path
+      path: "."
+      ref: v6
+      resolved-ref: "025ca38e418dba9504bd16b6ac30727c314b3707"
+      url: "https://github.com/cachapa/crdt_sync.git"
+    source: git
     version: "6.0.0"
   cross_file:
     dependency: transitive
@@ -867,9 +871,11 @@ packages:
   sqlite_crdt:
     dependency: "direct main"
     description:
-      path: "../../crdt/sqlite_crdt"
-      relative: true
-    source: path
+      path: "."
+      ref: v6
+      resolved-ref: d9efecf91ae6fd8d96e29c502c27101eb5912314
+      url: "https://github.com/cachapa/sqlite_crdt.git"
+    source: git
     version: "6.0.0"
   sqlparser:
     dependency: transitive
