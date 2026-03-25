@@ -62,5 +62,15 @@
         <string>net.cachapa.tudo</string>
       </dict>
     </array>
+    <key>FIREBASE_ANALYTICS_COLLECTION_DEACTIVATED</key>
+    <true/>
+    <key>FIREBASE_ANALYTICS_COLLECTION_ENABLED</key>
+    <false/>
+    <key>firebase_performance_collection_deactivated</key>
+    <true/>
+    <key>firebase_performance_collection_enabled</key>
+    <false/>
+    <key>FirebaseDataCollectionDefaultEnabled</key>
+    <false/>
 </dict>
 </plist>
