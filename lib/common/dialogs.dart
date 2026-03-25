@@ -16,7 +16,7 @@ Future<void> showMessageDialog(BuildContext context, String message) async =>
       ),
     );
 
-Future<T?> showIndeterminateProgressDialog<T>(
+Future<void> showIndeterminateProgressDialog<T>(
   BuildContext context, {
   required String message,
   required Future<T> future,
@@ -28,30 +28,25 @@ Future<T?> showIndeterminateProgressDialog<T>(
     context: context,
     useRootNavigator: true,
     barrierDismissible: false,
-    builder: (context) => AlertDialog.adaptive(
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(message, style: context.theme.textTheme.titleMedium),
-          const SizedBox(height: 24),
-          const LinearProgressIndicator(),
-        ],
-      ),
-    ),
+    builder: (context) {
+      final dialog = AlertDialog.adaptive(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(message, style: context.theme.textTheme.titleMedium),
+            const SizedBox(height: 24),
+            const LinearProgressIndicator(),
+          ],
+        ),
+      );
+      future
+          .whenComplete(() {
+            if (context.mounted) context.pop();
+          })
+          .onError((error, _) => onError?.call(error));
+      return dialog;
+    },
   );
-
-  try {
-    return await future.whenComplete(() {
-      if (context.mounted) context.pop();
-    });
-  } catch (e) {
-    if (context.mounted) {
-      context.pop();
-      e.toString().log;
-      onError?.call(e);
-    }
-    return null;
-  }
 }
 
 Future<String?> showTextInputDialog(

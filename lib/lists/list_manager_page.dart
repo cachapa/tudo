@@ -185,27 +185,21 @@ class _ListManagerPageState extends State<ListManagerPage>
     'Read QR: $code'.log;
     final uri = Uri.parse(code);
 
-    try {
-      await _joinList(uri.pathSegments.last);
-    } catch (e) {
-      '$e'.log;
-      if (mounted) context.showSnackBar('$e');
-    }
+    await _joinList(uri.pathSegments.last);
   }
 
   Future<void> _joinList(String listId) async {
-    try {
-      if (!Registry.listProvider.hasList(listId)) {
-        await showIndeterminateProgressDialog(
-          context,
-          message: context.t.joiningList,
-          future: Registry.syncProvider.joinList(listId),
-        );
-      } else {
-        context.showSnackBar(context.t.listAlreadyJoined);
-      }
-    } catch (e) {
-      if (mounted) context.showSnackBar('$e');
+    if (!Registry.listProvider.hasList(listId)) {
+      await showIndeterminateProgressDialog(
+        context,
+        message: context.t.joiningList,
+        future: Registry.syncProvider.joinList(listId),
+        onError: (e) {
+          if (mounted) context.showSnackBar('$e');
+        },
+      );
+    } else {
+      context.showSnackBar(context.t.listAlreadyJoined);
     }
   }
 
