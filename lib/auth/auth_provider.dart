@@ -10,7 +10,7 @@ import '../util/store_provider.dart';
 import '../util/uuid.dart';
 
 class AuthProvider {
-  final SqlCrdt _crdt;
+  final SqliteCrdt _crdt;
   final SettingsProvider _settingsProvider;
   final Store _store;
 
@@ -39,7 +39,7 @@ class AuthProvider {
     final body = jsonDecode(result.body);
 
     final userId = body['user_id'] as String;
-    final changeset = parseCrdtChangeset(body['changeset']);
+    final changeset = CrdtChangeset.fromMap(body['changeset']);
 
     await _crdt.merge(changeset);
     _storeCredentials(token, userId);

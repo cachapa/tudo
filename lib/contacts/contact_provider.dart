@@ -8,9 +8,11 @@ import '../extensions.dart';
 
 class ContactProvider {
   final String userId;
-  final SqlCrdt _crdt;
+  final SqliteCrdt _crdt;
 
   final _contacts = BehaviorSubject<Map<String, User>>();
+
+  Stream<Map<String, User>> get allContacts => _contacts;
 
   Stream<bool> get isNameSet => currentUser.map((e) => e.name.isNotEmpty);
 
@@ -20,10 +22,7 @@ class ContactProvider {
     : userId = authProvider.userId {
     _contacts.addStream(
       _crdt
-          .watch('''
-          SELECT * FROM users
-          WHERE is_deleted = 0
-        ''')
+          .watch('SELECT * FROM users')
           .map((l) => l.map((m) => User.fromMap(userId, m)))
           .map((l) => {for (final u in l) u.id: u}),
     );
@@ -34,17 +33,17 @@ class ContactProvider {
     if (!userExists) {
       await _crdt.execute(
         '''
-        INSERT INTO users (id, name)
-        VALUES (?1, ?2)
-      ''',
+          INSERT INTO users (id, name)
+          VALUES (?1, ?2)
+        ''',
         [userId, name.trim()],
       );
     } else {
       await _crdt.execute(
         '''
-        UPDATE users SET name = ?2
-        WHERE id = ?1
-      ''',
+          UPDATE users SET name = ?2
+          WHERE id = ?1
+        ''',
         [userId, name.trim()],
       );
     }

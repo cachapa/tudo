@@ -8,6 +8,7 @@ import '../auth/auth_provider.dart';
 import '../common/lists.dart';
 import '../contacts/contact_provider.dart';
 import '../extensions.dart';
+import '../registry.dart';
 import '../util/store_provider.dart';
 import '../util/uuid.dart';
 
@@ -15,23 +16,12 @@ const listIdsKey = 'list_id_keys';
 
 class ListProvider {
   final String userId;
-  final SqlCrdt _crdt;
+  final SqliteCrdt _crdt;
 
   final _undoItems = <String, Queue<Iterable<ToDo>>>{};
 
   late final lists = BehaviorSubject<List<ToDoList>>()
-    ..addStream(
-      _queryLists()
-          .asyncMap(
-            (l) => Future.wait(
-              l.map(
-                (map) async =>
-                    ToDoList.fromMap(map, await _getMembers(map['id'])),
-              ),
-            ),
-          )
-          .doOnError((p0, p1) => '$p0\n$p1'.log),
-    );
+    ..addStream(_queryLists().map((l) => l.map(ToDoList.fromMap).toList()));
 
   ListProvider(
     AuthProvider authProvider,
@@ -47,18 +37,15 @@ class ListProvider {
       // Create list
       await txn.execute(
         '''
-        INSERT INTO lists (id, name, color, creator_id, created_at)
-        VALUES (?1, ?2, ?3, ?4, ?5)
-      ''',
+          INSERT INTO lists (id, name, color, creator_id, created_at)
+          VALUES (?1, ?2, ?3, ?4, ?5)
+        ''',
         [listId, name.trim(), color.hexValue, userId, createdAt],
       );
       // Get max position
       final maxPosition =
           (await txn.query(
-                '''
-        SELECT max(position) as max_position FROM user_lists
-        WHERE user_id = ?1 AND is_deleted = 0
-      ''',
+                'SELECT max(position) as max_position FROM user_lists WHERE user_id = ?1',
                 [userId],
               )).first['max_position']
               as int? ??
@@ -66,9 +53,9 @@ class ListProvider {
       // Associate list to user
       await txn.execute(
         '''
-        INSERT INTO user_lists (user_id, list_id, created_at, position)
-        VALUES (?1, ?2, ?3, ?4)
-      ''',
+          INSERT INTO user_lists (user_id, list_id, created_at, position)
+          VALUES (?1, ?2, ?3, ?4)
+        ''',
         [userId, listId, createdAt, maxPosition + 1],
       );
     });
@@ -76,22 +63,24 @@ class ListProvider {
 
   bool hasList(String listId) => lists.value.map((e) => e.id).contains(listId);
 
-  Stream<List<Map<String, dynamic>>> _queryLists() => _crdt.watch('''
+  Stream<List<Map<String, dynamic>>> _queryLists() => _crdt.watch(
+    '''
         SELECT id, name, color, creator_id, lists.created_at, position, item_count, done_count, member_count FROM user_lists
         JOIN lists
           ON user_lists.user_id = ?1
           AND user_lists.list_id = id
         LEFT JOIN (
           SELECT list_id, count(*) AS item_count, sum(done) AS done_count
-          FROM todos WHERE is_deleted = 0 GROUP BY list_id
+          FROM todos GROUP BY list_id
         ) items ON items.list_id = id
         JOIN (
           SELECT list_id, count(*) AS member_count
-          FROM user_lists WHERE is_deleted = 0 GROUP BY list_id
+          FROM user_lists GROUP BY list_id
         ) members ON members.list_id = id
-        WHERE user_lists.is_deleted = 0
         ORDER BY position
-      ''', () => [userId]);
+      ''',
+    [userId],
+  );
 
   Stream<ToDoListWithItems> getList(String listId) => lists
       .map((e) => e.firstWhere((e) => e.id == listId))
@@ -104,23 +93,12 @@ class ListProvider {
   /// Does not actually delete the list, since it could be used by others
   Future<void> removeList(String listId) => removeUser(userId, listId);
 
-  Future<void> removeUser(String userId, String listId) => _crdt.execute(
-    '''
-    UPDATE user_lists SET is_deleted = 1
-    WHERE user_id = ?1 AND list_id = ?2
-  ''',
-    [userId, listId],
-  );
-
-  Future<void> undoRemoveList(String listId) => undoRemoveUser(userId, listId);
-
-  Future<void> undoRemoveUser(String userId, String listId) => _crdt.execute(
-    '''
-    UPDATE user_lists SET is_deleted = 0
-    WHERE user_id = ?1 AND list_id = ?2
-  ''',
-    [userId, listId],
-  );
+  Future<void> removeUser(String userId, String listId) async {
+    await _crdt.execute(
+      'DELETE FROM user_lists WHERE user_id = ?1 AND list_id = ?2',
+      [userId, listId],
+    );
+  }
 
   Future<void> deleteItems(Iterable<ToDo> todos) async {
     // Ensure all items belong to the same list
@@ -140,24 +118,17 @@ class ListProvider {
 
   Future<void> undoDelete(String listId) async {
     final items = _undoItems[listId]!.removeLast();
-    final placeholders = List.generate(
-      items.length,
-      (i) => '?${i + 1}',
-    ).join(', ');
-    await _crdt.execute(
-      'UPDATE todos SET is_deleted = 0 WHERE id IN ($placeholders)',
-      items.map((e) => e.id).toList(),
-    );
+    await _createItems(items);
   }
 
   Future<void> setDone(String itemId, bool isDone) => _crdt.execute(
     '''
-    UPDATE todos SET
-      done = ?1,
-      done_at = ?2,
-      done_by = ?3
-    WHERE id = ?4
-  ''',
+      UPDATE todos SET
+        done = ?1,
+        done_at = ?2,
+        done_by = ?3
+      WHERE id = ?4
+    ''',
     [
       isDone.toInt,
       isDone ? DateTime.now().toUtcString : null,
@@ -168,25 +139,25 @@ class ListProvider {
 
   Future<void> setItemName(String itemId, String name) => _crdt.execute(
     '''
-    UPDATE todos SET name = ?1
-    WHERE id = ?2
-  ''',
+      UPDATE todos SET name = ?1
+      WHERE id = ?2
+    ''',
     [name.trim(), itemId],
   );
 
   void setName(String listId, String name) => _crdt.execute(
     '''
-    UPDATE lists SET name = ?1
-    WHERE id = ?2
-  ''',
+      UPDATE lists SET name = ?1
+      WHERE id = ?2
+    ''',
     [name.trim(), listId],
   );
 
   void setColor(String listId, Color color) => _crdt.execute(
     '''
-    UPDATE lists SET color = ?1
-    WHERE id = ?2
-  ''',
+      UPDATE lists SET color = ?1
+      WHERE id = ?2
+    ''',
     [color.hexValue, listId],
   );
 
@@ -194,10 +165,7 @@ class ListProvider {
     final id = uuid();
     final maxPosition =
         (await _crdt.query(
-              '''
-                SELECT max(position) AS max_position FROM todos
-                WHERE list_id = ? AND is_deleted = 0
-              ''',
+              'SELECT max(position) AS max_position FROM todos WHERE list_id = ?1',
               [listId],
             )).first['max_position']
             as int? ??
@@ -251,9 +219,9 @@ class ListProvider {
         if (list.position != i) {
           await txn.execute(
             '''
-            UPDATE user_lists SET position = ?1
-            WHERE user_id = ?2 AND list_id = ?3
-          ''',
+              UPDATE user_lists SET position = ?1
+              WHERE user_id = ?2 AND list_id = ?3
+            ''',
             [i, userId, list.id],
           );
         }
@@ -268,9 +236,9 @@ class ListProvider {
         if (item.position != i) {
           await txn.execute(
             '''
-            UPDATE todos SET position = ?1
-            WHERE id = ?2
-          ''',
+              UPDATE todos SET position = ?1
+              WHERE id = ?2
+            ''',
             [i, item.id],
           );
         }
@@ -278,17 +246,16 @@ class ListProvider {
     });
   }
 
-  Future<List<Member>> _getMembers(String listId) => _crdt
-      .query(
+  Stream<List<Member>> getMembers(String listId) => _crdt
+      .watch(
         '''
         SELECT user_id AS id, name, user_lists.created_at AS joined_at FROM user_lists
           LEFT JOIN users ON user_id = id
         WHERE list_id = ?1
-          AND user_lists.is_deleted = 0 AND coalesce(users.is_deleted, 0) = 0
       ''',
         [listId],
       )
-      .then((l) => l.map((m) => Member.fromMap(userId, m)).toList());
+      .map((l) => l.map((m) => Member.fromMap(userId, m)).toList());
 
   Future<List<ToDo>> _getToDos(String listId) => _crdt
       .query(
@@ -313,7 +280,6 @@ class ListProvider {
       users AS created_users ON creator_id = created_users.id
     WHERE
       list_id = ?1
-      AND todos.is_deleted = 0
     ORDER BY
       position
   ''',
@@ -335,11 +301,10 @@ class ToDoListWithItems extends ToDoList {
         list.position,
         list.itemCount,
         list.doneCount,
-        list.members,
+        list.memberCount,
       );
 
-  ToDoListWithItems.fromMap(super.map, super.members, this.items)
-    : super.fromMap();
+  ToDoListWithItems.fromMap(super.map, this.items) : super.fromMap();
 }
 
 class ToDoList extends IdObject {
@@ -350,13 +315,13 @@ class ToDoList extends IdObject {
   final int position;
   final int itemCount;
   final int doneCount;
-  final List<Member> members;
+  final int memberCount;
 
-  int get shareCount => members.length;
-
-  bool get isShared => shareCount > 1;
-
+  bool get isShared => memberCount > 1;
   bool get isEmpty => itemCount == 0;
+
+  /// Convenience method to get list members
+  Stream<List<Member>> get members => Registry.listProvider.getMembers(id);
 
   const ToDoList(
     super.id,
@@ -367,10 +332,10 @@ class ToDoList extends IdObject {
     this.position,
     this.itemCount,
     this.doneCount,
-    this.members,
+    this.memberCount,
   );
 
-  ToDoList.fromMap(Map<String, dynamic> map, List<Member> members)
+  ToDoList.fromMap(Map<String, dynamic> map)
     : this(
         map['id'],
         map['name'],
@@ -380,12 +345,8 @@ class ToDoList extends IdObject {
         map['position'],
         map['item_count'] ?? 0,
         map['done_count'] ?? 0,
-        members,
+        map['member_count'] ?? 0,
       );
-
-  String memberNames(BuildContext context) => shareCount < 4
-      ? members.map((e) => e.nameOr(context)).join(' • ')
-      : context.t.memberCount(shareCount);
 
   @override
   String toString() => '$name [$doneCount/$itemCount]';
@@ -456,4 +417,9 @@ class Member extends User {
   Member.fromMap(super.userId, super.map)
     : joinedAt = (map['joined_at'] as String?)?.asDateTime.toLocal(),
       super.fromMap();
+}
+
+extension MembersX on List<Member> {
+  String toNames(BuildContext context) =>
+      map((e) => e.nameOr(context)).join(' • ');
 }

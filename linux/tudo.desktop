@@ -1,6 +1,6 @@
 [Desktop Entry]
 Type=Application
-Name=tudo
+Name=Tudo
 Icon=tudo
 Exec=/bin/sh -c "$HOME/.local/share/tudo/tudo"
 Comment=To-do lists
