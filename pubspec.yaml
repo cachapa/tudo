@@ -38,7 +38,8 @@ dependencies:
   sqlite3_flutter_libs: ^0.6.0+eol
 
   animated_list_plus: ^0.5.2
-  clipboard: ^3.0.14
+  clipboard: #^3.0.14
+    git: https://github.com/flipeip/flutter_clipboard.git
   device_info_plus: ^12.3.0
   mobile_scanner: ^7.2.0
   flutter_svg: ^2.2.4

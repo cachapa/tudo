@@ -30,22 +30,21 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "net.cachapa.tudo"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdk flutter.compileSdkVersion
     ndkVersion flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
 
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
-
+//    sourceSets {
+//        main.java.srcDirs += 'src/main/kotlin'
+//    }
 
     defaultConfig {
         applicationId "net.cachapa.tudo"
@@ -76,7 +75,6 @@ android {
 
         release {
             signingConfig signingConfigs.release
-
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile(
