@@ -117,6 +117,7 @@ class ListProvider {
   bool hasUndoItems(String listId) => _undoItems[listId]?.isNotEmpty ?? false;
 
   Future<void> undoDelete(String listId) async {
+    if (!hasUndoItems(listId)) return;
     final items = _undoItems[listId]!.removeLast();
     await _createItems(items);
   }
@@ -176,9 +177,9 @@ class ListProvider {
         listId,
         name.trim(),
         false,
-        null,
-        null,
-        null,
+        // null,
+        // null,
+        // null,
         maxPosition + 1,
         userId,
         null,
@@ -201,8 +202,8 @@ class ListProvider {
             item.listId,
             item.name,
             item.done ? 1 : 0,
-            item.doneAt?.toUtcString,
-            item.doneBy,
+            // item.doneAt?.toUtcString,
+            // item.doneBy,
             item.position,
             item.creatorId,
             item.createdAt?.toUtcString,
@@ -318,6 +319,7 @@ class ToDoList extends IdObject {
   final int memberCount;
 
   bool get isShared => memberCount > 1;
+
   bool get isEmpty => itemCount == 0;
 
   /// Convenience method to get list members
@@ -341,7 +343,7 @@ class ToDoList extends IdObject {
         map['name'],
         (map['color'] as String).asColor,
         map['creator_id'],
-        (map['created_at'] as String?)?.asDateTime,
+        tryParseDateTime(map['created_at']),
         map['position'],
         map['item_count'] ?? 0,
         map['done_count'] ?? 0,
@@ -356,9 +358,9 @@ class ToDo extends IdObject {
   final String listId;
   final String name;
   final bool done;
-  final DateTime? doneAt;
-  final String? doneBy;
-  final String? doneName;
+  // final DateTime? doneAt;
+  // final String? doneBy;
+  // final String? doneName;
   final int position;
   final String? creatorId;
   final String? creatorName;
@@ -369,32 +371,33 @@ class ToDo extends IdObject {
     this.listId,
     this.name,
     this.done,
-    this.doneAt,
-    this.doneBy,
-    this.doneName,
+    // this.doneAt,
+    // this.doneBy,
+    // this.doneName,
     this.position,
     this.creatorId,
     this.creatorName,
     this.createdAt,
-  ) : assert(
-        (doneAt == null) == (doneBy == null),
-        '$id doneAt $doneAt doneBy $doneBy',
-      ),
-      assert((doneAt != null) == done),
-      assert((doneBy != null) == done);
+  );
+  // : assert(
+  //   (doneAt == null) == (doneBy == null),
+  //   '$id doneAt $doneAt doneBy $doneBy',
+  // ),
+  // assert((doneAt != null) == done),
+  // assert((doneBy != null) == done);
 
   factory ToDo.fromMap(Map<String, dynamic> map) => ToDo(
     map['id'],
     map['list_id'],
     map['name'],
     map['done'] == 1,
-    (map['done_at'] as String?)?.asDateTime.toLocal(),
-    map['done_by'],
-    map['done_name'],
-    map['position'],
+    // tryParseDateTime(map['done_at']),
+    // map['done_by'],
+    // map['done_name'],
+    map['position'] is int ? map['position'] : 0,
     map['creator_id'],
     map['creator_name'],
-    (map['created_at'] as String?)?.asDateTime.toLocal(),
+    tryParseDateTime(map['created_at']),
   );
 
   @override
@@ -415,11 +418,18 @@ class Member extends User {
   final DateTime? joinedAt;
 
   Member.fromMap(super.userId, super.map)
-    : joinedAt = (map['joined_at'] as String?)?.asDateTime.toLocal(),
+    : joinedAt = tryParseDateTime(map['joined_at']),
       super.fromMap();
 }
 
 extension MembersX on List<Member> {
   String toNames(BuildContext context) =>
       map((e) => e.nameOr(context)).join(' • ');
+}
+
+DateTime? tryParseDateTime(Object value) {
+  print('--- $value ${value.runtimeType} ---');
+  print('--- ${value is String} ---');
+  print('--- ${DateTime.tryParse(value as String)} ---');
+  return value is String ? DateTime.tryParse(value)?.toLocal() : null;
 }

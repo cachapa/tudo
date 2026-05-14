@@ -22,7 +22,7 @@ class BuildInfo {
   static bool get isDebug => _p.buildMode.debug;
 
   static String get userAgent =>
-      'tudo/$version $platform/$platformVersion ($deviceModel)';
+      'Tudo/$version $platform/$platformVersion ($deviceModel)';
 
   BuildInfo._();
 

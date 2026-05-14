@@ -19,8 +19,6 @@ extension StringX on String {
     if (!kReleaseMode) print(this);
   }
 
-  DateTime get asDateTime => DateTime.parse(this);
-
   Color get asColor =>
       Color(int.parse(replaceFirst('#', ''), radix: 16) + 0xFF000000);
 }

@@ -23,7 +23,7 @@ jobs:
           cache: true
 
       - name: Install dev tools
-        run: sudo apt-get install ninja-build build-essential libgtk-3-0 libgtk-3-dev libblkid1 liblzma5
+        run: sudo apt-get install curl git unzip xz-utils zip libglu1-mesa
 
       - name: Build app
         run: |
